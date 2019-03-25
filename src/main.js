@@ -7,7 +7,6 @@ import MobileLogin from './views/mobile/Login';
 import MobileServiceFee from './views/mobile/ServiceFee';
 import MobileReceiptPlan from './views/mobile/ReceiptPlan';
 import MobileForms from './views/mobile/Forms';
-import userInfo from './store/userInfo';
 import './assets/styles.css';
 
 Vue.config.productionTip = false;

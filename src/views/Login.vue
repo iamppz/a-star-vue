@@ -1,7 +1,7 @@
 <template>
     <el-container>
         <el-header>
-            <h1>Test</h1>
+            <h1>Joyce</h1>
         </el-header>
         <el-main>
             <el-row type="flex" class="row-bg" justify="center" align="middle">
@@ -34,8 +34,8 @@
         data: function () {
             return {
                 form: {
-                    account: '张敬轩',
-                    password: '000000'
+                    account: 'joyce',
+                    password: '00000000'
                 },
                 rules: {
                     account: [
@@ -50,15 +50,14 @@
         },
         methods: {
             login: async function () {
-                this.$refs['form'].validate((valid) => {
+                this.$refs['form'].validate(async (valid) => {
                     if (valid) {
-                        alert('submit!');
+                        await loginService.login(this.form.account, this.form.password);
                     } else {
                         alert('error submit!!');
                         return false;
                     }
                 });
-                // await loginService.login(this.enterprise, this.account, this.password);
             }
         }
     };

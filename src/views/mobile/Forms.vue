@@ -50,7 +50,6 @@
     import formsService from "../../service/formsService";
     import moment from "moment";
     import * as $ from "lodash";
-    import {API_URL} from "../../common/config";
 
     export default {
         data: function () {
@@ -82,7 +81,7 @@
                 return this.$store.getters.getUserId;
             },
             avatarUrl() {
-                return API_URL + "/oa/common/attachment/showImage?id=";
+                return "/oa/common/attachment/showImage?id=";
             }
         },
         created: async function () {

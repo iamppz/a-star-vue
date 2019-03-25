@@ -148,7 +148,6 @@
     import userInfo from '../../store/userInfo';
     import serviceFeeService from "../../service/serviceFeeService";
     import moment from "moment";
-    import {API_URL} from "../../common/config";
 
     export default {
         data: function () {
@@ -178,7 +177,7 @@
                 return this.$store.getters.getUserId;
             },
             avatarUrl() {
-                return API_URL + "/oa/common/attachment/showImage?id=";
+                return "/oa/common/attachment/showImage?id=";
             }
         },
         created: function () {
