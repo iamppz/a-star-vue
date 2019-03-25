@@ -45,14 +45,12 @@
 
 <script>
     import {Button, List, Panel, PullRefresh, Search, Tab, Tabs, Toast} from 'vant';
-    import userInfo from '../store/userInfo';
+    import userInfo from '../../store/userInfo';
 
-    import formsService from "../service/formsService";
+    import formsService from "../../service/formsService";
     import moment from "moment";
-    import {formatMoney} from "../utils/money";
-    import {formatDictionary} from "../utils/dictionary";
     import * as $ from "lodash";
-    import {API_URL} from "../common/config";
+    import {API_URL} from "../../common/config";
 
     export default {
         data: function () {
@@ -118,17 +116,13 @@
                         case "order":
                         case "receipt":
                         case "contract":
-                            form.amount = formatMoney(form.amount);
                             break;
                         case "workorder":
-                            form.amount = formatMoney(form.balance);
                             break;
                         default:
-                            form.amount = formatMoney("");
                     }
 
                 });
-                formatDictionary(resp.data.Data.data, resp.data.Data.dictionary);
                 this.loading = false;
                 this.refreshing = false;
                 this.list = [...this.list, ...resp.data.Data.data];

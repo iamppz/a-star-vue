@@ -22,7 +22,7 @@ module.exports = {
           pxtorem({
             rootValue: 37.5,
             propList: ['*'],
-            selectorBlackList: ['van-']
+            selectorBlackList: ['van-', 'el-']
           })
         ]
       }

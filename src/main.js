@@ -1,22 +1,25 @@
 import Vue from 'vue/dist/vue.js';
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 import VueRouter from 'vue-router';
 import Login from './views/Login';
-import ServiceFee from './views/ServiceFee';
-import ReceiptPlan from './views/ReceiptPlan';
-import Forms from './views/Forms';
-import TableGrid from "./components/TableGrid";
+import MobileLogin from './views/mobile/Login';
+import MobileServiceFee from './views/mobile/ServiceFee';
+import MobileReceiptPlan from './views/mobile/ReceiptPlan';
+import MobileForms from './views/mobile/Forms';
 import userInfo from './store/userInfo';
 import './assets/styles.css';
 
 Vue.config.productionTip = false;
 Vue.use(VueRouter);
+Vue.use(ElementUI);
 
 const routes = [
+    {path: '/mobile/login', component: MobileLogin},
     {path: '/login', component: Login},
-    {path: '/serviceFee', component: ServiceFee},
-    {path: '/receiptPlan', component: ReceiptPlan},
-    {path: '/forms/:id', component: Forms},
-    {path: '/tg', component: TableGrid}
+    {path: '/mobile/serviceFee', component: MobileServiceFee},
+    {path: '/mobile/receiptPlan', component: MobileReceiptPlan},
+    {path: '/mobile/forms/:id', component: MobileForms}
 ];
 
 const router = new VueRouter({
@@ -28,6 +31,6 @@ new Vue({
     data: {},
     router,
     mounted() {
-        userInfo.commit('init');
+        // userInfo.commit('init');
     }
 });
