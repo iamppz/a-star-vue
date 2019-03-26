@@ -1,22 +1,22 @@
 import Vue from 'vue/dist/vue.js';
 import Vuex from 'vuex';
-import instance from '../utils/axios';
 
 Vue.use(Vuex);
 
 const userInfo = new Vuex.Store({
     state: {
-        userId: null
+        isLoggedIn: false
     },
     mutations: {
-        init(state) {
-            instance.get('/crm/user/').then((resp) => {
-                state.userId = resp.data.Data.userId;
-            });
+        login(state) {
+            state.isLoggedIn = true;
+        },
+        logout(state) {
+            state.isLoggedIn = false;
         }
     },
     getters: {
-        getUserId: state => state.userId
+        getIsLoggedIn: state => state.isLoggedIn
     }
 });
 export default userInfo;
