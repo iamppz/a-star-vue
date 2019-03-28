@@ -8,7 +8,7 @@
                 </p>
             </el-header>
             <el-container>
-                <el-aside>
+                <el-aside v-if="showNav">
                     <el-menu default-active="2" id="menu">
                         <el-submenu index="1">
                             <template slot="title">
@@ -78,16 +78,23 @@
         methods: {
             autoSetNavHeight() {
                 const menu = document.getElementById('menu');
-                menu.style.height = 'auto';
-                const clientHeight = document.body.clientHeight - 60;
-                const menuHeight = menu.offsetHeight;
-                if (menuHeight < clientHeight) {
-                    menu.style.height = `${clientHeight}px`;
+                if (menu) {
+                    menu.style.height = 'auto';
+                    const clientHeight = document.body.clientHeight - 60;
+                    const menuHeight = menu.offsetHeight;
+                    if (menuHeight < clientHeight) {
+                        menu.style.height = `${clientHeight}px`;
+                    }
                 }
             }
         },
         mounted() {
             this.autoSetNavHeight();
+        },
+        computed: {
+            showNav() {
+                return this.$store.getters.getIsLoggedIn;
+            }
         }
     };
 </script>
