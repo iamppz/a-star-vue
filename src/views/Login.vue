@@ -24,6 +24,7 @@
     import loginService from "../service/loginService";
     import {Message} from 'element-ui';
     import userInfo from "../store/userInfo";
+    import router from '../utils/router';
 
     export default {
         data: function () {
@@ -65,7 +66,12 @@
                 });
             }
         },
-        store: userInfo
+        store: userInfo,
+        mounted() {
+            if (this.$store.getters.getIsLoggedIn) {
+                router.push('/home');
+            }
+        }
     };
 </script>
 <style scoped>
