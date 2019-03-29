@@ -7,7 +7,7 @@ Vue.use(Vuex);
 const userInfo = new Vuex.Store({
     state: {
         isLoggedIn: false,
-        token: null
+        navs: []
     },
     mutations: {
         login(state) {
@@ -15,10 +15,14 @@ const userInfo = new Vuex.Store({
         },
         logout(state) {
             state.isLoggedIn = false;
+        },
+        setNavs(state, navs) {
+            state.navs = navs;
         }
     },
     getters: {
-        getIsLoggedIn: state => state.isLoggedIn
+        getIsLoggedIn: state => state.isLoggedIn,
+        getNavs: state => state.navs
     },
     plugins: [
         createPersistedState()

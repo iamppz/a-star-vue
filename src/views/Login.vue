@@ -25,6 +25,7 @@
     import {Message} from 'element-ui';
     import userInfo from "../store/userInfo";
     import router from '../utils/router';
+    import navService from "../service/navService";
 
     export default {
         data: function () {
@@ -48,21 +49,26 @@
         methods: {
             login: async function () {
                 this.$refs['form'].validate(async (valid) => {
-                    if (valid) {
-                        this.submitting = true;
-                        let resp = await loginService.login(this.form.account, this.form.password);
-                        if (resp.data.success) {
-                            userInfo.commit('login');
-                            Message.success(resp.data.message);
-                            this.$router.push('/home');
-                        } else {
-                            Message.error(resp.data.message);
-                        }
-                        this.submitting = false;
-                    } else {
+                    if (!valid) {
                         alert('error submit!!');
                         return false;
                     }
+
+                    this.submitting = true;
+                    let resp = await loginService.login(this.form.account, this.form.password);
+                    this.submitting = false;
+                    if (!resp.data.success) {
+                        Message.error(resp.data.message);
+                        return;
+                    }
+
+                    Message.success(resp.data.message);
+                    let navResp = await navService.getNavs();
+                    if (navResp.data.success) {
+                        userInfo.commit('setNavs', navResp.data.data);
+                    }
+                    userInfo.commit('login');
+                    this.$router.push('/home');
                 });
             }
         },
