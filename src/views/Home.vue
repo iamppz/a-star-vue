@@ -1,6 +1,6 @@
 <template>
     <p>
-        123
+        Hello!
     </p>
 </template>
 <script>
