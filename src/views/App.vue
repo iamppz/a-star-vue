@@ -51,23 +51,8 @@
     </div>
 </template>
 <script>
-    import Vue from 'vue/dist/vue.js';
-    import Home from "./Home";
-    import Login from "./Login";
-    import VueRouter from 'vue-router';
     import userInfo from "../store/userInfo";
-
-    Vue.use(VueRouter);
-
-    const routes = [
-        {path: '/', component: Login},
-        {path: '/login', component: Login},
-        {path: '/home', component: Home}
-    ];
-
-    const router = new VueRouter({
-        routes
-    });
+    import router from "../utils/router";
 
     export default {
         data: function () {
