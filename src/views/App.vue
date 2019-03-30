@@ -14,14 +14,17 @@
             </el-header>
             <el-container>
                 <el-aside v-show="isLoggedIn">
-                    <el-menu default-active="2-1" id="menu">
+                    <el-menu :default-active="this.$route.path" id="menu" router>
                         <template v-for="nav in this.navs">
+                            <el-menu-item index="/home">
+                                首页
+                            </el-menu-item>
                             <el-submenu :index="nav.id" :key="nav.id">
                                 <template slot="title">
                                     <span>{{nav.name}}</span>
                                 </template>
                                 <el-menu-item v-for="subNav in nav.navs" :key="subNav.id"
-                                              :index="nav.id + '-' + subNav.id">
+                                              :index="subNav.path">
                                     {{subNav.name}}
                                 </el-menu-item>
                             </el-submenu>
@@ -60,10 +63,10 @@
             }
         },
         mounted() {
+            this.autoSetNavHeight();
             if (!this.isLoggedIn) {
                 router.push('/login');
             }
-            this.autoSetNavHeight();
         },
         computed: {
             isLoggedIn() {
