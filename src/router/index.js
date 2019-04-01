@@ -15,8 +15,7 @@ const routes = [
     {path: '/user', component: User}
 ];
 
-const router = new VueRouter({
+let router = new VueRouter({
     routes
 });
-
 export default router;

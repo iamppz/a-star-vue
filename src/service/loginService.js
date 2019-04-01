@@ -1,4 +1,4 @@
-import instance from '../utils/axios';
+import instance from '../utils/instance';
 
 class LoginService {
     async login(account, password) {

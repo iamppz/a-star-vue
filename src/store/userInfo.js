@@ -6,8 +6,7 @@ Vue.use(Vuex);
 
 const userInfo = new Vuex.Store({
     state: {
-        isLoggedIn: false,
-        navs: []
+        isLoggedIn: false
     },
     mutations: {
         login(state) {

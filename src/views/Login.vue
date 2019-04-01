@@ -24,8 +24,7 @@
     import loginService from "../service/loginService";
     import {Message} from 'element-ui';
     import userInfo from "../store/userInfo";
-    import router from '../utils/router';
-    import navService from "../service/navService";
+    import router from '../router';
 
     export default {
         data: function () {
@@ -63,10 +62,6 @@
                     }
 
                     Message.success(resp.data.message);
-                    let navResp = await navService.getNavs();
-                    if (navResp.data.success) {
-                        userInfo.commit('setNavs', navResp.data.data);
-                    }
                     userInfo.commit('login');
                     this.$router.push('/home');
                 });

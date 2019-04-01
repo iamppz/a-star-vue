@@ -1,7 +1,8 @@
-import router from './router';
+import axios from 'axios';
+import qs from 'qs';
+import userInfo from '../store/userInfo';
 
-const axios = require('axios');
-const qs = require('qs');
+import router from '../router';
 
 const instance = axios.create({
     transformRequest: [function (data) {
@@ -30,10 +31,12 @@ instance.interceptors.response.use(response => {
         if (error.response) {
             switch (error.response.status) {
                 case 401:
+                    userInfo.commit('logout');
+                    localStorage.token = null;
                     router.replace({
-                        path: 'login',
+                        path: '/login',
                         query: {redirect: router.currentRoute.fullPath}
-                    })
+                    });
             }
         }
         return Promise.reject(error);

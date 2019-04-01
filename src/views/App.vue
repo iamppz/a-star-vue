@@ -15,11 +15,11 @@
             <el-container>
                 <el-aside v-show="isLoggedIn">
                     <el-menu :default-active="this.$route.path" id="menu" router>
+                        <el-menu-item index="/home">
+                            首页
+                        </el-menu-item>
                         <template v-for="nav in this.navs">
-                            <el-menu-item index="/home">
-                                首页
-                            </el-menu-item>
-                            <el-submenu :index="nav.id" :key="nav.id">
+                            <el-submenu :index="nav.name" :key="nav.id">
                                 <template slot="title">
                                     <span>{{nav.name}}</span>
                                 </template>
@@ -39,12 +39,15 @@
     </div>
 </template>
 <script>
+    import router from "../router";
+    import navService from '../service/navService';
     import userInfo from "../store/userInfo";
-    import router from "../utils/router";
 
     export default {
         data: function () {
-            return {}
+            return {
+                navs: []
+            }
         },
         router,
         store: userInfo,
@@ -62,18 +65,20 @@
                 router.push('/login');
             }
         },
-        mounted() {
+        async mounted() {
             this.autoSetNavHeight();
             if (!this.isLoggedIn) {
                 router.push('/login');
+            }
+
+            let navResp = await navService.getNavs();
+            if (navResp.data.success) {
+                this.navs = navResp.data.data;
             }
         },
         computed: {
             isLoggedIn() {
                 return this.$store.getters.getIsLoggedIn;
-            },
-            navs() {
-                return this.$store.getters.getNavs;
             }
         }
     };
