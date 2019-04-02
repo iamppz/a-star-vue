@@ -1,6 +1,5 @@
 import axios from 'axios';
 import qs from 'qs';
-import userInfo from '../store/userInfo';
 
 import router from '../router';
 
@@ -31,7 +30,6 @@ instance.interceptors.response.use(response => {
         if (error.response) {
             switch (error.response.status) {
                 case 401:
-                    userInfo.commit('logout');
                     localStorage.token = null;
                     router.replace({
                         path: '/login',
