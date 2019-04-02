@@ -3,18 +3,14 @@
         <el-col :span="6">
             <el-input placeholder="输入关键字进行过滤" v-model="filterText">
             </el-input>
-            <el-tree class="filter-tree" :data="department" :props="defaultProps" default-expand-all
-                     :filter-node-method="filterNode" ref="tree2">
+            <el-tree :data="department" :props="defaultProps" default-expand-all node-key="id"
+                     :filter-node-method="filterTreeNode" ref="tree2" @node-click="handleClickTreeNode">
             </el-tree>
         </el-col>
         <el-col :span="18">
             <el-table :data="tableData" style="width: 100%">
-                <el-table-column fixed prop="date" label="日期" width="150"></el-table-column>
                 <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-                <el-table-column prop="province" label="省份" width="120"></el-table-column>
-                <el-table-column prop="city" label="市区" width="120"></el-table-column>
-                <el-table-column prop="address" label="地址" width="300"></el-table-column>
-                <el-table-column prop="zip" label="邮编" width="120"></el-table-column>
+                <el-table-column prop="createdAt" label="创建时间" width="240"></el-table-column>
                 <el-table-column fixed="right" label="操作" width="100">
                     <template slot-scope="scope">
                         <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
@@ -25,17 +21,18 @@
             <el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
-                    :current-page="currentPage4"
-                    :page-sizes="[100, 200, 300, 400]"
-                    :page-size="100"
+                    :current-page="currentPage"
+                    :page-sizes="[10, 20, 30, 40]"
+                    :page-size="10"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total="400">
+                    :total="total">
             </el-pagination>
         </el-col>
     </el-row>
 </template>
 <script>
     import departmentService from "../service/departmentService";
+    import userService from "../service/userService";
 
     export default {
         watch: {
@@ -45,9 +42,9 @@
         },
 
         methods: {
-            filterNode(value, data) {
+            filterTreeNode(value, data) {
                 if (!value) return true;
-                return data.label.indexOf(value) !== -1;
+                return data.name.indexOf(value) !== -1;
             },
             handleClick() {
             },
@@ -56,24 +53,25 @@
             },
             handleSizeChange() {
 
+            },
+            async handleClickTreeNode(department) {
+                let resp = await userService.get(department.id, this.currentPage);
+                if (resp.data.success) {
+                    this.tableData = resp.data.data.records;
+                    this.total = resp.data.data.total;
+                }
             }
         },
         data() {
             return {
                 filterText: '',
-                currentPage4: 0,
+                currentPage: 1,
+                total: 0,
                 defaultProps: {
                     children: 'children',
                     label: 'name'
                 },
-                tableData: [{
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    province: '上海',
-                    city: '普陀区',
-                    address: '上海市普陀区金沙江路 1518 弄',
-                    zip: 200333
-                }],
+                tableData: [],
                 department: []
             };
         },
@@ -81,6 +79,7 @@
             let resp = await departmentService.get();
             if (resp.data.success) {
                 this.department = [resp.data.data];
+                this.handleClickTreeNode(resp.data.data)
             }
         }
     };
