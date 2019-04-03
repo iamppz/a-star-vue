@@ -33,6 +33,7 @@
 <script>
     import departmentService from "../service/departmentService";
     import userService from "../service/userService";
+    import {Loading} from 'element-ui';
 
     export default {
         watch: {
@@ -55,7 +56,9 @@
 
             },
             async handleClickTreeNode(department) {
+                let loading = Loading.service({});
                 let resp = await userService.get(department.id, this.currentPage);
+                loading.close();
                 if (resp.data.success) {
                     this.tableData = resp.data.data.records;
                     this.total = resp.data.data.total;
