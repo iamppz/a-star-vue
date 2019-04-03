@@ -8,7 +8,7 @@
             </el-tree>
         </el-col>
         <el-col :span="18">
-            <el-table :data="tableData" style="width: 100%">
+            <el-table :data="tableData" style="width: 100%" ref="table">
                 <el-table-column prop="name" label="姓名" width="120"></el-table-column>
                 <el-table-column prop="createdAt" label="创建时间" width="240"></el-table-column>
                 <el-table-column fixed="right" label="操作" width="100">
@@ -56,7 +56,8 @@
 
             },
             async handleClickTreeNode(department) {
-                let loading = Loading.service({});
+                let options = {target: this.$refs.table.$el};
+                let loading = Loading.service(options);
                 let resp = await userService.get(department.id, this.currentPage);
                 loading.close();
                 if (resp.data.success) {
