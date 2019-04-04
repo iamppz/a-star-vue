@@ -9,11 +9,11 @@
                 </el-tree>
             </el-col>
             <el-col :span="18">
-                <el-table :data="formattedTableData" style="width: 100%" ref="table" size="small">
+                <el-table :data="formattedTableData" style="width: 100%" ref="table" border>
                     <el-table-column prop="name" label="姓名" width="120"></el-table-column>
                     <el-table-column prop="departmentName" label="部门" width="120"></el-table-column>
                     <el-table-column prop="createdAt" label="创建时间" width="240"></el-table-column>
-                    <el-table-column fixed="right" label="操作" width="100">
+                    <el-table-column label="操作">
                         <template slot-scope="scope">
                             <el-button @click="handleClickEdit(scope.row)" type="text" size="small">编辑</el-button>
                             <el-button v-if="scope.row.disabled" @click="handleClickEnable(scope.row)" type="text"
