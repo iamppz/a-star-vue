@@ -4,7 +4,7 @@
             <div>
                 <p class="inno-title">
                     <img src="../assets/inno.jpg" alt="logo" class="inno-logo">
-                    Joyce Innovations
+                    Joyce
                 </p>
             </div>
         </el-header>

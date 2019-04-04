@@ -1,15 +1,20 @@
 <template>
     <div>
-        <el-row :gutter="20">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/app/home' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>系统设置</el-breadcrumb-item>
+            <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+        </el-breadcrumb>
+        <el-row :gutter="20" id="row">
             <el-col :span="6">
                 <el-input placeholder="输入关键字进行过滤" v-model="filterText">
                 </el-input>
-                <el-tree :data="department" :props="defaultProps" default-expand-all node-key="id"
+                <el-tree :data="department" :props="defaultProps" default-expand-all node-key="id" id="tree"
                          :filter-node-method="filterTreeNode" ref="tree" @node-click="handleClickTreeNode">
                 </el-tree>
             </el-col>
             <el-col :span="18">
-                <el-table :data="formattedTableData" style="width: 100%" ref="table" border>
+                <el-table :data="formattedTableData" style="width: 100%" ref="table" border stripe>
                     <el-table-column prop="name" label="姓名" width="120"></el-table-column>
                     <el-table-column prop="departmentName" label="部门" width="120"></el-table-column>
                     <el-table-column prop="createdAt" label="创建时间" width="240"></el-table-column>
@@ -27,11 +32,14 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" id="pager"
                                :current-page="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="10"
                                layout="total, sizes, prev, pager, next, jumper" :total="total">
                 </el-pagination>
-                <el-button type="primary" icon="el-icon-search" @click="handleClickCreate" size="small">新建</el-button>
+                <div id="toolbar">
+                    <el-button type="primary" icon="el-icon-search" @click="handleClickCreate" size="small">新建
+                    </el-button>
+                </div>
             </el-col>
         </el-row>
         <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="30%">
@@ -172,4 +180,11 @@
     };
 </script>
 <style scoped>
+    #tree, #pager, #toolbar {
+        margin-top: 20px;
+    }
+
+    #row {
+        margin-top: 40px;
+    }
 </style>

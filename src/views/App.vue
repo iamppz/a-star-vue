@@ -3,20 +3,26 @@
         <el-header class="inno-header">
             <div>
                 <p class="inno-title">
-                    <img src="../assets/inno.jpg" alt="logo" class="inno-logo">
-                    Joyce Innovations
+                    Joyce
                 </p>
-                <p class="inno-logout">
-                    <a href="javascript:void(0)" @click="logout">注销</a>
-                </p>
+                <div>
+                    <el-dropdown @command="handleCommand">
+                        <span class="el-dropdown-link">
+                            <a href="javascript:void(0)">
+                                <span class="inno-avatar"></span>
+                            </a>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="logout">注销</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+
+                </div>
             </div>
         </el-header>
         <el-container>
             <el-aside>
                 <el-menu :default-active="this.$route.path" router id="menu">
-                    <el-menu-item index="/app/home">
-                        首页
-                    </el-menu-item>
                     <template v-for="nav in this.navs">
                         <el-submenu :index="nav.name" :key="nav.id">
                             <template slot="title">
@@ -58,6 +64,13 @@
             logout() {
                 localStorage.token = null;
                 this.$router.push('/login');
+            },
+            handleCommand(cmd) {
+                switch (cmd) {
+                    case 'logout':
+                        this.logout();
+                        break;
+                }
             }
         },
         async mounted() {
@@ -83,7 +96,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 10px;
+        padding: 0 20px;
     }
 
     .inno-title {
@@ -94,11 +107,13 @@
         line-height: 59px;
     }
 
-    .inno-logo {
-        height: 50px;
-    }
-
-    .inno-logout {
-
+    .inno-avatar {
+        border-radius: 50%;
+        border: 1px solid #e6e6e6;
+        width: 32px;
+        height: 32px;
+        background-size: 32px;
+        display: block;
+        background-image: url('../assets/inno.jpg');
     }
 </style>
