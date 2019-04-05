@@ -10,7 +10,7 @@
                 <el-table :data="roles" style="width: 100%" ref="table" border stripe>
                     <el-table-column prop="name" label="角色" width="150"></el-table-column>
                     <el-table-column prop="description" label="说明"></el-table-column>
-                    <el-table-column label="操作">
+                    <el-table-column label="操作" width="210">
                         <template slot-scope="scope">
                             <el-button @click="handleClickEdit(scope.row.id)" type="text"
                                        size="small" icon="el-icon-edit-outline">

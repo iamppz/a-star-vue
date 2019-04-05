@@ -17,6 +17,7 @@
                 <el-table :data="formattedTableData" style="width: 100%" ref="table" border stripe>
                     <el-table-column prop="name" label="姓名" width="120"></el-table-column>
                     <el-table-column prop="departmentName" label="部门" width="120"></el-table-column>
+                    <el-table-column prop="mobile" label="手机" width="160"></el-table-column>
                     <el-table-column prop="createdAt" label="创建时间" width="240"></el-table-column>
                     <el-table-column label="操作">
                         <template slot-scope="scope">
@@ -44,10 +45,15 @@
         </el-row>
         <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="30%">
             <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="用户名">
+                <el-form-item label="姓名">
                     <input type="hidden" v-model="form.id"/>
-                    <input type="hidden" v-model="form.departmentId"/>
                     <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="部门">
+                    <treeselect v-model="form.departmentId" :options="department" :normalizer="normalizer"></treeselect>
+                </el-form-item>
+                <el-form-item label="手机">
+                    <el-input v-model="form.mobile"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -63,8 +69,13 @@
     import userService from "../service/userService";
     import {Loading, Message} from 'element-ui';
     import moment from 'moment';
+    import Treeselect from '@riophae/vue-treeselect';
+    import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 
     export default {
+        components: {
+            Treeselect
+        },
         watch: {
             filterText(val) {
                 this.$refs.tree.filter(val);
@@ -83,11 +94,10 @@
                 if (!value) return true;
                 return data.name.indexOf(value) !== -1;
             },
-            handleClick() {
-            },
             handleClickEdit(row) {
                 this.form.id = row.id;
                 this.form.name = row.name;
+                this.form.mobile = row.mobile;
                 this.form.departmentId = row.departmentId;
                 this.dialogVisible = true;
             },
@@ -136,12 +146,6 @@
                     Message.error(resp.data.message);
                 }
             },
-            handleCurrentChange() {
-
-            },
-            handleSizeChange() {
-
-            },
             async handleClickTreeNode(department) {
                 this.currentDepartment = department;
                 let options = {target: this.$refs.table.$el};
@@ -152,6 +156,10 @@
                     this.tableData = resp.data.data.records;
                     this.total = resp.data.data.total;
                 }
+            },
+            handleSizeChange() {
+            },
+            handleCurrentChange() {
             }
         },
         data() {
@@ -166,8 +174,13 @@
                 tableData: [],
                 department: [],
                 dialogVisible: false,
-                form: {id: null, name: null, departmentId: null},
-                currentDepartment: null
+                form: {id: null, name: null, departmentId: null, mobile: null},
+                currentDepartment: null,
+                normalizer(node) {
+                    return {
+                        label: node.name
+                    }
+                }
             };
         },
         async mounted() {

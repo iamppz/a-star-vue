@@ -10,7 +10,7 @@ class UserService {
     }
 
     async update(form) {
-        return await instance.put(`/api/user/?name=${form.name}&userId=${form.id}`);
+        return await instance.put(`/api/user/?name=${form.name || ''}&userId=${form.id || ''}&mobile=${form.mobile || ''}&departmentId=${form.departmentId}`);
     }
 
     async enable(id) {
