@@ -32,14 +32,25 @@
                     </el-button>
                 </div>
                 <el-dialog title="设置权限" :visible.sync="dialogVisible" width="30%">
-                    <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
-                    <el-tree :data="permission" :props="defaultProps" default-expand-all node-key="id" show-checkbox
-                             ref="tree" :filter-node-method="filterTreeNode" id="tree">
-                    </el-tree>
-                    <span slot="footer" class="dialog-footer">
-                        <el-button @click="dialogVisible = false">取消</el-button>
-                        <el-button type="primary" @click="handleClickSave">确定</el-button>
-                    </span>
+                    <el-tabs :value="'permission'">
+                        <el-tab-pane label="权限" name="permission">
+                            <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+                            <el-tree :data="permission" :props="defaultProps" default-expand-all node-key="id"
+                                     show-checkbox
+                                     ref="tree" :filter-node-method="filterTreeNode" id="tree">
+                            </el-tree>
+                            <span slot="footer" class="dialog-footer">
+                                <el-button @click="dialogVisible = false">取消</el-button>
+                                <el-button type="primary" @click="handleClickSave">确定</el-button>
+                            </span>
+                        </el-tab-pane>
+                        <el-tab-pane label="菜单" name="nav">
+                            <el-tree :data="navs" :props="defaultProps" default-expand-all node-key="id"
+                                     show-checkbox ref="navTree" :filter-node-method="filterTreeNode" id="navTree">
+                            </el-tree>
+                        </el-tab-pane>
+                    </el-tabs>
+
                 </el-dialog>
                 <el-dialog :title="form.id > 0 ? '编辑角色' : '新建角色'" :visible.sync="roleDialogVisible" width="30%">
                     <el-form ref="form" :model="form" label-width="80px">
@@ -65,6 +76,7 @@
     import {Message, Loading} from 'element-ui';
     import roleService from "../service/roleService";
     import permissionService from "../service/permissionService";
+    import navService from "../service/navService";
 
     export default {
         watch: {
@@ -143,7 +155,8 @@
                     id: null,
                     name: null,
                     description: null
-                }
+                },
+                navs: []
             };
         },
         async mounted() {
@@ -152,11 +165,15 @@
             if (resp.data.success) {
                 this.permission = [resp.data.data];
             }
+            resp = await navService.getAll();
+            if (resp.data.success) {
+                this.navs = resp.data.data;
+            }
         }
     };
 </script>
 <style scoped>
-    #tree, #toolbar {
+    #toolbar {
         margin-top: 20px;
     }
 

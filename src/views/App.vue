@@ -28,7 +28,7 @@
                             <template slot="title">
                                 <span>{{nav.name}}</span>
                             </template>
-                            <el-menu-item v-for="subNav in nav.navs" :key="subNav.id"
+                            <el-menu-item v-for="subNav in nav.children" :key="subNav.id"
                                           :index="subNav.path">
                                 {{subNav.name}}
                             </el-menu-item>
@@ -75,7 +75,7 @@
         },
         async mounted() {
             this.autoSetNavHeight();
-            let resp = await navService.getNavs();
+            let resp = await navService.get();
             if (resp.data.success) {
                 this.navs = resp.data.data;
             }
