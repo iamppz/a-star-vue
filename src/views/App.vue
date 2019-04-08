@@ -2,9 +2,7 @@
     <el-container>
         <el-header class="inno-header">
             <div>
-                <p class="inno-title">
-                    Joyce
-                </p>
+                <p class="inno-title">Joyce</p>
                 <div>
                     <el-dropdown @command="handleCommand">
                         <span class="el-dropdown-link">
@@ -28,8 +26,7 @@
                             <template slot="title">
                                 <span>{{nav.name}}</span>
                             </template>
-                            <el-menu-item v-for="subNav in nav.children" :key="subNav.id"
-                                          :index="subNav.path">
+                            <el-menu-item v-for="subNav in nav.children" :key="subNav.id" :index="subNav.path">
                                 {{subNav.name}}
                             </el-menu-item>
                         </el-submenu>
@@ -75,7 +72,7 @@
         },
         async mounted() {
             this.autoSetNavHeight();
-            let resp = await navService.get();
+            let resp = await navService.getCategories();
             if (resp.data.success) {
                 this.navs = resp.data.data;
             }

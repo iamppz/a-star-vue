@@ -19,6 +19,17 @@ class RoleService {
     async getPermission(roleId) {
         return await instance.get(`/api/role/permission?roleId=${roleId}`);
     }
+
+    async getNav(roleId) {
+        return await instance.get(`/api/role/nav?roleId=${roleId}`);
+    }
+
+    async saveNav(roleId, navIds) {
+        return await instance.post('/api/role/nav', {
+            roleId,
+            navIds: navIds.join(',')
+        });
+    }
 }
 
 export default new RoleService();

@@ -32,25 +32,24 @@
                     </el-button>
                 </div>
                 <el-dialog title="设置权限" :visible.sync="dialogVisible" width="30%">
-                    <el-tabs :value="'permission'">
+                    <el-tabs v-model="tab">
                         <el-tab-pane label="权限" name="permission">
                             <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
                             <el-tree :data="permission" :props="defaultProps" default-expand-all node-key="id"
-                                     show-checkbox
-                                     ref="tree" :filter-node-method="filterTreeNode" id="tree">
+                                     show-checkbox ref="tree" :filter-node-method="filterTreeNode" id="tree">
                             </el-tree>
-                            <span slot="footer" class="dialog-footer">
-                                <el-button @click="dialogVisible = false">取消</el-button>
-                                <el-button type="primary" @click="handleClickSave">确定</el-button>
-                            </span>
                         </el-tab-pane>
                         <el-tab-pane label="菜单" name="nav">
+                            <el-input placeholder="输入关键字进行过滤" v-model="filterTextNav"></el-input>
                             <el-tree :data="navs" :props="defaultProps" default-expand-all node-key="id"
                                      show-checkbox ref="navTree" :filter-node-method="filterTreeNode" id="navTree">
                             </el-tree>
                         </el-tab-pane>
                     </el-tabs>
-
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="dialogVisible = false">取消</el-button>
+                        <el-button type="primary" @click="handleClickSave">确定</el-button>
+                    </span>
                 </el-dialog>
                 <el-dialog :title="form.id > 0 ? '编辑角色' : '新建角色'" :visible.sync="roleDialogVisible" width="30%">
                     <el-form ref="form" :model="form" label-width="80px">
@@ -81,7 +80,10 @@
     export default {
         watch: {
             filterText(val) {
-                this.$refs.permissionTree.filter(val);
+                this.$refs.tree.filter(val);
+            },
+            filterTextNav(val) {
+                this.$refs.navTree.filter(val);
             }
         },
         methods: {
@@ -92,20 +94,32 @@
             async handleClickSave() {
                 let keys = this.$refs.tree.getCheckedKeys();
                 let resp = await roleService.savePermission(this.currentRoleId, keys);
-                if (resp.data.success) {
-                    Message.success(resp.data.message);
-                    this.dialogVisible = false;
-                    this.handleClickTreeNode(this.currentDepartment);
-                } else {
+                if (!resp.data.success) {
                     Message.error(resp.data.message);
+                } else {
+                    keys = this.$refs.navTree.getCheckedKeys();
+                    resp = await roleService.saveNav(this.currentRoleId, keys);
+                    if (!resp.data.success) {
+                        Message.error(resp.data.message);
+                    } else {
+                        Message.success(resp.data.message);
+                        this.dialogVisible = false;
+                        this.handleClickTreeNode(this.currentDepartment);
+                    }
                 }
             },
             async handleClickEdit(roleId) {
-                this.dialogVisible = true;
                 this.currentRoleId = roleId;
+                this.dialogVisible = true;
                 let resp = await roleService.getPermission(roleId);
                 if (resp.data.success) {
                     this.$refs.tree.setCheckedKeys(resp.data.data.map(item => item.permissionId));
+                } else {
+                    Message.error(resp.data.message);
+                }
+                resp = await roleService.getNav(roleId);
+                if (resp.data.success) {
+                    this.$refs.navTree.setCheckedKeys(resp.data.data.map(item => item.navId));
                 } else {
                     Message.error(resp.data.message);
                 }
@@ -142,6 +156,7 @@
         data() {
             return {
                 filterText: '',
+                filterTextNav: '',
                 defaultProps: {
                     children: 'children',
                     label: 'name'
@@ -156,7 +171,8 @@
                     name: null,
                     description: null
                 },
-                navs: []
+                navs: [],
+                tab: 'permission'
             };
         },
         async mounted() {
@@ -165,7 +181,7 @@
             if (resp.data.success) {
                 this.permission = [resp.data.data];
             }
-            resp = await navService.getAll();
+            resp = await navService.getAllCategories();
             if (resp.data.success) {
                 this.navs = resp.data.data;
             }
@@ -173,7 +189,7 @@
     };
 </script>
 <style scoped>
-    #toolbar {
+    #toolbar, #navTree, #tree {
         margin-top: 20px;
     }
 

@@ -1,12 +1,16 @@
 import instance from '../utils/instance';
 
 class NavService {
-    async get() {
-        return await instance.get('/api/nav/');
+    async getCategories() {
+        return await instance.get('/api/nav/category');
     }
 
-    async getAll() {
-        return await instance.get('/api/nav/all');
+    async getAllCategories() {
+        return await instance.get('/api/nav/category/all');
+    }
+
+    async get() {
+        return await instance.get('/api/nav/');
     }
 }
 
