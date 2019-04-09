@@ -72,7 +72,7 @@
         },
         async mounted() {
             this.autoSetNavHeight();
-            let resp = await navService.getCategories();
+            let resp = await navService.getUserCategories();
             if (resp.data.success) {
                 this.navs = resp.data.data;
             }
