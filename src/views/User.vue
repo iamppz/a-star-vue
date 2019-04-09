@@ -17,9 +17,10 @@
                 <el-table :data="formattedTableData" style="width: 100%" ref="table" border stripe>
                     <el-table-column prop="name" label="姓名" width="120"></el-table-column>
                     <el-table-column prop="departmentName" label="部门" width="120"></el-table-column>
-                    <el-table-column prop="mobile" label="手机" width="160"></el-table-column>
+                    <el-table-column prop="roleNames" label="角色" width="120"></el-table-column>
+                    <el-table-column prop="mobile" label="手机" width="110"></el-table-column>
                     <el-table-column prop="createdAt" label="创建时间" width="240"></el-table-column>
-                    <el-table-column label="操作">
+                    <el-table-column label="操作" fixed="right" width="83">
                         <template slot-scope="scope">
                             <el-button @click="handleClickEdit(scope.row)" type="text" size="small">编辑</el-button>
                             <el-button v-if="scope.row.disabled" @click="handleClickEnable(scope.row)" type="text"
@@ -153,8 +154,8 @@
                 let resp = await userService.get(department.id, this.currentPage);
                 loading.close();
                 if (resp.data.success) {
-                    this.tableData = resp.data.data.records;
-                    this.total = resp.data.data.total;
+                    this.tableData = resp.data.data.content;
+                    this.total = resp.data.data.totalElements;
                 }
             },
             handleSizeChange() {
