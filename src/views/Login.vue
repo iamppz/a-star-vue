@@ -10,25 +10,19 @@
         </el-header>
         <el-container>
             <el-main>
-                <el-row type="flex" class="row-bg" justify="center" align="middle">
-                    <el-col :span="8"></el-col>
-                    <el-col :span="8">
-                        <el-card class="box-card">
-                            <el-form ref="form" :model="form" label-width="80px" label-position="top" :rules="rules">
-                                <el-form-item label="用户名" prop="account">
-                                    <el-input v-model="form.account" placeholder="请输入用户名"></el-input>
-                                </el-form-item>
-                                <el-form-item label="密码" prop="password">
-                                    <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-button type="primary" @click="login" :loading="submitting">登录</el-button>
-                                </el-form-item>
-                            </el-form>
-                        </el-card>
-                    </el-col>
-                    <el-col :span="8"></el-col>
-                </el-row>
+                <el-card style="width: 500px; margin: auto;">
+                    <el-form ref="form" :model="form" label-width="80px" label-position="top" :rules="rules">
+                        <el-form-item label="用户名" prop="account">
+                            <el-input v-model="form.account" placeholder="请输入用户名"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密码" prop="password">
+                            <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="login" :loading="submitting" autofocus>登录</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-card>
             </el-main>
         </el-container>
     </el-container>

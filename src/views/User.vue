@@ -5,17 +5,18 @@
             <el-breadcrumb-item>系统设置</el-breadcrumb-item>
             <el-breadcrumb-item>用户管理</el-breadcrumb-item>
         </el-breadcrumb>
-        <el-row :gutter="20" id="row">
-            <el-col :span="6">
+        <el-container>
+            <el-aside style="width: 250px">
                 <el-input placeholder="输入关键字进行过滤" v-model="filterText">
                 </el-input>
                 <el-tree :data="department" :props="defaultProps" default-expand-all node-key="id" id="tree"
-                         :filter-node-method="filterTreeNode" ref="tree" @node-click="handleClickTreeNode">
-                    <span class="tree-node" slot-scope="{ node, data }">
+                         :filter-node-method="filterTreeNode" ref="tree" @node-click="handleClickTreeNode"
+                         :expand-on-click-node="false">
+                    <span class="flexible" slot-scope="{ node, data }">
                         <span>{{ node.label }}</span>
                         &nbsp;
                          <span>
-                            <el-button type="text" size="mini" @click="() => append(data)"
+                            <el-button type="text" size="mini" @click="() => edit(data)"
                                        icon="el-icon-edit-outline">
                             </el-button>
                             <el-button type="text" size="mini" @click="() => append(data)"
@@ -27,8 +28,8 @@
                         </span>
                     </span>
                 </el-tree>
-            </el-col>
-            <el-col :span="18">
+            </el-aside>
+            <el-main>
                 <el-table :data="formattedTableData" style="width: 100%" ref="table" border stripe>
                     <el-table-column prop="name" label="姓名" width="120"></el-table-column>
                     <el-table-column prop="departmentName" label="部门" width="120"></el-table-column>
@@ -57,8 +58,8 @@
                     <el-button type="primary" icon="el-icon-search" @click="handleClickCreate" size="small">新建
                     </el-button>
                 </div>
-            </el-col>
-        </el-row>
+            </el-main>
+        </el-container>
         <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="30%">
             <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="姓名">
@@ -96,7 +97,7 @@
 <script>
     import departmentService from "../service/departmentService";
     import userService from "../service/userService";
-    import {Loading, Message} from 'element-ui';
+    import {Loading, Message, MessageBox} from 'element-ui';
     import moment from 'moment';
     import Treeselect from '@riophae/vue-treeselect';
     import '@riophae/vue-treeselect/dist/vue-treeselect.css';
@@ -132,7 +133,7 @@
             },
             handleClickCreate() {
                 this.form = {
-                    departmentId: this.currentDepartment.id
+                    departmentId: this.$refs.tree.getCurrentKey()
                 };
                 this.dialogVisible = true;
             },
@@ -142,7 +143,7 @@
                     if (resp.data.success) {
                         Message.success(resp.data.message);
                         this.dialogVisible = false;
-                        this.handleClickTreeNode(this.currentDepartment);
+                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
                     } else {
                         Message.error(resp.data.message);
                     }
@@ -151,7 +152,7 @@
                     if (resp.data.success) {
                         Message.success(resp.data.message);
                         this.dialogVisible = false;
-                        this.handleClickTreeNode(this.currentDepartment);
+                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
                     } else {
                         Message.error(resp.data.message);
                     }
@@ -163,7 +164,7 @@
                     if (resp.data.success) {
                         Message.success(resp.data.message);
                         this.departmentDialogVisible = false;
-                        this.currentDepartment.name = this.form.name;
+                        this.$refs.tree.getCurrentNode().name = this.departmentForm.name;
                     } else {
                         Message.error(resp.data.message);
                     }
@@ -172,10 +173,10 @@
                     if (resp.data.success) {
                         Message.success(resp.data.message);
                         this.departmentDialogVisible = false;
-                        if (!this.currentDepartment.children) {
-                            this.$set(this.currentDepartment, 'children', []);
+                        if (!this.$refs.tree.getCurrentNode().children) {
+                            this.$set(this.$refs.tree.getCurrentNode(), 'children', []);
                         }
-                        this.currentDepartment.children.push(this.departmentForm);
+                        this.$refs.tree.getCurrentNode().children.push(resp.data.data);
 
                     } else {
                         Message.error(resp.data.message);
@@ -201,7 +202,6 @@
                 }
             },
             async handleClickTreeNode(department) {
-                this.currentDepartment = department;
                 let options = {target: this.$refs.table.$el};
                 let loading = Loading.service(options);
                 let resp = await userService.get(department.id, this.currentPage);
@@ -215,15 +215,33 @@
             },
             handleCurrentChange() {
             },
-            append() {
+            append(data) {
                 this.departmentDialogVisible = true;
-                this.departmentForm = {parentId: this.currentDepartment.id};
+                this.departmentForm = {parentId: data.id};
+            },
+            edit(data) {
+                this.departmentDialogVisible = true;
+                this.departmentForm = {...data};
             },
             remove(node, data) {
-                const parent = node.parent;
-                const children = parent.data.children || parent.data;
-                const index = children.findIndex(d => d.id === data.id);
-                children.splice(index, 1);
+                MessageBox.confirm('确定要删除部门"' + data.name + '"?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async () => {
+                    let resp = await departmentService.delete(data.id);
+                    if (resp.data.success) {
+                        Message.success(resp.data.message);
+                        const parent = node.parent;
+                        const children = parent.data.children || parent.data;
+                        const index = children.findIndex(d => d.id === data.id);
+                        children.splice(index, 1);
+                    } else {
+                        Message.error(resp.data.message);
+                    }
+                }).catch(() => {
+                    Message.info('取消操作');
+                });
             }
         },
         data() {
@@ -239,7 +257,6 @@
                 department: [],
                 dialogVisible: false,
                 form: {id: null, name: null, departmentId: null, mobile: null},
-                currentDepartment: null,
                 normalizer(node) {
                     return {
                         label: node.name
@@ -271,13 +288,22 @@
         margin-top: 40px;
     }
 
-    .tree-node {
+    .el-tree-node .flexible {
         display: flex;
         align-items: center;
         padding-right: 8px;
     }
 
-    .tree-node .el-button {
-        margin-left: 0;
+    .el-tree-node .el-button {
+        display: none;
+        margin-left: 6px;
+    }
+
+    .el-tree-node__content:hover .el-button {
+        display: initial;
+    }
+
+    .el-aside {
+        padding: 20px 0;
     }
 </style>
