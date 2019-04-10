@@ -11,6 +11,21 @@
                 </el-input>
                 <el-tree :data="department" :props="defaultProps" default-expand-all node-key="id" id="tree"
                          :filter-node-method="filterTreeNode" ref="tree" @node-click="handleClickTreeNode">
+                    <span class="tree-node" slot-scope="{ node, data }">
+                        <span>{{ node.label }}</span>
+                        &nbsp;
+                         <span>
+                            <el-button type="text" size="mini" @click="() => append(data)"
+                                       icon="el-icon-edit-outline">
+                            </el-button>
+                            <el-button type="text" size="mini" @click="() => append(data)"
+                                       icon="el-icon-plus">
+                            </el-button>
+                            <el-button type="text" size="mini" @click="() => remove(node, data)"
+                                       icon="el-icon-close">
+                            </el-button>
+                        </span>
+                    </span>
                 </el-tree>
             </el-col>
             <el-col :span="18">
@@ -60,6 +75,19 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
                 <el-button type="primary" @click="handleClickSave">确定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :title="departmentForm.id > 0 ? '编辑部门' : '新建部门'" :visible.sync="departmentDialogVisible" width="30%">
+            <el-form ref="form" :model="form" label-width="80px">
+                <el-form-item label="名称">
+                    <input type="hidden" v-model="departmentForm.id"/>
+                    <input type="hidden" v-model="departmentForm.parentId"/>
+                    <el-input v-model="departmentForm.name"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="departmentDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleClickSaveDepartment">确定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -129,6 +157,31 @@
                     }
                 }
             },
+            async handleClickSaveDepartment() {
+                if (this.departmentForm.id > 0) {
+                    let resp = await departmentService.update(this.departmentForm);
+                    if (resp.data.success) {
+                        Message.success(resp.data.message);
+                        this.departmentDialogVisible = false;
+                        this.currentDepartment.name = this.form.name;
+                    } else {
+                        Message.error(resp.data.message);
+                    }
+                } else {
+                    let resp = await departmentService.add(this.departmentForm);
+                    if (resp.data.success) {
+                        Message.success(resp.data.message);
+                        this.departmentDialogVisible = false;
+                        if (!this.currentDepartment.children) {
+                            this.$set(this.currentDepartment, 'children', []);
+                        }
+                        this.currentDepartment.children.push(this.departmentForm);
+
+                    } else {
+                        Message.error(resp.data.message);
+                    }
+                }
+            },
             async handleClickEnable(user) {
                 let resp = await userService.enable(user.id);
                 if (resp.data.success) {
@@ -161,6 +214,16 @@
             handleSizeChange() {
             },
             handleCurrentChange() {
+            },
+            append() {
+                this.departmentDialogVisible = true;
+                this.departmentForm = {parentId: this.currentDepartment.id};
+            },
+            remove(node, data) {
+                const parent = node.parent;
+                const children = parent.data.children || parent.data;
+                const index = children.findIndex(d => d.id === data.id);
+                children.splice(index, 1);
             }
         },
         data() {
@@ -181,7 +244,13 @@
                     return {
                         label: node.name
                     }
-                }
+                },
+                departmentForm: {
+                    id: null,
+                    name: null,
+                    parentId: null
+                },
+                departmentDialogVisible: false
             };
         },
         async mounted() {
@@ -200,5 +269,15 @@
 
     #row {
         margin-top: 40px;
+    }
+
+    .tree-node {
+        display: flex;
+        align-items: center;
+        padding-right: 8px;
+    }
+
+    .tree-node .el-button {
+        margin-left: 0;
     }
 </style>

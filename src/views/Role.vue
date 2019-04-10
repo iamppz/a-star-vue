@@ -113,7 +113,7 @@
                 this.dialogVisible = true;
                 let resp = await roleService.getPermission(roleId);
                 if (resp.data.success) {
-                    this.$refs.tree.setCheckedKeys(resp.data.data.map(item => item.permissionId));
+                    this.$refs.tree.setCheckedKeys(resp.data.data.map(item => item.permission.id));
                 } else {
                     Message.error(resp.data.message);
                 }
