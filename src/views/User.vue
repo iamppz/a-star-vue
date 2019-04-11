@@ -33,19 +33,26 @@
                 <el-table :data="formattedTableData" style="width: 100%" ref="table" border stripe>
                     <el-table-column prop="name" label="姓名" width="120"></el-table-column>
                     <el-table-column prop="departmentName" label="部门" width="120"></el-table-column>
-                    <el-table-column prop="roleNames" label="角色" width="120"></el-table-column>
+                    <el-table-column prop="roleNames" label="角色" width="200"></el-table-column>
                     <el-table-column prop="mobile" label="手机" width="110"></el-table-column>
-                    <el-table-column prop="createdAt" label="创建时间" width="240"></el-table-column>
-                    <el-table-column label="操作" fixed="right" width="83">
+                    <el-table-column prop="createdAt" label="创建时间" width="135"></el-table-column>
+                    <el-table-column label="操作" fixed="right">
                         <template slot-scope="scope">
-                            <el-button @click="handleClickEdit(scope.row)" type="text" size="small">编辑</el-button>
+                            <el-button @click="handleClickEdit(scope.row)" type="text" size="small"
+                                       icon="el-icon-edit-outline">
+                                编辑
+                            </el-button>
                             <el-button v-if="scope.row.disabled" @click="handleClickEnable(scope.row)" type="text"
-                                       size="small">
+                                       size="small" icon="el-icon-edit-outline">
                                 启用
                             </el-button>
                             <el-button v-if="!scope.row.disabled" @click="handleClickDisable(scope.row)" type="text"
-                                       size="small">
+                                       size="small" icon="el-icon-edit-outline">
                                 禁用
+                            </el-button>
+                            <el-button @click="handleClickResetPassword(scope.row)" type="text" size="small"
+                                       icon="el-icon-refresh">
+                                重置密码
                             </el-button>
                         </template>
                     </el-table-column>
@@ -204,7 +211,7 @@
             async handleClickTreeNode(department) {
                 let options = {target: this.$refs.table.$el};
                 let loading = Loading.service(options);
-                let resp = await userService.get(department.id, this.currentPage);
+                let resp = await userService.getByDepartment(department.id, this.currentPage);
                 loading.close();
                 if (resp.data.success) {
                     this.tableData = resp.data.data.content;
@@ -236,6 +243,22 @@
                         const children = parent.data.children || parent.data;
                         const index = children.findIndex(d => d.id === data.id);
                         children.splice(index, 1);
+                    } else {
+                        Message.error(resp.data.message);
+                    }
+                }).catch(() => {
+                    Message.info('取消操作');
+                });
+            },
+            handleClickResetPassword(data) {
+                MessageBox.confirm('确定要将用户"' + data.name + '"的密码重置为"00000000"吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async () => {
+                    let resp = await userService.resetPassword(data.id);
+                    if (resp.data.success) {
+                        Message.success(resp.data.message);
                     } else {
                         Message.error(resp.data.message);
                     }
@@ -282,10 +305,6 @@
 <style scoped>
     #tree, #pager, #toolbar {
         margin-top: 20px;
-    }
-
-    #row {
-        margin-top: 40px;
     }
 
     .el-tree-node .flexible {

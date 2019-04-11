@@ -1,8 +1,12 @@
 import instance from "../utils/instance";
 
 class UserService {
-    async get(departmentId, pageIndex) {
-        return await instance.get(`/api/user/?departmentId=${departmentId}&pageIndex=${pageIndex}`);
+    async getByDepartment(departmentId, pageIndex) {
+        return await instance.get(`/api/user/department?departmentId=${departmentId}&pageIndex=${pageIndex}`);
+    }
+
+    async get() {
+        return await instance.get(`/api/user/`);
     }
 
     async add(form) {
@@ -19,6 +23,14 @@ class UserService {
 
     async disable(id) {
         return await instance.post('/api/user/disable', {userId: id});
+    }
+
+    async resetPassword(id) {
+        return await instance.delete(`/api/account/password?userId=${id}`);
+    }
+
+    async changePassword(form) {
+        return await instance.put(`/api/account/password?currentPassword=${form.currentPassword}&password=${form.password}`);
     }
 }
 
