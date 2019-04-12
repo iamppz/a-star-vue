@@ -31,12 +31,12 @@
             </el-aside>
             <el-main>
                 <el-table :data="formattedTableData" style="width: 100%" ref="table" border stripe>
-                    <el-table-column prop="name" label="姓名" width="120"></el-table-column>
-                    <el-table-column prop="departmentName" label="部门" width="120"></el-table-column>
-                    <el-table-column prop="roleNames" label="角色" width="200"></el-table-column>
-                    <el-table-column prop="mobile" label="手机" width="110"></el-table-column>
-                    <el-table-column prop="createdAt" label="创建时间" width="135"></el-table-column>
-                    <el-table-column label="操作" fixed="right">
+                    <el-table-column prop="name" label="姓名" min-width="120" width="120"></el-table-column>
+                    <el-table-column prop="departmentName" label="部门" min-width="120" width="120"></el-table-column>
+                    <el-table-column prop="roleNames" label="角色" min-width="200" width="200"></el-table-column>
+                    <el-table-column prop="mobile" label="手机" min-width="110" width="110"></el-table-column>
+                    <el-table-column prop="createdAt" label="创建时间" min-width="135" width="135"></el-table-column>
+                    <el-table-column label="操作" fixed="right" min-width="205px">
                         <template slot-scope="scope">
                             <el-button @click="handleClickEdit(scope.row)" type="text" size="small"
                                        icon="el-icon-edit-outline">
