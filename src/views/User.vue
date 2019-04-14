@@ -11,7 +11,7 @@
                 </el-input>
                 <el-tree :data="department" :props="defaultProps" default-expand-all node-key="id" id="tree"
                          :filter-node-method="filterTreeNode" ref="tree" @node-click="handleClickTreeNode"
-                         :expand-on-click-node="false">
+                         :expand-on-click-node="false" highlight-current>
                     <span class="flexible" slot-scope="{ node, data }">
                         <span>{{ node.label }}</span>
                         &nbsp;
@@ -144,7 +144,7 @@
                 };
                 this.dialogVisible = true;
             },
-            async handleClickSaveDictionaryItem() {
+            async handleClickSave() {
                 if (this.form.id > 0) {
                     let resp = await userService.update(this.form);
                     if (resp.data.success) {
@@ -220,7 +220,9 @@
             },
             handleSizeChange() {
             },
-            handleCurrentChange() {
+            handleCurrentChange(current) {
+                this.currentPage = current;
+                this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
             },
             append(data) {
                 this.departmentDialogVisible = true;
@@ -296,8 +298,13 @@
         async mounted() {
             let resp = await departmentService.get();
             if (resp.data.success) {
-                this.department = [resp.data.data];
-                this.handleClickTreeNode(resp.data.data)
+                if (resp.data.data) {
+                    this.department = [resp.data.data];
+                    this.$nextTick(function () {
+                        this.$refs.tree.setCurrentKey(resp.data.data.id);
+                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
+                    });
+                }
             }
         }
     };
