@@ -10,7 +10,8 @@
                 <el-input placeholder="输入关键字进行过滤" v-model="filterText">
                 </el-input>
                 <el-tree :data="dictionaries" :props="{ children: 'children', label: 'name' }" node-key="id" id="tree"
-                         :filter-node-method="filterTreeNode" ref="tree" @node-click="handleClickTreeNode">
+                         :filter-node-method="filterTreeNode" ref="tree" @node-click="handleClickTreeNode"
+                         highlight-current>
                     <span slot-scope="{ node }">
                         {{ node.label }}
                     </span>
@@ -87,12 +88,14 @@
             let resp = await dictionaryService.get();
             if (resp.data.success) {
                 this.dictionaries = resp.data.data;
+                if (this.dictionaries.length > 0) {
+                    this.$nextTick(function () {
+                        this.$refs.tree.setCurrentKey(this.dictionaries[0].id);
+                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
+                    });
+                }
             } else {
                 Message.error(resp.data.message);
-            }
-
-            if (this.dictionaries.length > 0) {
-                this.$refs.tree.setCurrentNode(this.dictionaries[0]);
             }
         },
         methods: {
@@ -120,6 +123,7 @@
                 let resp = await dictionaryService.deleteItem(item.id);
                 if (resp.data.success) {
                     Message.success(resp.data.message);
+                    this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
                 } else {
                     Message.error(resp.data.message);
                 }
@@ -129,6 +133,8 @@
                 let resp = await dictionaryService.addItems(this.form.names.replace(/\n/g, ','), dictionaryId);
                 if (resp.data.success) {
                     Message.success(resp.data.message);
+                    this.addDialogVisible = false;
+                    this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
                 } else {
                     Message.error(resp.data.message);
                 }
@@ -137,6 +143,8 @@
                 let resp = await dictionaryService.saveItem(this.editForm);
                 if (resp.data.success) {
                     Message.success(resp.data.message);
+                    this.editDialogVisible = false;
+                    this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
                 } else {
                     Message.error(resp.data.message);
                 }
