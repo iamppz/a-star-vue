@@ -5,69 +5,65 @@
             <el-breadcrumb-item>系统设置</el-breadcrumb-item>
             <el-breadcrumb-item>角色管理</el-breadcrumb-item>
         </el-breadcrumb>
-        <el-row :gutter="20" id="row">
-            <el-col :span="24">
-                <el-table :data="roles" style="width: 100%" ref="table" border stripe>
-                    <el-table-column prop="name" label="角色" width="150"></el-table-column>
-                    <el-table-column prop="description" label="说明"></el-table-column>
-                    <el-table-column label="操作" width="210">
-                        <template slot-scope="scope">
-                            <el-button @click="handleClickEdit(scope.row.id)" type="text"
-                                       size="small" icon="el-icon-edit-outline">
-                                分配权限
-                            </el-button>
-                            <el-button @click="handleClickEditRole(scope.row)" type="text"
-                                       size="small" icon="el-icon-edit-outline">
-                                编辑
-                            </el-button>
-                            <el-button @click="handleClickEdit(scope.row.id)" type="text"
-                                       size="small" icon="el-icon-delete">
-                                删除
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-                <div id="toolbar">
-                    <el-button type="primary" icon="el-icon-plus" @click="handleClickCreate" size="small">新建
+        <el-table :data="roles" style="width: 100%" ref="table" border stripe id="table">
+            <el-table-column prop="name" label="角色" width="150"></el-table-column>
+            <el-table-column prop="description" label="说明"></el-table-column>
+            <el-table-column label="操作" width="210">
+                <template slot-scope="scope">
+                    <el-button @click="handleClickEdit(scope.row.id)" type="text"
+                               size="small" icon="el-icon-edit-outline">
+                        分配权限
                     </el-button>
-                </div>
-                <el-dialog title="设置权限" :visible.sync="dialogVisible" width="30%">
-                    <el-tabs v-model="tab">
-                        <el-tab-pane label="权限" name="permission">
-                            <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
-                            <el-tree :data="permission" :props="defaultProps" default-expand-all node-key="id"
-                                     show-checkbox ref="tree" :filter-node-method="filterTreeNode" id="tree">
-                            </el-tree>
-                        </el-tab-pane>
-                        <el-tab-pane label="菜单" name="nav">
-                            <el-input placeholder="输入关键字进行过滤" v-model="filterTextNav"></el-input>
-                            <el-tree :data="navs" :props="defaultProps" default-expand-all node-key="id"
-                                     show-checkbox ref="navTree" :filter-node-method="filterTreeNode" id="navTree">
-                            </el-tree>
-                        </el-tab-pane>
-                    </el-tabs>
-                    <span slot="footer" class="dialog-footer">
+                    <el-button @click="handleClickEditRole(scope.row)" type="text"
+                               size="small" icon="el-icon-edit-outline">
+                        编辑
+                    </el-button>
+                    <el-button @click="handleClickEdit(scope.row.id)" type="text"
+                               size="small" icon="el-icon-delete">
+                        删除
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div id="toolbar">
+            <el-button type="primary" icon="el-icon-plus" @click="handleClickCreate" size="small">新建
+            </el-button>
+        </div>
+        <el-dialog title="设置权限" :visible.sync="dialogVisible" width="30%">
+            <el-tabs v-model="tab">
+                <el-tab-pane label="权限" name="permission">
+                    <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+                    <el-tree :data="permission" :props="defaultProps" default-expand-all node-key="id"
+                             show-checkbox ref="tree" :filter-node-method="filterTreeNode" id="tree">
+                    </el-tree>
+                </el-tab-pane>
+                <el-tab-pane label="菜单" name="nav">
+                    <el-input placeholder="输入关键字进行过滤" v-model="filterTextNav"></el-input>
+                    <el-tree :data="navs" :props="defaultProps" default-expand-all node-key="id"
+                             show-checkbox ref="navTree" :filter-node-method="filterTreeNode" id="navTree">
+                    </el-tree>
+                </el-tab-pane>
+            </el-tabs>
+            <span slot="footer" class="dialog-footer">
                         <el-button @click="dialogVisible = false">取消</el-button>
                         <el-button type="primary" @click="handleClickSave">确定</el-button>
                     </span>
-                </el-dialog>
-                <el-dialog :title="form.id > 0 ? '编辑角色' : '新建角色'" :visible.sync="roleDialogVisible" width="30%">
-                    <el-form ref="form" :model="form" label-width="80px">
-                        <el-form-item label="角色">
-                            <input type="hidden" v-model="form.id"/>
-                            <el-input v-model="form.name"></el-input>
-                        </el-form-item>
-                        <el-form-item label="说明">
-                            <el-input v-model="form.description"></el-input>
-                        </el-form-item>
-                    </el-form>
-                    <span slot="footer" class="dialog-footer">
+        </el-dialog>
+        <el-dialog :title="form.id > 0 ? '编辑角色' : '新建角色'" :visible.sync="roleDialogVisible" width="30%">
+            <el-form ref="form" :model="form" label-width="80px">
+                <el-form-item label="角色">
+                    <input type="hidden" v-model="form.id"/>
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="说明">
+                    <el-input v-model="form.description"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
                         <el-button @click="dialogVisible = false">取消</el-button>
                         <el-button type="primary" @click="handleClickSaveRole">确定</el-button>
                     </span>
-                </el-dialog>
-            </el-col>
-        </el-row>
+        </el-dialog>
     </div>
 
 </template>
@@ -91,7 +87,7 @@
                 if (!value) return true;
                 return data.name.indexOf(value) !== -1;
             },
-            async handleClickSave() {
+            async handleClickSaveDictionaryItem() {
                 let keys = this.$refs.tree.getCheckedKeys();
                 let resp = await roleService.savePermission(this.currentRoleId, keys);
                 if (!resp.data.success) {
@@ -193,7 +189,7 @@
         margin-top: 20px;
     }
 
-    #row {
+    #table {
         margin-top: 40px;
     }
 </style>

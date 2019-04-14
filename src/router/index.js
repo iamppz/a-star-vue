@@ -6,6 +6,7 @@ import User from "../views/User";
 import Role from "../views/Role";
 import App from "../views/App";
 import EChartsTest from "../views/EChartsTest";
+import Dictionary from "../views/Dictionary";
 
 Vue.use(VueRouter);
 
@@ -18,6 +19,7 @@ const routes = [
             {path: 'user', component: User},
             {path: 'role', component: Role},
             {path: 'echartsTest', component: EChartsTest},
+            {path: 'dictionary', component: Dictionary}
         ]
     }
 ];

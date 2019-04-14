@@ -144,7 +144,7 @@
                 };
                 this.dialogVisible = true;
             },
-            async handleClickSave() {
+            async handleClickSaveDictionaryItem() {
                 if (this.form.id > 0) {
                     let resp = await userService.update(this.form);
                     if (resp.data.success) {
