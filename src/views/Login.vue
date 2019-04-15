@@ -14,7 +14,7 @@
         </el-header>
         <el-container id="body">
             <el-main style="display: flex; flex-direction: row; align-items: center;">
-                <el-card style="width: 450px; margin: auto">
+                <el-card style="width: 430px; margin: auto" id="card">
                     <el-form ref="form" :model="form" label-width="80px" label-position="top" :rules="rules">
                         <el-form-item label="用户名" prop="account">
                             <el-input v-model="form.account" placeholder="请输入用户名"></el-input>
@@ -89,6 +89,10 @@
         background-size: cover;
     }
 
+    #card {
+        background: rgba(255, 255, 255, 0.9);
+    }
+
     #link {
         color: #999;
     }
@@ -98,6 +102,10 @@
         text-decoration-line: none;
         color: inherit;
         margin-right: 60px;
+    }
+
+    #link > a:hover {
+        color: #606266;
     }
 
     .inno-header {
