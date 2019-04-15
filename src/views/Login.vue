@@ -1,16 +1,20 @@
 <template>
-    <el-container>
+    <el-container id="container">
         <el-header class="inno-header">
             <div>
                 <p class="inno-title">
-                    <img src="../assets/inno.jpg" alt="logo" class="inno-logo">
+                    <img src="../assets/inno.png" alt="logo" class="inno-logo">
                     Joyce
+                </p>
+                <p id="link">
+                    <a href="mailto:zsl@joyceinnovations.com">Contact</a>
+                    <a href="https://www.jianshu.com/u/f5527e87925e">Blog</a>
                 </p>
             </div>
         </el-header>
-        <el-container>
-            <el-main>
-                <el-card style="width: 500px; margin: auto;">
+        <el-container id="body">
+            <el-main style="display: flex; flex-direction: row; align-items: center;">
+                <el-card style="width: 450px; margin: auto">
                     <el-form ref="form" :model="form" label-width="80px" label-position="top" :rules="rules">
                         <el-form-item label="用户名" prop="account">
                             <el-input v-model="form.account" placeholder="请输入用户名"></el-input>
@@ -19,7 +23,9 @@
                             <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="login" :loading="submitting" autofocus>登录</el-button>
+                            <el-button type="primary" @click="login" :loading="submitting" autofocus
+                                       style="width: 100%;">登录
+                            </el-button>
                         </el-form-item>
                     </el-form>
                 </el-card>
@@ -74,6 +80,26 @@
     };
 </script>
 <style scoped>
+    #container {
+        height: 100%;
+    }
+
+    #body {
+        background-image: url("../assets/bg.jpg");
+        background-size: cover;
+    }
+
+    #link {
+        color: #999;
+    }
+
+    #link > a {
+        text-underline: none;
+        text-decoration-line: none;
+        color: inherit;
+        margin-right: 60px;
+    }
+
     .inno-header {
         padding: 0;
         border-bottom: 1px solid #e6e6e6;
@@ -95,6 +121,8 @@
     }
 
     .inno-logo {
-        height: 50px;
+        height: 40px;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 </style>
