@@ -1,10 +1,9 @@
 <template>
     <el-container id="container">
-        <el-header class="inno-header">
+        <el-header class="joyce-header">
             <div>
-                <p class="inno-title">
-                    <img src="../assets/inno.png" alt="logo" class="inno-logo">
-                    Joyce
+                <p class="joyce-title">
+                    JCloud
                 </p>
                 <p id="link">
                     <a href="mailto:zsl@joyceinnovations.com">Contact</a>
@@ -14,21 +13,34 @@
         </el-header>
         <el-container id="body">
             <el-main style="display: flex; flex-direction: row; align-items: center;">
-                <el-card style="width: 430px; margin: auto" id="card">
-                    <el-form ref="form" :model="form" label-width="80px" label-position="top" :rules="rules">
-                        <el-form-item label="用户名" prop="account">
-                            <el-input v-model="form.account" placeholder="请输入用户名"></el-input>
-                        </el-form-item>
-                        <el-form-item label="密码" prop="password">
-                            <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="login" :loading="submitting" autofocus
-                                       style="width: 100%;">登录
-                            </el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-card>
+                <div style="width: 1000px; display: flex; align-items: center; margin: auto;
+                            justify-content: space-between; color: white;">
+                    <div style="width: 530px;">
+                        <h1 style="font-size: 54px; margin: 0;">
+                            欢迎来到<br>JCloud 企业管理平台</h1>
+                        <p style="font-size: 24px; margin: 10px 0 0 0; line-height: 160%;">
+                            注册即可开始使用，亦可部署至私有环境，并进行个性需求的定制开发<br>
+                        </p>
+                        <p style="font-size: 24px; margin: 10px 0 0 0; line-height: 160%;">
+                            我们按天对数据进行备份，并提供全量导出，以保证您对数据的所有权
+                        </p>
+                    </div>
+                    <el-card style="width: 400px;" id="card">
+                        <el-form ref="form" :model="form" label-width="80px" label-position="top" :rules="rules">
+                            <el-form-item label="用户名" prop="account">
+                                <el-input v-model="form.account" placeholder="请输入用户名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="密码" prop="password">
+                                <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="login" :loading="submitting" autofocus
+                                           style="width: 100%;">登录
+                                </el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-card>
+                </div>
             </el-main>
         </el-container>
     </el-container>
@@ -101,36 +113,30 @@
         text-underline: none;
         text-decoration-line: none;
         color: inherit;
-        margin-right: 60px;
+        padding-left: 30px;
     }
 
     #link > a:hover {
         color: #606266;
     }
 
-    .inno-header {
+    .joyce-header {
         padding: 0;
         border-bottom: 1px solid #e6e6e6;
     }
 
-    .inno-header > div {
+    .joyce-header > div {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 10px;
+        padding: 0 20px;
     }
 
-    .inno-title {
+    .joyce-title {
         font-size: 20px;
         display: flex;
         align-items: center;
         margin: 0;
         line-height: 59px;
-    }
-
-    .inno-logo {
-        height: 40px;
-        margin-left: 10px;
-        margin-right: 10px;
     }
 </style>

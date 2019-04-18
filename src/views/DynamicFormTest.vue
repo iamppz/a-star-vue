@@ -63,7 +63,7 @@
                 data: {
                     name: 'zsl',
                     age: 30
-                }
+                },
             }
         }
     }

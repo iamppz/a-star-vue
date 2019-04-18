@@ -1,14 +1,14 @@
 <template>
     <el-container>
-        <el-header class="inno-header">
+        <el-header class="joyce-header">
             <div>
-                <p class="inno-title">Joyce</p>
+                <p class="joyce-title">JCloud</p>
                 <div>
                     <el-dropdown @command="handleCommand">
                         <span class="el-dropdown-link">
-                            <a href="javascript:void(0)" class="inno-user">
-                                <span class="inno-avatar"></span>
-                                <span class="inno-name">
+                            <a href="javascript:void(0)" class="joyce-user">
+                                <span class="joyce-avatar"></span>
+                                <span class="joyce-name">
                                     {{name}}
                                     <i class="el-icon-caret-bottom"></i>
                                 </span>
@@ -167,19 +167,19 @@
         height: auto;
     }
 
-    .inno-header {
+    .joyce-header {
         padding: 0;
         border-bottom: 1px solid #e6e6e6;
     }
 
-    .inno-header > div {
+    .joyce-header > div {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 0 20px;
     }
 
-    .inno-title {
+    .joyce-title {
         font-size: 20px;
         display: flex;
         align-items: center;
@@ -187,13 +187,13 @@
         line-height: 59px;
     }
 
-    .inno-user {
+    .joyce-user {
         text-decoration-line: none;
         display: inline-flex;
         color: black;
     }
 
-    .inno-avatar {
+    .joyce-avatar {
         border-radius: 50%;
         border: 1px solid #e6e6e6;
         width: 32px;
@@ -203,7 +203,7 @@
         background-image: url('../assets/inno.jpg');
     }
 
-    .inno-name {
+    .joyce-name {
         line-height: 32px;
         display: inline-block;
         margin-left: 5px;
