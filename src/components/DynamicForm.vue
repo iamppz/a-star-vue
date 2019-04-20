@@ -13,9 +13,6 @@
                 </template>
             </tr>
         </table>
-        <div class="toolbar">
-            <el-button>保存</el-button>
-        </div>
     </div>
 </template>
 <script>
@@ -90,10 +87,4 @@
     .dynamic-form > tr > td > label {
         margin: 0 8px;
     }
-
-    .toolbar {
-        padding: 10px 0;
-        text-align: center;
-    }
-
 </style>
