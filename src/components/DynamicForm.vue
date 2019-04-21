@@ -1,15 +1,15 @@
 <template>
     <div :style="{width: widthPixel}">
-        <input type="hidden" v-model="value.id"/>
+        <input type="hidden" v-model="data.id"/>
         <table class="dynamic-form" width="100%">
-            <tr v-for="i in row" v-bind:key="i">
-                <template v-for="j in col">
+            <tr v-for="i in form.row" v-bind:key="i">
+                <template v-for="j in form.col">
                     <td v-if="getCell(i, j) !== null" v-bind:key="j" :colspan="getCell(i, j).colspan"
                         :rowspan="getCell(i, j).rowspan" :width="cellWidth * getCell(i, j).colspan + 'px'"
                         :height="cellHeight * getCell(i, j).rowspan + 'px'">
                         <label v-if="getCell(i, j).type === 'label'">{{getCell(i, j).text}}</label>
-                        <input v-if="getCell(i, j).type === 'input'" v-model="value[getCell(i, j).binding]"/>
-                        <textarea v-if="getCell(i, j).type === 'textarea'"></textarea>
+                        <input v-if="getCell(i, j).type === 'input'" v-model="data[getCell(i, j).binding]"/>
+                        <textarea v-if="getCell(i, j).type === 'textarea'" v-model="data[getCell(i, j).binding]"></textarea>
                     </td>
                 </template>
             </tr>
@@ -17,36 +17,35 @@
     </div>
 </template>
 <script>
+    import {Message} from "element-ui";
+
     import dynamicFormService from "../service/dynamicFormService";
 
     export default {
         props: {
-            row: {
+            formId: {
                 type: Number,
                 default: 0
             },
-            col: {
-                type: Number,
-                default: 0
-            },
-            cells: {
-                type: Array,
-                default: () => []
-            },
-            width: {
-                type: Number,
-                default: 720
-            },
-            value: {
+            dataId: {
                 type: Object,
                 default: null
             }
         },
         data() {
-            return {}
+            return {
+                form: {},
+                data: {}
+            }
         },
         name: 'DynamicForm',
-        mounted() {
+        async mounted() {
+            let resp = await dynamicFormService.get(this.formId);
+            if (resp.data.success) {
+                this.form = resp.data.data;
+            } else {
+                Message.error(resp.data.message);
+            }
         },
         computed: {
             widthPixel() {
@@ -57,6 +56,9 @@
             },
             cellHeight() {
                 return 36;
+            },
+            cells() {
+                return JSON.parse(this.form.cells);
             }
         },
         methods: {
@@ -65,7 +67,18 @@
                 return filtered.length > 0 ? filtered[0] : null;
             },
             add() {
-                dynamicFormService.add()
+            },
+            update() {
+            },
+            validate() {
+            }
+        },
+        watch: {
+            data: {
+                handler: function (val) {
+                    console.log(val);
+                },
+                deep: true
             }
         }
     }

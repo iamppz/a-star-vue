@@ -3,7 +3,7 @@
         <div class="title">
             <h1>{{definition.name}}</h1>
         </div>
-        <dynamic-form :form="definition.form.id" ref="form" v-model="data"></dynamic-form>
+        <dynamic-form :form-id="definition.form.id" :data-id="dataId" ref="form"></dynamic-form>
         <div class="toolbar">
             <el-button @click="handleClickSave">保存</el-button>
             <el-button>提交</el-button>
@@ -21,7 +21,7 @@
         data() {
             return {
                 definition: {},
-                data: {}
+                dataId: null
             }
         },
         async created() {
@@ -34,11 +34,7 @@
         },
         async mounted() {
         },
-        computed: {
-            cells() {
-                return JSON.parse(this.definition.form.cells);
-            }
-        },
+        computed: {},
         methods: {
             handleClickSave() {
                 this.$refs.form.save();
