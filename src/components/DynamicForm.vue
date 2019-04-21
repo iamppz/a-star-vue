@@ -1,5 +1,6 @@
 <template>
     <div :style="{width: widthPixel}">
+        <input type="hidden" v-model="value.id"/>
         <table class="dynamic-form" width="100%">
             <tr v-for="i in row" v-bind:key="i">
                 <template v-for="j in col">
@@ -16,6 +17,8 @@
     </div>
 </template>
 <script>
+    import dynamicFormService from "../service/dynamicFormService";
+
     export default {
         props: {
             row: {
@@ -60,6 +63,9 @@
             getCell(row, col) {
                 let filtered = this.cells.filter(cell => cell.row === row && cell.col === col);
                 return filtered.length > 0 ? filtered[0] : null;
+            },
+            add() {
+                dynamicFormService.add()
             }
         }
     }

@@ -3,10 +3,9 @@
         <div class="title">
             <h1>{{definition.name}}</h1>
         </div>
-        <dynamic-form :row="definition.form.row" :col="definition.form.col" :cells="cells"
-                      v-model="data"></dynamic-form>
+        <dynamic-form :form="definition.form.id" ref="form" v-model="data"></dynamic-form>
         <div class="toolbar">
-            <el-button>保存</el-button>
+            <el-button @click="handleClickSave">保存</el-button>
             <el-button>提交</el-button>
         </div>
     </div>
@@ -38,6 +37,11 @@
         computed: {
             cells() {
                 return JSON.parse(this.definition.form.cells);
+            }
+        },
+        methods: {
+            handleClickSave() {
+                this.$refs.form.save();
             }
         }
     }

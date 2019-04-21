@@ -23,11 +23,12 @@
             </div>
         </el-header>
         <el-container>
-            <el-aside>
+            <el-aside width="200px">
                 <el-menu :default-active="this.$route.path" router id="menu">
                     <template v-for="nav in this.navs">
                         <el-submenu :index="nav.name" :key="nav.id">
                             <template slot="title">
+                                <i :class="nav.iconClass"></i>
                                 <span>{{nav.name}}</span>
                             </template>
                             <el-menu-item v-for="subNav in nav.children" :key="subNav.id" :index="subNav.path">
