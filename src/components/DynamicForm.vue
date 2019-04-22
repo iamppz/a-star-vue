@@ -36,7 +36,6 @@
                 data: {}
             }
         },
-        name: 'DynamicForm',
         async mounted() {
             let resp = await dynamicFormService.get(this.formId);
             if (resp.data.success) {

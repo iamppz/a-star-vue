@@ -1,9 +1,13 @@
 import instance from "../utils/instance";
 
-class ProcessDefinitionService {
-    async get(id) {
+class ProcessService {
+    async getDefinition(id) {
         return await instance.get(`/api/process/definition?id=${id}`);
+    }
+
+    async getInstance(id) {
+        return await instance.get(`/api/process/instance?id=${id}`);
     }
 }
 
-export default new ProcessDefinitionService();
+export default new ProcessService();

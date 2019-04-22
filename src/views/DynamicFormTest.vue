@@ -1,6 +1,6 @@
 <template>
     <div>
-        <process-instance></process-instance>
+        <process-instance :definition-id="1" id="14"></process-instance>
     </div>
 </template>
 <script>

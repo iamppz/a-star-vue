@@ -11,10 +11,8 @@
     </div>
 </template>
 <script>
-    import {Message} from "element-ui";
-
     import DynamicForm from "./DynamicForm";
-    import processDefinitionService from "../service/processDefinitionService";
+    import processService from "../service/processDefinitionService";
 
     export default {
         components: {DynamicForm},
@@ -25,7 +23,14 @@
             }
         },
         async created() {
-            let resp = await processDefinitionService.get(1);
+            if (this.id) {
+                let resp = await processService.getInstance(this.id);
+                if (resp.data.success) {
+                    this.definitionId = resp.data.data.processDefinitionId;
+                    this.dataId = resp.data.data.dataId;
+                }
+            }
+            let resp = await processService.getDefinition(this.definitionId);
             if (resp.data.success) {
                 this.definition = resp.data.data;
             }
@@ -36,6 +41,16 @@
         methods: {
             handleClickSave() {
                 this.$refs.form.save();
+            }
+        },
+        props: {
+            id: {
+                type: Number,
+                default: null
+            },
+            definitionId: {
+                type: Number,
+                default: null
             }
         }
     }
