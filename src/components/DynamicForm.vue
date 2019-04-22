@@ -45,7 +45,7 @@
             }
 
             if (this.dataId) {
-                resp = await dynamicFormService.getData(this.formId, this.dataId);
+                resp = await dynamicFormService.getData(this.form.id, this.dataId);
                 if (resp.data.success) {
                     this.data = resp.data.data;
                 }
@@ -70,20 +70,21 @@
                 let filtered = this.cells.filter(cell => cell.row === row && cell.col === col);
                 return filtered.length > 0 ? filtered[0] : null;
             },
-            async save() {
-                if (this.data.id) {
-                    let resp = await dynamicFormService.update(this.formId, this.data);
-                    if (resp.data.success) {
-                        Message.success(resp.data.message);
-                    }
-                    return;
-                }
-
-                let resp = await dynamicFormService.add(this.formId, this.data);
+            async update() {
+                let resp = await dynamicFormService.update(this.form.id, this.data);
                 if (resp.data.success) {
-                    this.data.id = resp.data.data;
                     Message.success(resp.data.message);
                 }
+            },
+            async add() {
+                let resp = await dynamicFormService.add(this.form.id, this.data);
+                if (!resp.data.success) {
+                    return null;
+                }
+
+                this.data.id = resp.data.data;
+                Message.success(resp.data.message);
+                return this.data.id;
             },
             validate() {
             }

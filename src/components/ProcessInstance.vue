@@ -1,25 +1,27 @@
 <template>
-    <div class="container" v-if="definition.form">
+    <div class="container" v-if="definition">
         <div class="title">
             <h1>{{definition.name}}</h1>
         </div>
-        <dynamic-form :form-id="definition.form.id" :data-id="instance.dataId" ref="form"></dynamic-form>
+        <dynamic-form v-if="definition !== null" :form-id="definition.form.id" :data-id="instance ? instance.dataId : null" ref="form"></dynamic-form>
         <div class="toolbar">
-            <el-button @click="handleClickSave">保存</el-button>
-            <el-button>提交</el-button>
+            <el-button v-if="instance  === null" @click="handleClickSave">保存</el-button>
+            <el-button v-if="instance !== null">提交</el-button>
         </div>
     </div>
 </template>
 <script>
+    import {Message} from "element-ui";
+
     import DynamicForm from "./DynamicForm";
-    import processService from "../service/processDefinitionService";
+    import processService from "../service/processService";
 
     export default {
         components: {DynamicForm},
         data() {
             return {
-                instance: {},
-                definition: {}
+                instance: null,
+                definition: null
             }
         },
         async created() {
@@ -29,7 +31,8 @@
                     this.instance = resp.data.data;
                 }
             }
-            let definitionId = this.definitionId || this.instance.processDefinitionId;
+
+            let definitionId = this.instance ? this.instance.processDefinitionId : this.definitionId;
             let resp = await processService.getDefinition(definitionId);
             if (resp.data.success) {
                 this.definition = resp.data.data;
@@ -39,8 +42,16 @@
         },
         computed: {},
         methods: {
-            handleClickSave() {
-                this.$refs.form.save();
+            async handleClickSave() {
+                let dataId = await this.$refs.form.add();
+                if (dataId) {
+                    console.log(dataId);
+                    let resp = await processService.create(this.definition.id, dataId);
+                    if (resp.data.success) {
+                        Message.success("提交成功");
+                        this.instance = resp.data.data;
+                    }
+                }
             }
         },
         props: {
