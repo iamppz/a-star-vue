@@ -17,8 +17,6 @@
     </div>
 </template>
 <script>
-    import {Message} from "element-ui";
-
     import dynamicFormService from "../service/dynamicFormService";
 
     export default {
@@ -45,7 +43,7 @@
                 this.form = resp.data.data;
             }
 
-            if (!this.dataId) {
+            if (this.dataId) {
                 resp = await dynamicFormService.getData(this.formId, this.dataId);
                 if (resp.data.success) {
                     this.data = resp.data.data;
@@ -54,7 +52,7 @@
         },
         computed: {
             widthPixel() {
-                return this.width + 'px';
+                return (this.form.width || 720) + 'px';
             },
             cellWidth() {
                 return this.width / this.col;
