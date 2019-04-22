@@ -8,6 +8,10 @@ class DynamicFormService {
     async get(formId) {
         return await instance.get(`/api/dynamicForm/?formId=${formId}`);
     }
+
+    async getData(formId, dataId) {
+        return await instance.get(`/api/dynamicForm/data?formId=${formId}&dataId=${dataId}`);
+    }
 }
 
 export default new DynamicFormService();

@@ -151,8 +151,6 @@
                         Message.success(resp.data.message);
                         this.dialogVisible = false;
                         this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                    } else {
-                        Message.error(resp.data.message);
                     }
                 } else {
                     let resp = await userService.add(this.form);
@@ -160,8 +158,6 @@
                         Message.success(resp.data.message);
                         this.dialogVisible = false;
                         this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                    } else {
-                        Message.error(resp.data.message);
                     }
                 }
             },
@@ -172,8 +168,6 @@
                         Message.success(resp.data.message);
                         this.departmentDialogVisible = false;
                         this.$refs.tree.getCurrentNode().name = this.departmentForm.name;
-                    } else {
-                        Message.error(resp.data.message);
                     }
                 } else {
                     let resp = await departmentService.add(this.departmentForm);
@@ -184,9 +178,6 @@
                             this.$set(this.$refs.tree.getCurrentNode(), 'children', []);
                         }
                         this.$refs.tree.getCurrentNode().children.push(resp.data.data);
-
-                    } else {
-                        Message.error(resp.data.message);
                     }
                 }
             },
@@ -195,8 +186,6 @@
                 if (resp.data.success) {
                     Message.success(resp.data.message);
                     user.disabled = false;
-                } else {
-                    Message.error(resp.data.message);
                 }
             },
             async handleClickDisable(user) {
@@ -204,8 +193,6 @@
                 if (resp.data.success) {
                     Message.success(resp.data.message);
                     user.disabled = true;
-                } else {
-                    Message.error(resp.data.message);
                 }
             },
             async handleClickTreeNode(department) {
@@ -245,8 +232,6 @@
                         const children = parent.data.children || parent.data;
                         const index = children.findIndex(d => d.id === data.id);
                         children.splice(index, 1);
-                    } else {
-                        Message.error(resp.data.message);
                     }
                 }).catch(() => {
                     Message.info('取消操作');
@@ -261,8 +246,6 @@
                     let resp = await userService.resetPassword(data.id);
                     if (resp.data.success) {
                         Message.success(resp.data.message);
-                    } else {
-                        Message.error(resp.data.message);
                     }
                 }).catch(() => {
                     Message.info('取消操作');

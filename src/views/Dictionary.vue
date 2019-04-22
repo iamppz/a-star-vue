@@ -94,8 +94,6 @@
                         this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
                     });
                 }
-            } else {
-                Message.error(resp.data.message);
             }
         },
         methods: {
@@ -107,8 +105,6 @@
                 let resp = await dictionaryService.getItems(dictionary.name);
                 if (resp.data.success) {
                     this.dictionaryItems = resp.data.data;
-                } else {
-                    Message.error(resp.data.message);
                 }
             },
             handleClickCreateDictionaryItem() {
@@ -124,8 +120,6 @@
                 if (resp.data.success) {
                     Message.success(resp.data.message);
                     this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                } else {
-                    Message.error(resp.data.message);
                 }
             },
             async handleClickAddDictionaryItem() {
@@ -135,8 +129,6 @@
                     Message.success(resp.data.message);
                     this.addDialogVisible = false;
                     this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                } else {
-                    Message.error(resp.data.message);
                 }
             },
             async handleClickSaveDictionaryItem() {
@@ -145,8 +137,6 @@
                     Message.success(resp.data.message);
                     this.editDialogVisible = false;
                     this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                } else {
-                    Message.error(resp.data.message);
                 }
             }
         }

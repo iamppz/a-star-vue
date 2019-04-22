@@ -139,8 +139,6 @@
                             Message.success("操作成功，请使用新密码重新登录");
                             this.passwordDialogVisible = false;
                             this.logout();
-                        } else {
-                            Message.error(resp.data.message);
                         }
                     } else {
                         return false;

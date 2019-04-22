@@ -28,8 +28,6 @@
             let resp = await processDefinitionService.get(1);
             if (resp.data.success) {
                 this.definition = resp.data.data;
-            } else {
-                Message.error(resp.data.message);
             }
         },
         async mounted() {

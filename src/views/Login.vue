@@ -80,7 +80,6 @@
                     let resp = await loginService.login(this.form.account, this.form.password);
                     this.submitting = false;
                     if (!resp.data.success) {
-                        Message.error(resp.data.message);
                         return;
                     }
 

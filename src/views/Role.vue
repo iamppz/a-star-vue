@@ -90,9 +90,7 @@
             async handleClickSaveDictionaryItem() {
                 let keys = this.$refs.tree.getCheckedKeys();
                 let resp = await roleService.savePermission(this.currentRoleId, keys);
-                if (!resp.data.success) {
-                    Message.error(resp.data.message);
-                } else {
+                if (resp.data.success) {
                     keys = this.$refs.navTree.getCheckedKeys();
                     resp = await roleService.saveNav(this.currentRoleId, keys);
                     if (!resp.data.success) {
@@ -110,14 +108,10 @@
                 let resp = await roleService.getPermission(roleId);
                 if (resp.data.success) {
                     this.$refs.tree.setCheckedKeys(resp.data.data.map(item => item.permission.id));
-                } else {
-                    Message.error(resp.data.message);
                 }
                 resp = await roleService.getNav(roleId);
                 if (resp.data.success) {
                     this.$refs.navTree.setCheckedKeys(resp.data.data.map(item => item.navId));
-                } else {
-                    Message.error(resp.data.message);
                 }
             },
             async handleClickSaveRole() {
@@ -125,8 +119,6 @@
                 if (resp.data.success) {
                     this.roleDialogVisible = false;
                     this.loadRoleList();
-                } else {
-                    Message.error(resp.data.message);
                 }
             },
             handleClickCreate() {

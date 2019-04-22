@@ -43,8 +43,13 @@
             let resp = await dynamicFormService.get(this.formId);
             if (resp.data.success) {
                 this.form = resp.data.data;
-            } else {
-                Message.error(resp.data.message);
+            }
+
+            if (!this.dataId) {
+                resp = await dynamicFormService.getData(this.formId, this.dataId);
+                if (resp.data.success) {
+                    this.data = resp.data.data;
+                }
             }
         },
         computed: {
@@ -66,9 +71,7 @@
                 let filtered = this.cells.filter(cell => cell.row === row && cell.col === col);
                 return filtered.length > 0 ? filtered[0] : null;
             },
-            add() {
-            },
-            update() {
+            save() {
             },
             validate() {
             }
