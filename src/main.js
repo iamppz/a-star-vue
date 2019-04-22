@@ -13,7 +13,8 @@ new Vue({
     router,
     mounted() {
         this.$on('login', async () => {
-            this.$router.push('/app/home');
+            let redirect = this.$route.query.redirect;
+            this.$router.push(redirect || '/app/home');
         });
     }
 });

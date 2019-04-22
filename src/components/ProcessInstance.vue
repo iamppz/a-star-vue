@@ -3,7 +3,7 @@
         <div class="title">
             <h1>{{definition.name}}</h1>
         </div>
-        <dynamic-form :form-id="definition.form.id" :data-id="dataId" ref="form"></dynamic-form>
+        <dynamic-form :form-id="definition.form.id" :data-id="instance.dataId" ref="form"></dynamic-form>
         <div class="toolbar">
             <el-button @click="handleClickSave">保存</el-button>
             <el-button>提交</el-button>
@@ -18,19 +18,19 @@
         components: {DynamicForm},
         data() {
             return {
-                definition: {},
-                dataId: null
+                instance: {},
+                definition: {}
             }
         },
         async created() {
             if (this.id) {
                 let resp = await processService.getInstance(this.id);
                 if (resp.data.success) {
-                    this.definitionId = resp.data.data.processDefinitionId;
-                    this.dataId = resp.data.data.dataId;
+                    this.instance = resp.data.data;
                 }
             }
-            let resp = await processService.getDefinition(this.definitionId);
+            let definitionId = this.definitionId || this.instance.processDefinitionId;
+            let resp = await processService.getDefinition(definitionId);
             if (resp.data.success) {
                 this.definition = resp.data.data;
             }
