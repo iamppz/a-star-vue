@@ -1,6 +1,5 @@
 <template>
     <div :style="{width: widthPixel}">
-        <input type="hidden" v-model="data.id"/>
         <table class="dynamic-form" width="100%">
             <tr v-for="i in form.row" v-bind:key="i">
                 <template v-for="j in form.col">
@@ -9,7 +8,8 @@
                         :height="cellHeight * getCell(i, j).rowspan + 'px'">
                         <label v-if="getCell(i, j).type === 'label'">{{getCell(i, j).text}}</label>
                         <input v-if="getCell(i, j).type === 'input'" v-model="data[getCell(i, j).binding]"/>
-                        <textarea v-if="getCell(i, j).type === 'textarea'" v-model="data[getCell(i, j).binding]"></textarea>
+                        <textarea v-if="getCell(i, j).type === 'textarea'"
+                                  v-model="data[getCell(i, j).binding]"></textarea>
                     </td>
                 </template>
             </tr>
@@ -17,6 +17,8 @@
     </div>
 </template>
 <script>
+    import {Message} from "element-ui";
+
     import dynamicFormService from "../service/dynamicFormService";
 
     export default {
@@ -26,7 +28,7 @@
                 default: 0
             },
             dataId: {
-                type: Object,
+                type: Number,
                 default: null
             }
         },
@@ -68,7 +70,20 @@
                 let filtered = this.cells.filter(cell => cell.row === row && cell.col === col);
                 return filtered.length > 0 ? filtered[0] : null;
             },
-            save() {
+            async save() {
+                if (this.data.id) {
+                    let resp = await dynamicFormService.update(this.formId, this.data);
+                    if (resp.data.success) {
+                        Message.success(resp.data.message);
+                    }
+                    return;
+                }
+
+                let resp = await dynamicFormService.add(this.formId, this.data);
+                if (resp.data.success) {
+                    this.data.id = resp.data.data;
+                    Message.success(resp.data.message);
+                }
             },
             validate() {
             }
