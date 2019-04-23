@@ -5,8 +5,10 @@
         </div>
         <dynamic-form v-if="definition !== null" :form-id="definition.form.id" :data-id="instance ? instance.dataId : null" ref="form"></dynamic-form>
         <div class="toolbar">
-            <el-button v-if="instance  === null" @click="handleClickSave">保存</el-button>
-            <el-button v-if="instance !== null">提交</el-button>
+            <el-button v-if="btnSaveVisible" @click="handleClickSave">保存</el-button>
+            <el-button v-if="btnSubmitVisible" @click="handleClickSubmit">提交</el-button>
+            <el-button v-if="btnApproveVisible" @click="handleClickApprove">通过</el-button>
+            <el-button v-if="btnRejectVisible" @click="handleClickReject">驳回</el-button>
         </div>
     </div>
 </template>
@@ -40,7 +42,20 @@
         },
         async mounted() {
         },
-        computed: {},
+        computed: {
+            btnSaveVisible() {
+                return this.instance === null || this.instance.state === 'unsubmit';
+            },
+            btnSubmitVisible() {
+                return this.instance !== null && this.instance.state === 'unsubmit';
+            },
+            btnApproveVisible() {
+                return this.instance !== null && this.instance.state === 'inprocess';
+            },
+            btnRejectVisible() {
+                return this.instance !== null && this.instance.state === 'inprocess';
+            }
+        },
         methods: {
             async handleClickSave() {
                 let dataId = await this.$refs.form.add();
@@ -48,9 +63,30 @@
                     console.log(dataId);
                     let resp = await processService.create(this.definition.id, dataId);
                     if (resp.data.success) {
-                        Message.success("提交成功");
+                        Message.success(resp.data.message);
                         this.instance = resp.data.data;
                     }
+                }
+            },
+            async handleClickSubmit() {
+                let resp = await processService.submit(this.instance.id);
+                if (resp.data.success) {
+                    Message.success(resp.data.message);
+                    this.instance = resp.data.data;
+                }
+            },
+            async handleClickApprove() {
+                let resp = await processService.approve(this.instance.id);
+                if (resp.data.success) {
+                    Message.success(resp.data.message);
+                    this.instance = resp.data.data;
+                }
+            },
+            async handleClickReject() {
+                let resp = await processService.reject(this.instance.id);
+                if (resp.data.success) {
+                    Message.success(resp.data.message);
+                    this.instance = resp.data.data;
                 }
             }
         },
