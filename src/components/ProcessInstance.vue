@@ -60,7 +60,6 @@
             async handleClickSave() {
                 let dataId = await this.$refs.form.add();
                 if (dataId) {
-                    console.log(dataId);
                     let resp = await processService.create(this.definition.id, dataId);
                     if (resp.data.success) {
                         Message.success(resp.data.message);
