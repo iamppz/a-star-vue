@@ -3211,11 +3211,6 @@ etag@~1.8.1:
   resolved "http://registry.npm.taobao.org/etag/download/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
-eve-raphael@0.5.0:
-  version "0.5.0"
-  resolved "http://registry.npm.taobao.org/eve-raphael/download/eve-raphael-0.5.0.tgz#17c754b792beef3fa6684d79cf5a47c63c4cda30"
-  integrity sha1-F8dUt5K+7z+maE15z1pHxjxM2jA=
-
 event-pubsub@4.3.0:
   version "4.3.0"
   resolved "http://registry.npm.taobao.org/event-pubsub/download/event-pubsub-4.3.0.tgz#f68d816bc29f1ec02c539dc58c8dd40ce72cb36e"
@@ -3569,13 +3564,6 @@ flatted@^2.0.0:
   version "2.0.0"
   resolved "http://registry.npm.taobao.org/flatted/download/flatted-2.0.0.tgz#55122b6536ea496b4b44893ee2608141d10d9916"
   integrity sha1-VRIrZTbqSWtLRIk+4mCBQdENmRY=
-
-flowchart.js@^1.11.3:
-  version "1.11.3"
-  resolved "http://registry.npm.taobao.org/flowchart.js/download/flowchart.js-1.11.3.tgz#e27e2c2bb5ed0e78bea403f1370a0ea3dfe274dd"
-  integrity sha1-4n4sK7XtDni+pAPxNwoOo9/idN0=
-  dependencies:
-    raphael "2.2.7"
 
 flush-write-stream@^1.0.0:
   version "1.1.1"
@@ -6442,13 +6430,6 @@ range-parser@^1.0.3, range-parser@~1.2.0:
   version "1.2.0"
   resolved "http://registry.npm.taobao.org/range-parser/download/range-parser-1.2.0.tgz#f49be6b487894ddc40dcc94a322f611092e00d5e"
   integrity sha1-9JvmtIeJTdxA3MlKMi9hEJLgDV4=
-
-raphael@2.2.7:
-  version "2.2.7"
-  resolved "http://registry.npm.taobao.org/raphael/download/raphael-2.2.7.tgz#231b19141f8d086986d8faceb66f8b562ee2c810"
-  integrity sha1-IxsZFB+NCGmG2PrOtm+LVi7iyBA=
-  dependencies:
-    eve-raphael "0.5.0"
 
 raw-body@2.3.3:
   version "2.3.3"

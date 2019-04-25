@@ -5,7 +5,7 @@ import Home from "../views/Home";
 import User from "../views/User";
 import Role from "../views/Role";
 import App from "../views/App";
-import Flowchart from "../views/process/Flowchart";
+import Flowchart from "../views/process/FlowDesign";
 import EChartsTest from "../views/EChartsTest";
 import Dictionary from "../views/Dictionary";
 import DynamicFormTest from "../views/DynamicFormTest";
@@ -22,7 +22,7 @@ const routes = [
             {path: 'role', component: Role},
             {path: 'echartsTest', component: EChartsTest},
             {path: 'dynamicFormTest', component: DynamicFormTest},
-            {path: 'process/flowchart', component: Flowchart},
+            {path: 'process/flowDesign', component: Flowchart},
             {path: 'dictionary', component: Dictionary}
         ]
     }
