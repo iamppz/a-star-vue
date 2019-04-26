@@ -7,7 +7,9 @@
                 <div class="zoom-in"></div>
             </div>
             <div class="box-scale" id="box-scale" style="transform: scale(1); transform-origin: 50% 0px 0px;">
-                <node v-if="startNode !== null" :node="startNode"></node>
+                <template v-if="nodes.length > 0">
+                    <node :node="startNode"></node>
+                </template>
                 <div class="end-node">
                     <div class="end-node-circle"></div>
                     <div class="end-node-text">流程结束</div>
@@ -18,7 +20,7 @@
 </template>
 <script>
     import processService from "../../service/processService";
-    import Node from "../../components/flow/Node";
+    import Node from "./Node";
 
     export default {
         components: {Node},
