@@ -22048,6 +22048,14 @@ textarea.ant-pagination-options-quick-jumper input {
     white-space: nowrap
 }
 
+.node-wrap-box .title {
+    background: rgb(255, 148, 62);
+}
+
+.start-node.node-wrap-box .title {
+    background: rgb(87, 106, 149);
+}
+
 .node-wrapper-box-new {
     padding: 12px 10px
 }
@@ -22081,8 +22089,7 @@ textarea.ant-pagination-options-quick-jumper input {
 }
 
 .add-node-popover {
-    width: 300px;
-    min-height: 160px
+    padding: 10px 0;
 }
 
 .add-node-popover-header {
@@ -22106,6 +22113,7 @@ textarea.ant-pagination-options-quick-jumper input {
     cursor: pointer;
     text-align: center;
     flex: 1;
+    margin: 0 10px;
     color: #191f25!important
 }
 
@@ -22816,7 +22824,6 @@ textarea.ant-input-number {
 
 .flow-design .branch-box .col-box {
     background: #f5f5f7;
-    padding-top: 30px;
     width: 340px;
 }
 
@@ -23082,7 +23089,8 @@ textarea.ant-input-number {
     border: none;
     line-height: 30px;
     -webkit-transition: all .3s cubic-bezier(.645,.045,.355,1);
-    transition: all .3s cubic-bezier(.645,.045,.355,1)
+    transition: all .3s cubic-bezier(.645,.045,.355,1);
+    padding: 0
 }
 
 .flow-design .add-node-btn .btn .iconfont {

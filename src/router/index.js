@@ -15,6 +15,7 @@ Vue.use(VueRouter);
 const routes = [
     {path: '/', component: Login},
     {path: '/login', component: Login},
+    {path: '/flowDesign', component: Flowchart},
     {
         path: '/app', component: App, children: [
             {path: 'home', component: Home},

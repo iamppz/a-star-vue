@@ -18,7 +18,7 @@
 </template>
 <script>
     import processService from "../../service/processService";
-    import Node from "../../components/FlowNode";
+    import Node from "../../components/flow/Node";
 
     export default {
         components: {Node},
@@ -35,9 +35,6 @@
         },
         computed: {
             startNode() {
-                this.nodes.filter(node => node.state !== 'end').forEach(function (node, index, array) {
-                    node.children = node.transitions.map(transition => array.find(node => node.id === transition.to));
-                });
                 return this.nodes.find(node => node.state === 'start');
             }
         }
