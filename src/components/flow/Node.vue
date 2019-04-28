@@ -26,7 +26,7 @@
         <template v-if="showNextBranch">
             <branch-box :transitions="node.transitions" :parent-intersection="intersection"></branch-box>
         </template>
-        <node v-else-if="showNextNode" :node="node.transitions[0].to"></node>
+        <node v-else-if="showNextNode" :node="node.transitions[0].to" :intersection="intersection"></node>
     </div>
 </template>
 <script>
@@ -50,10 +50,11 @@
         },
         computed: {
             showNextNode() {
+                console.log(this.node.id);
+                console.log(this.intersection);
                 return this.node.transitions.length === 1
                     && this.node.transitions[0].to.state !== 'end'
-                    && this.intersection !== null
-                    && this.node.transitions[0].to.id !== this.intersection.id;
+                    && (!this.intersection || this.node.transitions[0].to.id !== this.intersection.id);
             },
             showNextBranch() {
                 return this.node.transitions.length > 1;

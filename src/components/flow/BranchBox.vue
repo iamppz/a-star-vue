@@ -18,7 +18,7 @@
             </div>
         </div>
         <template v-if="intersection">
-            <node :node="intersection"></node>
+            <node :node="intersection" :intersection="parentIntersection"></node>
         </template>
     </div>
 </template>
@@ -35,7 +35,7 @@
                 default: () => []
             },
             parentIntersection: {
-                type: Object,
+                type: Array,
                 default: null
             }
         },
