@@ -35,7 +35,7 @@
     import EndNode from "./EndNode";
 
     export default {
-        name: 'node',
+        name: 'operation-node',
         components: {ButtonBox, EndNode, OperationNode},
         props: {
             node: {

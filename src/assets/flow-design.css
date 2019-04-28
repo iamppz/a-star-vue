@@ -22824,7 +22824,7 @@ textarea.ant-input-number {
 
 .flow-design .branch-box .col-box {
     background: #f5f5f7;
-    width: 340px;
+    /*width: 340px;*/
 }
 
 .flow-design .branch-box .col-box:before {
