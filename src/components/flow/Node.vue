@@ -24,9 +24,9 @@
             </template>
         </div>
         <template v-if="showNextBranch">
-            <branch-box :transitions="node.transitions"></branch-box>
+            <branch-box :transitions="node.transitions" :parent-intersection="intersection"></branch-box>
         </template>
-        <node v-if="showNextNode" :node="node.transitions[0].to"></node>
+        <node v-else-if="showNextNode" :node="node.transitions[0].to"></node>
     </div>
 </template>
 <script>

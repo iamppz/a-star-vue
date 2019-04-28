@@ -8,8 +8,7 @@
                             <condition :transition="transition"></condition>
                             <div :class="{'top-left-cover-line': index === 0, 'top-right-cover-line': index === transitions.length - 1}"></div>
                             <div :class="{'bottom-left-cover-line': index === 0, 'bottom-right-cover-line': index === transitions.length - 1}"></div>
-                            <template
-                                    v-if="transition.to !== null && transition.to.state !== 'end' && transition.to.id !== intersection.id">
+                            <template v-if="transition.to.state !== 'end' && (intersection == null || transition.to.id !== intersection.id)">
                                 <node :node="transition.to" :intersection="intersection"></node>
                             </template>
                         </div>
@@ -18,7 +17,7 @@
                 <button-box :btn-add-condition-visible="true"></button-box>
             </div>
         </div>
-        <template v-if="transitions.length > 1">
+        <template v-if="intersection">
             <node :node="intersection"></node>
         </template>
     </div>
@@ -34,6 +33,10 @@
             transitions: {
                 type: Array,
                 default: () => []
+            },
+            parentIntersection: {
+                type: Object,
+                default: null
             }
         },
         computed: {
