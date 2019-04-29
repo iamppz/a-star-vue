@@ -17,7 +17,7 @@
             <button-box :btn-add-condition-visible="true"></button-box>
         </div>
         <template v-if="next === 'branch'">
-            <branch-box :transitions="node.transitions" :intersection="intersection"></branch-box>
+            <branch :transitions="node.transitions" :intersection="intersection"></branch>
         </template>
         <template v-else-if="next === 'node'">
             <template v-if="node.transitions[0].to.state === 'end'">
@@ -30,13 +30,13 @@
     </div>
 </template>
 <script>
-    import ButtonBox from "./ButtonBox";
-    import OperationNode from "./OperationNode";
-    import EndNode from "./EndNode";
+    import Toolbar from "./Toolbar";
+    import Operation from "./Operation";
+    import End from "./End";
 
     export default {
         name: 'operation-node',
-        components: {ButtonBox, EndNode, OperationNode},
+        components: {ButtonBox: Toolbar, EndNode: End, OperationNode: Operation},
         props: {
             node: {
                 type: Object,
@@ -48,7 +48,7 @@
             }
         },
         beforeCreate: function () {
-            this.$options.components.BranchBox = () => import('./BranchBox.vue')
+            this.$options.components.Branch = () => import('./Branch.vue')
         },
         computed: {
             next() {

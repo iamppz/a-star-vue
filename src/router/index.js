@@ -5,7 +5,7 @@ import Home from "../views/Home";
 import User from "../views/User";
 import Role from "../views/Role";
 import App from "../views/App";
-import Flowchart from "../components/flow/Design";
+import Flowchart from "../components/flow/Canvas";
 import EChartsTest from "../views/EChartsTest";
 import Dictionary from "../views/Dictionary";
 import DynamicFormTest from "../views/DynamicFormTest";
