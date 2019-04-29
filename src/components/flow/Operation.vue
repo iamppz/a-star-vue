@@ -8,35 +8,51 @@
                         <span class="editable-title">审批人</span>
                         <i class="anticon anticon-close close"></i>
                     </div>
-                    <div class="content">
+                    <div class="content" @click="handleApproverDivClick">
                         <div class="text">{{ node.name }}</div>
                         <i class="anticon anticon-right arrow"></i>
                     </div>
                 </div>
             </div>
-            <button-box :btn-add-condition-visible="true"></button-box>
+            <toolbar :btn-add-condition-visible="true"></toolbar>
         </div>
         <template v-if="next === 'branch'">
             <branch :transitions="node.transitions" :intersection="intersection"></branch>
         </template>
         <template v-else-if="next === 'node'">
             <template v-if="node.transitions[0].to.state === 'end'">
-                <end-node></end-node>
+                <end></end>
             </template>
             <template v-else>
-                <operation-node :node="node.transitions[0].to" :intersection="intersection"></operation-node>
+                <operation :node="node.transitions[0].to" :intersection="intersection"></operation>
             </template>
         </template>
+        <el-dialog title="编辑节点" :visible.sync="dialogApproverVisible" :append-to-body="true" width="500px">
+            <operation-form :approver-form="approverForm"></operation-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogApproverVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleClickSaveApprover">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
+    import {Message} from "element-ui";
+
     import Toolbar from "./Toolbar";
-    import Operation from "./Operation";
     import End from "./End";
+    import OperationForm from "./OperationForm";
+    import processService from "../../service/processService";
 
     export default {
-        name: 'operation-node',
-        components: {ButtonBox: Toolbar, EndNode: End, OperationNode: Operation},
+        name: 'operation',
+        components: {Toolbar, End, OperationForm},
+        data() {
+            return {
+                approverForm: {},
+                dialogApproverVisible: false
+            }
+        },
         props: {
             node: {
                 type: Object,
@@ -60,6 +76,24 @@
                     return 'node';
                 }
                 return 'nothing';
+            }
+        },
+        methods: {
+            handleApproverDivClick() {
+                this.approverForm = {
+                    id: this.node.id,
+                    name: this.node.name,
+                    approverIds: this.node.approverIds
+                };
+                this.dialogApproverVisible = true;
+            },
+            async handleClickSaveApprover() {
+                let resp = await processService.updateNode(this.approverForm);
+                if (resp.data.success) {
+                    this.dialogApproverVisible = false;
+                    Object.assign(this.node, this.approverForm);
+                    Message.success(resp.data.message);
+                }
             }
         }
     }
