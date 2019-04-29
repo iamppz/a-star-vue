@@ -20,7 +20,7 @@
         <template v-if="innerIntersection.state === 'end'">
             <end></end>
         </template>
-        <template v-else>
+        <template v-else-if="intersection === null || intersection.id !== innerIntersection.id">
             <operation :node="innerIntersection" :intersection="intersection"></operation>
         </template>
     </div>
