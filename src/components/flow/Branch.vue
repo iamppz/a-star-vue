@@ -9,30 +9,32 @@
                             <div :class="{'top-left-cover-line': index === 0, 'top-right-cover-line': index === transitions.length - 1}"></div>
                             <div :class="{'bottom-left-cover-line': index === 0, 'bottom-right-cover-line': index === transitions.length - 1}"></div>
                             <template v-if="transition.to.id !== innerIntersection.id">
-                                <operation-node :node="transition.to" :intersection="innerIntersection"></operation-node>
+                                <operation :node="transition.to" :intersection="innerIntersection"></operation>
                             </template>
                         </div>
                     </template>
                 </div>
-                <button-box :btn-add-condition-visible="true"></button-box>
+                <toolbar :btn-add-condition-visible="true" :from="endings"></toolbar>
             </div>
         </div>
         <template v-if="innerIntersection.state === 'end'">
-            <end-node></end-node>
+            <end></end>
         </template>
-        <template v-else>
-            <operation-node :node="innerIntersection" :intersection="intersection"></operation-node>
+        <template v-else-if="intersection === null || intersection.id !== innerIntersection.id">
+            <operation :node="innerIntersection" :intersection="intersection""></operation>
         </template>
     </div>
 </template>
 <script>
-    import ButtonBox from './ButtonBox';
+    import Toolbar from './Toolbar';
     import Condition from './Condition';
-    import OperationNode from "./OperationNode";
-    import EndNode from "./EndNode";
+    import Operation from "./Operation";
+    import End from "./End";
+    import {pathing} from "../../utils/process";
+
 
     export default {
-        components: {ButtonBox, Condition, OperationNode, EndNode},
+        components: {Toolbar, Condition, Operation, End},
         props: {
             transitions: {
                 type: Array,
@@ -68,6 +70,18 @@
                     let find = paths[1].find(r => r.id === t.id);
                     return find !== undefined && find !== null;
                 });
+            },
+            endings() {
+                let from = JSON.parse(JSON.stringify(this.transitions[0].from));
+                from.transitions = this.transitions;
+                let paths = pathing(from);
+                let result = paths.map(path => {
+                    let intersection = path.find(node => node.id === this.innerIntersection.id);
+                    return path.filter(node => path.indexOf(node) < path.indexOf(intersection));
+                });
+                console.log("endings: ");
+                console.log(result.map(item => item.map(n => n.id)));
+                return result;
             }
         }
     }

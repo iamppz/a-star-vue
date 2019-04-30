@@ -9,16 +9,16 @@
                 </div>
                 <div class="content">{{transition.expression || '无条件'}}</div>
             </div>
-            <flow-node-add-button-box></flow-node-add-button-box>
+            <toolbar></toolbar>
         </div>
     </div>
 </template>
 <script>
-    import FlowNodeAddButtonBox from "./ButtonBox";
+    import Toolbar from "./Toolbar";
 
     export default {
         components: {
-            FlowNodeAddButtonBox
+            Toolbar
         },
         name: 'condition',
         props: {

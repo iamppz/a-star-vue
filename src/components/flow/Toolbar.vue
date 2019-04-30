@@ -12,7 +12,8 @@
                                 </div>
                                 <p>审批人</p>
                             </a>
-                            <a class="add-node-popover-item condition" v-if="btnAddConditionVisible">
+                            <a class="add-node-popover-item condition" v-if="btnAddConditionVisible"
+                               @click="handleClickAddBranch">
                                 <div class="item-wrapper">
                                     <span class="iconfont"></span>
                                 </div>
@@ -24,24 +25,33 @@
                 </el-popover>
             </div>
         </div>
-        <el-dialog title="收货地址" :visible.sync="dialogApproverVisible" :append-to-body="true" width="500px">
-            <el-form :model="approverForm" label-width="80px">
-                <el-form-item label="节点名称">
-                    <el-input v-model="approverForm.name"></el-input>
+        <el-dialog title="新建节点" :visible.sync="dialogApproverVisible" :append-to-body="true" width="500px">
+            <operation-form :approver-form="approverForm"></operation-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogApproverVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogApproverVisible = false">确 定</el-button>
+            </div>
+        </el-dialog>
+        <el-dialog title="新建分支" :visible.sync="dialogBranchVisible" :append-to-body="true" width="500px">
+            <el-form :model="branchForm" label-width="80px">
+                <el-form-item label="名称">
+                    <el-input v-model="branchForm.name"></el-input>
                 </el-form-item>
-                <el-form-item label="审核人">
-                    <el-input v-model="approverForm.name"></el-input>
+                <el-form-item label="表达式">
+                    <el-input v-model="branchForm.expression"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                <el-button @click="dialogBranchVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogBranchVisible = false">确 定</el-button>
             </div>
         </el-dialog>
     </div>
 </template>
 <script>
+    import OperationForm from "./OperationForm";
     export default {
+        components: {OperationForm},
         props: {
             btnAddApproverVisible: {
                 type: Boolean,
@@ -55,16 +65,22 @@
         data() {
             return {
                 dialogApproverVisible: false,
+                dialogBranchVisible: false,
                 approverForm: {},
+                branchForm: {},
                 visible: false
             }
         },
         methods: {
             handleClickAddApprover() {
                 this.visible = false;
-                this.$nextTick(function () {
-                    this.dialogApproverVisible = true;
-                });
+                this.dialogApproverVisible = true;
+                this.approverForm = {};
+            },
+            handleClickAddBranch() {
+                this.visible = false;
+                this.dialogBranchVisible = true;
+                this.branchForm = {};
             }
         }
     }

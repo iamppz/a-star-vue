@@ -8,7 +8,7 @@
             </div>
             <div class="box-scale" id="box-scale" style="transform: scale(1); transform-origin: 50% 0px 0px;">
                 <template v-if="nodes.length > 0">
-                    <start-node :node="startNode"></start-node>
+                    <start :node="startNode"></start>
                 </template>
             </div>
         </div>
@@ -16,15 +16,19 @@
 </template>
 <script>
     import processService from "../../service/processService";
-    import StartNode from "./StartNode";
+    import Start from "./Start";
+    import {pathing} from "../../utils/process";
+
 
     export default {
-        components: {StartNode},
+        components: {Start},
         async mounted() {
             let resp = await processService.getNodes(this.$route.query.def || 1);
             if (resp.data.success) {
                 this.nodes = resp.data.data;
             }
+
+            pathing(this.startNode);
         },
         data() {
             return {

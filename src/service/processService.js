@@ -13,6 +13,11 @@ class ProcessService {
         return await instance.get(`/api/process/nodes?processDefinitionId=${id}`);
     }
 
+    async updateNode(node) {
+        let url = `/api/process/node?id=${node.id}&name=${node.name}&approverIds=${node.approverIds}`;
+        return await instance.put(url);
+    }
+
     async create(workflowDefinitionId, dataId, attachmentId) {
         return await instance.post('/api/process/instance', {
             workflowDefinitionId, dataId, attachmentId
