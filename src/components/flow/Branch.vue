@@ -14,14 +14,14 @@
                         </div>
                     </template>
                 </div>
-                <toolbar :btn-add-condition-visible="true"></toolbar>
+                <toolbar :btn-add-condition-visible="true" :from="endings"></toolbar>
             </div>
         </div>
         <template v-if="innerIntersection.state === 'end'">
             <end></end>
         </template>
         <template v-else-if="intersection === null || intersection.id !== innerIntersection.id">
-            <operation :node="innerIntersection" :intersection="intersection"></operation>
+            <operation :node="innerIntersection" :intersection="intersection""></operation>
         </template>
     </div>
 </template>
@@ -30,6 +30,8 @@
     import Condition from './Condition';
     import Operation from "./Operation";
     import End from "./End";
+    import {pathing} from "../../utils/process";
+
 
     export default {
         components: {Toolbar, Condition, Operation, End},
@@ -68,6 +70,18 @@
                     let find = paths[1].find(r => r.id === t.id);
                     return find !== undefined && find !== null;
                 });
+            },
+            endings() {
+                let from = JSON.parse(JSON.stringify(this.transitions[0].from));
+                from.transitions = this.transitions;
+                let paths = pathing(from);
+                let result = paths.map(path => {
+                    let intersection = path.find(node => node.id === this.innerIntersection.id);
+                    return path.filter(node => path.indexOf(node) < path.indexOf(intersection));
+                });
+                console.log("endings: ");
+                console.log(result.map(item => item.map(n => n.id)));
+                return result;
             }
         }
     }

@@ -1,5 +1,5 @@
 <template>
-    <el-form :model="approverForm" label-width="130px">
+    <el-form :model="approverForm" label-width="100px">
         <input type="hidden" v-model="approverForm.id"/>
         <el-form-item label="名称">
             <el-input v-model="approverForm.name"></el-input>
