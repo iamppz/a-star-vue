@@ -95,7 +95,12 @@
                 this.source.forEach(node => {
                     node.transitions[0].to = this.approverForm;
                 });
-                this.approverForm.to = this.destination;
+                this.approverForm.transitions = [{
+                    name: 'Default',
+                    from: this.approverForm,
+                    to: this.destination,
+                    expression: null
+                }];
                 this.dialogApproverVisible = false;
             }
         }

@@ -72,9 +72,7 @@
                 });
             },
             endings() {
-                let from = JSON.parse(JSON.stringify(this.transitions[0].from));
-                from.transitions = this.transitions;
-                let paths = pathing(from);
+                let paths = pathing(this.transitions[0].from);
                 let result = paths.map(path => {
                     let intersection = path.find(node => node.id === this.innerIntersection.id);
                     return path.slice().reverse().find(node => path.indexOf(node) < path.indexOf(intersection));
