@@ -29,7 +29,7 @@
             <operation-form :approver-form="approverForm"></operation-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogApproverVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogApproverVisible = false">确 定</el-button>
+                <el-button type="primary" @click="handleClickSaveApprover">确 定</el-button>
             </div>
         </el-dialog>
         <el-dialog title="新建分支" :visible.sync="dialogBranchVisible" :append-to-body="true" width="500px">
@@ -60,6 +60,14 @@
             btnAddConditionVisible: {
                 type: Boolean,
                 default: false
+            },
+            source: {
+                type: Array,
+                default: () => []
+            },
+            destination: {
+                type: Object,
+                default: null
             }
         },
         data() {
@@ -81,6 +89,14 @@
                 this.visible = false;
                 this.dialogBranchVisible = true;
                 this.branchForm = {};
+            },
+            handleClickSaveApprover() {
+                this.approverForm.id = 10000;
+                this.source.forEach(node => {
+                    node.transitions[0].to = this.approverForm;
+                });
+                this.approverForm.to = this.destination;
+                this.dialogApproverVisible = false;
             }
         }
     }

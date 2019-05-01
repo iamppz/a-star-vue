@@ -27,7 +27,6 @@
             if (resp.data.success) {
                 this.nodes = resp.data.data;
             }
-
             pathing(this.startNode);
         },
         data() {
