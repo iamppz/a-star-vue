@@ -50,6 +50,7 @@
 </template>
 <script>
     import OperationForm from "./OperationForm";
+
     export default {
         components: {OperationForm},
         props: {
@@ -66,8 +67,8 @@
                 default: () => []
             },
             destination: {
-                type: Object,
-                default: null
+                type: Array,
+                default: () => []
             }
         },
         data() {
@@ -92,15 +93,24 @@
             },
             handleClickSaveApprover() {
                 this.approverForm.id = 10000;
-                this.source.forEach(node => {
-                    node.transitions[0].to = this.approverForm;
-                });
-                this.approverForm.transitions = [{
+                if (this.source.length > 1) {
+                    this.source.forEach(node => {
+                        node.transitions[0].to = this.approverForm;
+                    });
+                } else {
+                    this.source[0].transitions = [{
+                        name: 'Default',
+                        from: this.source[0],
+                        to: this.approverForm,
+                        expression: null
+                    }];
+                }
+                this.approverForm.transitions = this.destination.map(item => ({
                     name: 'Default',
                     from: this.approverForm,
-                    to: this.destination,
+                    to: item,
                     expression: null
-                }];
+                }));
                 this.dialogApproverVisible = false;
             }
         }

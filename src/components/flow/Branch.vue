@@ -14,7 +14,7 @@
                         </div>
                     </template>
                 </div>
-                <toolbar :btn-add-condition-visible="true" :source="endings" :destination="innerIntersection"></toolbar>
+                <toolbar :btn-add-condition-visible="true" :source="endings" :destination="[innerIntersection]"></toolbar>
             </div>
         </div>
         <template v-if="innerIntersection.state === 'end'">
@@ -77,8 +77,11 @@
                     let intersection = path.find(node => node.id === this.innerIntersection.id);
                     return path.slice().reverse().find(node => path.indexOf(node) < path.indexOf(intersection));
                 });
+                console.log('intersection: ');
+                console.log(this.innerIntersection);
                 console.log("endings: ");
                 console.log(result.map(n => n.id));
+                // todo: distinct result's items by id to avoid situations like: 8, 10000, 10000, 10000
                 return result;
             }
         }
