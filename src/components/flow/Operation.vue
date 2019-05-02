@@ -14,7 +14,8 @@
                     </div>
                 </div>
             </div>
-            <toolbar :btn-add-condition-visible="true"></toolbar>
+            <toolbar :btn-add-condition-visible="true" :source="[node]"
+                     :destination="node.transitions.map(t => t.to)"></toolbar>
         </div>
         <template v-if="next === 'branch'">
             <branch :transitions="node.transitions" :intersection="intersection"></branch>
