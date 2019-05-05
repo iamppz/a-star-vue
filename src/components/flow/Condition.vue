@@ -9,7 +9,7 @@
                 </div>
                 <div class="content">{{transition.expression || '无条件'}}</div>
             </div>
-            <toolbar></toolbar>
+            <toolbar :source="[transition.from]" :destination="[transition.to]"></toolbar>
         </div>
     </div>
 </template>

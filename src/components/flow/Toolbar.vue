@@ -98,12 +98,22 @@
                         node.transitions[0].to = this.approverForm;
                     });
                 } else {
-                    this.source[0].transitions = [{
-                        name: 'Default',
-                        from: this.source[0],
-                        to: this.approverForm,
-                        expression: null
-                    }];
+                    let source = this.source[0];
+                    let isOnBranch = source.transitions.length > 1;
+                    if (isOnBranch) {
+                        // 将分支指向新增的节点
+                        let destination = this.destination[0];
+                        let transition = source.transitions.find(t => t.to.id === destination.id);
+                        transition.to = this.approverForm;
+                    } else {
+                        // 将来源连到新增的节点
+                        source.transitions = [{
+                            name: 'Default',
+                            from: source,
+                            to: this.approverForm,
+                            expression: null
+                        }];
+                    }
                 }
                 this.approverForm.transitions = this.destination.map(item => ({
                     name: 'Default',
