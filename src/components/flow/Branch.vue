@@ -14,7 +14,8 @@
                         </div>
                     </template>
                 </div>
-                <toolbar :btn-add-condition-visible="true" :source="endings" :destination="[innerIntersection]"></toolbar>
+                <toolbar :btn-add-condition-visible="true" :source="endings" :destination="[innerIntersection]"
+                         @onsave="onToolbarSave"></toolbar>
             </div>
         </div>
         <template v-if="innerIntersection.state === 'end'">
@@ -43,6 +44,19 @@
             intersection: {
                 type: Object,
                 default: null
+            }
+        },
+        methods: {
+            onToolbarSave(node) {
+                this.$set(node, 'transitions', [{
+                    name: 'Default',
+                    from: node,
+                    to: this.innerIntersection,
+                    expression: null
+                }]);
+                this.endings.forEach(item => {
+                    item.transitions[0].to = node;
+                });
             }
         },
         computed: {
@@ -77,12 +91,8 @@
                     let intersection = path.find(node => node.id === this.innerIntersection.id);
                     return path.slice().reverse().find(node => path.indexOf(node) < path.indexOf(intersection));
                 });
-                console.log('intersection: ');
-                console.log(this.innerIntersection);
-                console.log("endings: ");
-                console.log(result.map(n => n.id));
                 // todo: distinct result's items by id to avoid situations like: 8, 10000, 10000, 10000
-                return result;
+                return _.uniqBy(result, item => item.id);
             }
         }
     }

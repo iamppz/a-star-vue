@@ -9,7 +9,7 @@
                 </div>
                 <div class="content">{{transition.expression || '无条件'}}</div>
             </div>
-            <toolbar :source="[transition.from]" :destination="[transition.to]"></toolbar>
+            <toolbar :source="[transition.from]" :destination="[transition.to]" @onsave="onToolbarSave"></toolbar>
         </div>
     </div>
 </template>
@@ -25,6 +25,17 @@
             transition: {
                 type: Object,
                 default: null
+            }
+        },
+        methods: {
+            onToolbarSave(node) {
+                this.$set(node, 'transitions', [{
+                    name: 'Default',
+                    from: node,
+                    to: this.transition.to,
+                    expression: null
+                }]);
+                this.transition.to = node;
             }
         }
     }

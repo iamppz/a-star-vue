@@ -14,7 +14,7 @@
                     </div>
                 </div>
             </div>
-            <toolbar :btn-add-condition-visible="true" :source="[node]"
+            <toolbar :btn-add-condition-visible="true" :source="[node]" @onsave="onToolbarSave"
                      :destination="node.transitions.map(t => t.to)"></toolbar>
         </div>
         <template v-if="next === 'branch'">
@@ -95,6 +95,15 @@
                     Object.assign(this.node, this.approverForm);
                     Message.success(resp.data.message);
                 }
+            },
+            onToolbarSave(node) {
+                this.$set(node, 'transitions', this.node.transitions.map(item => Object.assign({}, item, {from: node})));
+                this.node.transitions = [{
+                    name: 'Default',
+                    from: this.node,
+                    to: node,
+                    expression: null
+                }];
             }
         }
     }
