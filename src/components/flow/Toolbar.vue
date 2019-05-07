@@ -95,34 +95,6 @@
                 this.approverForm.id = new Date().getTime();
                 this.approverForm.state = 'operation';
                 this.$emit('onsave', this.approverForm);
-                // if (this.source.length > 1) {
-                //     this.source.forEach(node => {
-                //         node.transitions[0].to = this.approverForm;
-                //     });
-                // } else {
-                //     let source = this.source[0];
-                //     let isOnBranch = source.transitions.length > 1 && this.destination.length === 1;
-                //     if (isOnBranch) {
-                //         // 将分支指向新增的节点
-                //         let destination = this.destination[0];
-                //         let transition = source.transitions.find(t => t.to.id === destination.id);
-                //         transition.to = this.approverForm;
-                //     } else {
-                //         // 将来源连到新增的节点
-                //         source.transitions = [{
-                //             name: 'Default',
-                //             from: source,
-                //             to: this.approverForm,
-                //             expression: null
-                //         }];
-                //     }
-                // }
-                // this.approverForm.transitions = this.destination.map(item => ({
-                //     name: 'Default',
-                //     from: this.approverForm,
-                //     to: item,
-                //     expression: null
-                // }));
                 this.dialogApproverVisible = false;
             }
         }

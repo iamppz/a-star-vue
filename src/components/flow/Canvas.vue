@@ -1,5 +1,6 @@
 <template>
     <div style="position: relative;">
+        <el-button @click="save">Save</el-button>
         <div class="flow-design">
             <div class="zoom">
                 <div class="zoom-out"></div>
@@ -17,8 +18,6 @@
 <script>
     import processService from "../../service/processService";
     import Start from "./Start";
-    import {pathing} from "../../utils/process";
-
 
     export default {
         components: {Start},
@@ -27,7 +26,20 @@
             if (resp.data.success) {
                 this.nodes = resp.data.data;
             }
-            pathing(this.startNode);
+            let setFrom = (transition) => {
+                if (transition.to.transitions.length > 0) {
+                    for (let i = 0; i < transition.to.transitions.length; i++) {
+                        let nextTransition = transition.to.transitions[i];
+                        nextTransition.from = transition.to;
+                        setFrom(nextTransition);
+                    }
+                }
+            };
+
+            this.startNode.transitions.forEach(transition => {
+                transition.from = this.startNode;
+                setFrom(transition);
+            });
         },
         data() {
             return {
@@ -37,6 +49,16 @@
         computed: {
             startNode() {
                 return this.nodes.find(node => node.state === 'start');
+            }
+        },
+        methods: {
+            save() {
+                console.log(JSON.stringify(this.startNode, function (key, value) {
+                    if (key === 'from') {
+                        return null;
+                    }
+                    return value;
+                }));
             }
         }
     }
