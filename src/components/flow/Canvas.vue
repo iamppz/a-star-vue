@@ -52,13 +52,9 @@
             }
         },
         methods: {
-            save() {
-                console.log(JSON.stringify(this.startNode, function (key, value) {
-                    if (key === 'from') {
-                        return null;
-                    }
-                    return value;
-                }));
+            async save() {
+                let resp = await processService.save(this.startNode);
+                console.log(resp);
             }
         }
     }

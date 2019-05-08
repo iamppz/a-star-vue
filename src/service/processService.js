@@ -18,6 +18,16 @@ class ProcessService {
         return await instance.put(url);
     }
 
+    async save(start) {
+        let json = JSON.stringify(start, function (key, value) {
+            if (key === 'from') {
+                return null;
+            }
+            return value;
+        });
+        return await instance.post('/api/process/node/start', {data: json});
+    }
+
     async create(workflowDefinitionId, dataId, attachmentId) {
         return await instance.post('/api/process/instance', {
             workflowDefinitionId, dataId, attachmentId
