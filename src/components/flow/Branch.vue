@@ -8,8 +8,8 @@
                             <condition :transition="transition"></condition>
                             <div :class="{'top-left-cover-line': index === 0, 'top-right-cover-line': index === transitions.length - 1}"></div>
                             <div :class="{'bottom-left-cover-line': index === 0, 'bottom-right-cover-line': index === transitions.length - 1}"></div>
-                            <template v-if="transition.to.id !== innerIntersection.id">
-                                <operation :node="transition.to" :intersection="innerIntersection"></operation>
+                            <template v-if="transition.destination.id !== innerIntersection.id">
+                                <operation :node="transition.destination" :intersection="innerIntersection"></operation>
                             </template>
                         </div>
                     </template>
@@ -50,12 +50,12 @@
             onToolbarSave(node) {
                 this.$set(node, 'transitions', [{
                     name: 'Default',
-                    from: node,
-                    to: this.innerIntersection,
+                    source: node,
+                    destination: this.innerIntersection,
                     expression: null
                 }]);
                 this.endings.forEach(item => {
-                    item.transitions[0].to = node;
+                    item.transitions[0].destination = node;
                 });
             }
         },
@@ -72,8 +72,8 @@
                     let transition = this.transitions[i],
                         path = [];
                     while (transition) {
-                        path.push(transition.to);
-                        transition = transition.to.transitions.length > 0 ? transition.to.transitions[0] : null;
+                        path.push(transition.destination);
+                        transition = transition.destination.transitions.length > 0 ? transition.destination.transitions[0] : null;
                     }
                     paths.push(path);
                 }
@@ -86,7 +86,7 @@
                 });
             },
             endings() {
-                let paths = pathing(this.transitions[0].from);
+                let paths = pathing(this.transitions[0].source);
                 let result = paths.map(path => {
                     let intersection = path.find(node => node.id === this.innerIntersection.id);
                     return path.slice().reverse().find(node => path.indexOf(node) < path.indexOf(intersection));

@@ -26,19 +26,25 @@
             if (resp.data.success) {
                 this.nodes = resp.data.data;
             }
-            let setFrom = (transition) => {
-                if (transition.to.transitions.length > 0) {
-                    for (let i = 0; i < transition.to.transitions.length; i++) {
-                        let nextTransition = transition.to.transitions[i];
-                        nextTransition.from = transition.to;
-                        setFrom(nextTransition);
+            let setSrcAndDest = (transition) => {
+                if (transition.destination.transitions.length > 0) {
+                    for (let i = 0; i < transition.destination.transitions.length; i++) {
+                        let nextTransition = transition.destination.transitions[i];
+                        if (typeof nextTransition.source !== 'number') {
+                            continue;
+                        }
+
+                        nextTransition.source = this.nodes.find(node => node.id === nextTransition.source);
+                        nextTransition.destination = this.nodes.find(node => node.id === nextTransition.destination);
+                        setSrcAndDest(nextTransition);
                     }
                 }
             };
 
             this.startNode.transitions.forEach(transition => {
-                transition.from = this.startNode;
-                setFrom(transition);
+                transition.source = this.nodes.find(node => node.id === transition.source);
+                transition.destination = this.nodes.find(node => node.id === transition.destination);
+                setSrcAndDest(transition);
             });
         },
         data() {
@@ -53,7 +59,7 @@
         },
         methods: {
             async save() {
-                let resp = await processService.save(this.startNode);
+                let resp = await processService.saveNodes(this.nodes);
                 console.log(resp);
             }
         }

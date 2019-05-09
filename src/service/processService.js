@@ -18,14 +18,22 @@ class ProcessService {
         return await instance.put(url);
     }
 
-    async save(start) {
-        let json = JSON.stringify(start, function (key, value) {
-            if (key === 'from') {
-                return null;
-            }
-            return value;
+    async saveNodes(nodes) {
+        let copy = nodes.map(node => {
+            return Object.assign({}, node, {id: null, clientId: node.id});
         });
-        return await instance.post('/api/process/node/start', {data: json});
+        copy.forEach(node => {
+            node.transitions = node.transitions.map(transition => {
+                return Object.assign({}, transition, {
+                    source: transition.source.id,
+                    destination: transition.destination.id,
+                    id: null
+                });
+            });
+        });
+        return await instance.post('/api/process/nodes', {
+            data: JSON.stringify(copy)
+        });
     }
 
     async create(workflowDefinitionId, dataId, attachmentId) {

@@ -15,17 +15,17 @@
                 </div>
             </div>
             <toolbar :btn-add-condition-visible="true" :source="[node]" @onsave="onToolbarSave"
-                     :destination="node.transitions.map(t => t.to)"></toolbar>
+                     :destination="node.transitions.map(t => t.destination)"></toolbar>
         </div>
         <template v-if="next === 'branch'">
             <branch :transitions="node.transitions" :intersection="intersection"></branch>
         </template>
         <template v-else-if="next === 'node'">
-            <template v-if="node.transitions[0].to.state === 'end'">
+            <template v-if="node.transitions[0].destination.state === 'end'">
                 <end></end>
             </template>
             <template v-else>
-                <operation :node="node.transitions[0].to" :intersection="intersection"></operation>
+                <operation :node="node.transitions[0].destination" :intersection="intersection"></operation>
             </template>
         </template>
         <el-dialog title="编辑节点" :visible.sync="dialogApproverVisible" :append-to-body="true" width="500px">
@@ -72,7 +72,7 @@
                 if (this.node.transitions.length > 1) {
                     // 当节点后有多个节点时，显示为分支
                     return 'branch';
-                } else if (!this.intersection || this.node.transitions[0].to.id !== this.intersection.id) {
+                } else if (!this.intersection || this.node.transitions[0].destination.id !== this.intersection.id) {
                     // （否则）显示为节点，不是汇合节点才进行渲染
                     return 'node';
                 }
@@ -97,11 +97,11 @@
                 }
             },
             onToolbarSave(node) {
-                this.$set(node, 'transitions', this.node.transitions.map(item => Object.assign({}, item, {from: node})));
+                this.$set(node, 'transitions', this.node.transitions.map(item => Object.assign({}, item, {source: node})));
                 this.node.transitions = [{
                     name: 'Default',
-                    from: this.node,
-                    to: node,
+                    source: this.node,
+                    destination: node,
                     expression: null
                 }];
             }

@@ -13,17 +13,17 @@
                 </div>
             </div>
             <toolbar :btn-add-condition-visible="true" :source="[node]" @onsave="onToolbarSave"
-                     :destination="node.transitions.map(t => t.to)"></toolbar>
+                     :destination="node.transitions.map(t => t.destination)"></toolbar>
         </div>
         <template v-if="showNextBranch">
             <branch :transitions="node.transitions"></branch>
         </template>
         <template v-else>
-            <template v-if="node.transitions[0].to.state === 'end'">
+            <template v-if="node.transitions[0].destination.state === 'end'">
                 <end></end>
             </template>
             <template v-else>
-                <operation :node="node.transitions[0].to"></operation>
+                <operation :node="node.transitions[0].destination"></operation>
             </template>
         </template>
         <el-dialog title="编辑节点" :visible.sync="dialogApproverVisible" :append-to-body="true" width="500px">
@@ -71,11 +71,11 @@
                 this.dialogApproverVisible = true;
             },
             onToolbarSave(node) {
-                this.$set(node, 'transitions', this.node.transitions.map(item => Object.assign({}, item, {from: node})));
+                this.$set(node, 'transitions', this.node.transitions.map(item => Object.assign({}, item, {source: node})));
                 this.node.transitions = [{
                     name: 'Default',
-                    from: this.node,
-                    to: node,
+                    source: this.node,
+                    destination: node,
                     expression: null
                 }];
             }
