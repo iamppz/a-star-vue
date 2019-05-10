@@ -55,7 +55,11 @@
                     expression: null
                 }]);
                 this.endings.forEach(item => {
-                    item.transitions[0].destination = node;
+                    let root = this.transitions[0].source;
+                    let transition = item === root
+                        ? item.transitions.find(item => item.destination === this.innerIntersection)
+                        : item.transitions[0];
+                    transition.destination = node;
                 });
             }
         },

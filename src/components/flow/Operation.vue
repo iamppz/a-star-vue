@@ -6,7 +6,7 @@
                     <div class="title">
                         <span class="iconfont"></span>
                         <span class="editable-title">审批人</span>
-                        <i class="anticon anticon-close close"></i>
+                        <i class="anticon anticon-close close" @click="remove"></i>
                     </div>
                     <div class="content" @click="handleApproverDivClick">
                         <div class="text">{{ node.name }}</div>
@@ -104,6 +104,9 @@
                     destination: node,
                     expression: null
                 }];
+            },
+            remove() {
+
             }
         }
     }
