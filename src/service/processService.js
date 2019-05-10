@@ -18,7 +18,17 @@ class ProcessService {
         return await instance.put(url);
     }
 
-    async saveNodes(nodes) {
+    async saveNodes(startNode) {
+        let nodes = [];
+        let findAllNodes = node => {
+            if (!nodes.find(item => item === node)) {
+                nodes.push(node);
+                node.transitions.forEach(item => {
+                    findAllNodes(item.destination);
+                });
+            }
+        };
+        findAllNodes(startNode);
         let copy = nodes.map(node => {
             return Object.assign({}, node, {id: null, clientId: node.id});
         });

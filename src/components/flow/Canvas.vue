@@ -8,7 +8,7 @@
                 <div class="zoom-in"></div>
             </div>
             <div class="box-scale" id="box-scale" style="transform: scale(1); transform-origin: 50% 0 0;">
-                <template v-if="nodes.length > 0">
+                <template v-if="startNode">
                     <start :node="startNode"></start>
                 </template>
             </div>
@@ -26,42 +26,38 @@
         async mounted() {
             let resp = await processService.getNodes(this.$route.query.def || 1);
             if (resp.data.success) {
-                this.nodes = resp.data.data;
-            }
-            let setSrcAndDest = (transition) => {
-                for (let i = 0; i < transition.destination.transitions.length; i++) {
-                    let nextTransition = transition.destination.transitions[i];
-                    if (typeof nextTransition.source !== 'number') {
-                        continue;
+                let nodes = resp.data.data;
+                this.startNode = nodes.find(node => node.state === 'start');
+                let setSrcAndDest = (transition) => {
+                    for (let i = 0; i < transition.destination.transitions.length; i++) {
+                        let nextTransition = transition.destination.transitions[i];
+                        if (typeof nextTransition.source !== 'number') {
+                            continue;
+                        }
+
+                        nextTransition.source = nodes.find(node => node.id === nextTransition.source);
+                        nextTransition.destination = nodes.find(node => node.id === nextTransition.destination);
+                        setSrcAndDest(nextTransition);
                     }
+                };
 
-                    nextTransition.source = this.nodes.find(node => node.id === nextTransition.source);
-                    nextTransition.destination = this.nodes.find(node => node.id === nextTransition.destination);
-                    setSrcAndDest(nextTransition);
-                }
-            };
-
-            this.startNode.transitions.forEach(transition => {
-                transition.source = this.nodes.find(node => node.id === transition.source);
-                transition.destination = this.nodes.find(node => node.id === transition.destination);
-                if (transition.destination.transitions.length > 0) {
-                    setSrcAndDest(transition);
-                }
-            });
+                this.startNode.transitions.forEach(transition => {
+                    transition.source = nodes.find(node => node.id === transition.source);
+                    transition.destination = nodes.find(node => node.id === transition.destination);
+                    if (transition.destination.transitions.length > 0) {
+                        setSrcAndDest(transition);
+                    }
+                });
+            }
         },
         data() {
             return {
-                nodes: []
+                startNode: null
             };
-        },
-        computed: {
-            startNode() {
-                return this.nodes.find(node => node.state === 'start');
-            }
         },
         methods: {
             async save() {
-                let resp = await processService.saveNodes(this.nodes);
+                let resp = await processService.saveNodes(this.startNode);
                 if (resp.data.success) {
                     Message.success(resp.data.message);
                 }
