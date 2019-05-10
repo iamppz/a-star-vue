@@ -7,7 +7,7 @@
                 <span>100%</span>
                 <div class="zoom-in"></div>
             </div>
-            <div class="box-scale" id="box-scale" style="transform: scale(1); transform-origin: 50% 0px 0px;">
+            <div class="box-scale" id="box-scale" style="transform: scale(1); transform-origin: 50% 0 0;">
                 <template v-if="nodes.length > 0">
                     <start :node="startNode"></start>
                 </template>
@@ -16,6 +16,8 @@
     </div>
 </template>
 <script>
+    import {Message} from "element-ui";
+
     import processService from "../../service/processService";
     import Start from "./Start";
 
@@ -27,24 +29,24 @@
                 this.nodes = resp.data.data;
             }
             let setSrcAndDest = (transition) => {
-                if (transition.destination.transitions.length > 0) {
-                    for (let i = 0; i < transition.destination.transitions.length; i++) {
-                        let nextTransition = transition.destination.transitions[i];
-                        if (typeof nextTransition.source !== 'number') {
-                            continue;
-                        }
-
-                        nextTransition.source = this.nodes.find(node => node.id === nextTransition.source);
-                        nextTransition.destination = this.nodes.find(node => node.id === nextTransition.destination);
-                        setSrcAndDest(nextTransition);
+                for (let i = 0; i < transition.destination.transitions.length; i++) {
+                    let nextTransition = transition.destination.transitions[i];
+                    if (typeof nextTransition.source !== 'number') {
+                        continue;
                     }
+
+                    nextTransition.source = this.nodes.find(node => node.id === nextTransition.source);
+                    nextTransition.destination = this.nodes.find(node => node.id === nextTransition.destination);
+                    setSrcAndDest(nextTransition);
                 }
             };
 
             this.startNode.transitions.forEach(transition => {
                 transition.source = this.nodes.find(node => node.id === transition.source);
                 transition.destination = this.nodes.find(node => node.id === transition.destination);
-                setSrcAndDest(transition);
+                if (transition.destination.transitions.length > 0) {
+                    setSrcAndDest(transition);
+                }
             });
         },
         data() {
@@ -60,7 +62,9 @@
         methods: {
             async save() {
                 let resp = await processService.saveNodes(this.nodes);
-                console.log(resp);
+                if (resp.data.success) {
+                    Message.success(resp.data.message);
+                }
             }
         }
     }

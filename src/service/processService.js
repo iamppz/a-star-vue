@@ -31,7 +31,7 @@ class ProcessService {
                 });
             });
         });
-        return await instance.post('/api/process/nodes', {
+        return await instance.post('/api/process/flowchart', {
             data: JSON.stringify(copy)
         });
     }
