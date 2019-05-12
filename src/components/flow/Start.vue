@@ -12,8 +12,9 @@
                     </div>
                 </div>
             </div>
-            <toolbar :btn-add-condition-visible="true" :source="[node]" @onsave="onToolbarSave"
-                     :destination="node.transitions.map(t => t.destination)"></toolbar>
+            <toolbar :btn-add-condition-visible="true" :source="[node]" @onnodecreated="onToolbarSave"
+                     :destination="node.transitions.map(t => t.destination)" @onbranchcreated="onToolbarSaveBranch">
+            </toolbar>
         </div>
         <template v-if="showNextBranch">
             <branch :transitions="node.transitions"></branch>
@@ -40,6 +41,7 @@
     import Operation from './Operation';
     import End from './End';
     import OperationForm from './OperationForm';
+    import {pathing} from "../../utils/process";
 
     export default {
         name: 'node',
@@ -78,6 +80,20 @@
                     destination: node,
                     expression: null
                 }];
+            },
+            onToolbarSaveBranch(condition) {
+                if (this.showNextBranch) {
+
+                } else {
+                    let paths = pathing(this.node);
+                    let end = paths[0].pop();
+                    this.node.transitions.push({
+                        name: condition.name || 'Default',
+                        source: this.node,
+                        destination: end,
+                        expression: condition.expression
+                    });
+                }
             }
         }
     }

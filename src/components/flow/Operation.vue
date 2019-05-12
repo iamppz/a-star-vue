@@ -14,7 +14,7 @@
                     </div>
                 </div>
             </div>
-            <toolbar :btn-add-condition-visible="true" :source="[node]" @onsave="onToolbarSave"
+            <toolbar :btn-add-condition-visible="true" :source="[node]" @onnodecreated="onToolbarSave"
                      :destination="node.transitions.map(t => t.destination)"></toolbar>
         </div>
         <template v-if="next === 'branch'">

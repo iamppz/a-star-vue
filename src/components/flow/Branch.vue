@@ -15,7 +15,7 @@
                     </template>
                 </div>
                 <toolbar :btn-add-condition-visible="true" :source="endings" :destination="[innerIntersection]"
-                         @onsave="onToolbarSave"></toolbar>
+                         @onnodecreated="onToolbarSave"></toolbar>
             </div>
         </div>
         <template v-if="innerIntersection.state === 'end'">

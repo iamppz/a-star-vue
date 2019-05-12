@@ -43,7 +43,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogBranchVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogBranchVisible = false">确 定</el-button>
+                <el-button type="primary" @click="handleClickSaveBranch">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -94,8 +94,12 @@
             handleClickSaveApprover() {
                 this.approverForm.id = new Date().getTime();
                 this.approverForm.state = 'operation';
-                this.$emit('onsave', this.approverForm);
+                this.$emit('onnodecreated', this.approverForm);
                 this.dialogApproverVisible = false;
+            },
+            handleClickSaveBranch() {
+                this.$emit('onbranchcreated', this.branchForm);
+                this.dialogBranchVisible = false;
             }
         }
     }
