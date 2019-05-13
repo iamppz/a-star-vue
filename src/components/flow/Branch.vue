@@ -31,7 +31,7 @@
     import Condition from './Condition';
     import Operation from "./Operation";
     import End from "./End";
-    import {pathing} from "../../utils/process";
+    import {getIntersection, pathing} from "../../utils/process";
 
 
     export default {
@@ -64,30 +64,8 @@
             }
         },
         computed: {
-            /**
-             * 分支需计算出汇合点，将汇合点传递给分支中的节点
-             * 以便在递归到该节点时，停止继续向下渲染
-             * @returns 分支汇合点
-             */
             innerIntersection() {
-                // 对分支中的路径进行采样
-                let paths = [];
-                for (let i = 0; i < 2; i++) {
-                    let transition = this.transitions[i],
-                        path = [];
-                    while (transition) {
-                        path.push(transition.destination);
-                        transition = transition.destination.transitions.length > 0 ? transition.destination.transitions[0] : null;
-                    }
-                    paths.push(path);
-                }
-
-                // 两条路径中最早同时出现的节点即为汇合点
-                // 如 1, 2, 3, 5 和 1, 3, 5，则 3 为汇合点
-                return paths[0].find(t => {
-                    let find = paths[1].find(r => r.id === t.id);
-                    return find !== undefined && find !== null;
-                });
+                return getIntersection(this.transitions);
             },
             endings() {
                 let paths = pathing(this.transitions[0].source);

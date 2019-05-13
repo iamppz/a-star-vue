@@ -41,7 +41,7 @@
     import Operation from './Operation';
     import End from './End';
     import OperationForm from './OperationForm';
-    import {pathing} from "../../utils/process";
+    import {getIntersection, pathing} from "../../utils/process";
 
     export default {
         name: 'node',
@@ -83,14 +83,26 @@
             },
             onToolbarSaveBranch(condition) {
                 if (this.showNextBranch) {
-
-                } else {
-                    let paths = pathing(this.node);
-                    let end = paths[0].pop();
+                    let destination = null;
+                    if (this.node.transitions.length === 1) {
+                        let paths = pathing(this.node);
+                        destination = paths[0].pop();
+                    } else {
+                        destination = getIntersection(this.node.transitions);
+                    }
                     this.node.transitions.push({
                         name: condition.name || 'Default',
                         source: this.node,
-                        destination: end,
+                        destination: destination,
+                        expression: condition.expression
+                    });
+                } else {
+                    let paths = pathing(this.node);
+                    let destination = paths[0].pop();
+                    this.node.transitions.push({
+                        name: condition.name || 'Default',
+                        source: this.node,
+                        destination: destination,
                         expression: condition.expression
                     });
                 }
