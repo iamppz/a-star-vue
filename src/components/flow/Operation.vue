@@ -15,7 +15,8 @@
                 </div>
             </div>
             <toolbar :btn-add-condition-visible="true" :source="[node]" @onnodecreated="onToolbarSave"
-                     :destination="node.transitions.map(t => t.destination)"></toolbar>
+                     :destination="node.transitions.map(t => t.destination)" onbranchcreated="onToolbarSaveBranch">
+            </toolbar>
         </div>
         <template v-if="next === 'branch'">
             <branch :transitions="node.transitions" :intersection="intersection"></branch>
@@ -44,6 +45,7 @@
     import End from "./End";
     import OperationForm from "./OperationForm";
     import processService from "../../service/processService";
+    import {getIntersection, pathing} from "../../utils/process";
 
     export default {
         name: 'operation',
@@ -105,8 +107,22 @@
                     expression: null
                 }];
             },
+            onToolbarSaveBranch(condition) {
+                let destination = null;
+                if (this.next === 'branch') {
+                    destination = getIntersection(this.node.transitions);
+                } else {
+                    let paths = pathing(this.node);
+                    destination = paths[0].pop();
+                }
+                this.node.transitions.push({
+                    name: condition.name || 'Default',
+                    source: this.node,
+                    destination: destination,
+                    expression: condition.expression
+                });
+            },
             remove() {
-
             }
         }
     }

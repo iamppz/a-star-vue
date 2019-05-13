@@ -82,30 +82,19 @@
                 }];
             },
             onToolbarSaveBranch(condition) {
+                let destination = null;
                 if (this.showNextBranch) {
-                    let destination = null;
-                    if (this.node.transitions.length === 1) {
-                        let paths = pathing(this.node);
-                        destination = paths[0].pop();
-                    } else {
-                        destination = getIntersection(this.node.transitions);
-                    }
-                    this.node.transitions.push({
-                        name: condition.name || 'Default',
-                        source: this.node,
-                        destination: destination,
-                        expression: condition.expression
-                    });
+                    destination = getIntersection(this.node.transitions);
                 } else {
                     let paths = pathing(this.node);
-                    let destination = paths[0].pop();
-                    this.node.transitions.push({
-                        name: condition.name || 'Default',
-                        source: this.node,
-                        destination: destination,
-                        expression: condition.expression
-                    });
+                    destination = paths[0].pop();
                 }
+                this.node.transitions.push({
+                    name: condition.name || 'Default',
+                    source: this.node,
+                    destination: destination,
+                    expression: condition.expression
+                });
             }
         }
     }
