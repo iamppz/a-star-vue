@@ -33,7 +33,6 @@
     import End from "./End";
     import {getIntersection, pathing} from "../../utils/process";
 
-
     export default {
         components: {Toolbar, Condition, Operation, End},
         props: {

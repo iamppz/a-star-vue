@@ -26,7 +26,9 @@
                 <end></end>
             </template>
             <template v-else>
-                <operation :node="node.transitions[0].destination" :intersection="intersection"></operation>
+                <operation :node="node.transitions[0].destination" :intersection="intersection"
+                           @onremove="onNextRemove">
+                </operation>
             </template>
         </template>
         <el-dialog title="编辑节点" :visible.sync="dialogApproverVisible" :append-to-body="true" width="500px">
@@ -113,6 +115,17 @@
                 });
             },
             remove() {
+                this.$emit('onremove');
+            },
+            onNextRemove() {
+                this.node.transitions = this.node.transitions[0].destination.transitions.map(item => {
+                    return {
+                        name: item.name,
+                        source: this.node,
+                        destination: item.destination,
+                        expression: item.expression
+                    }
+                });
             }
         }
     }
