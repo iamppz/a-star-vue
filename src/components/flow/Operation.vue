@@ -15,13 +15,13 @@
                 </div>
             </div>
             <toolbar :btn-add-condition-visible="true" :source="[node]" @onnodecreated="onToolbarSave"
-                     :destination="node.transitions.map(t => t.destination)" onbranchcreated="onToolbarSaveBranch">
+                     :destination="node.transitions.map(t => t.destination)" @onbranchcreated="onToolbarSaveBranch">
             </toolbar>
         </div>
-        <template v-if="next === 'branch'">
+        <template v-if="node.transitions.length > 1">
             <branch :transitions="node.transitions" :intersection="intersection"></branch>
         </template>
-        <template v-else-if="next === 'node'">
+        <template v-else-if="!intersection || node.transitions[0].destination.id !== intersection.id">
             <template v-if="node.transitions[0].destination.state === 'end'">
                 <end></end>
             </template>
@@ -69,18 +69,6 @@
         beforeCreate: function () {
             this.$options.components.Branch = () => import('./Branch.vue')
         },
-        computed: {
-            next() {
-                if (this.node.transitions.length > 1) {
-                    // 当节点后有多个节点时，显示为分支
-                    return 'branch';
-                } else if (!this.intersection || this.node.transitions[0].destination.id !== this.intersection.id) {
-                    // （否则）显示为节点，不是汇合节点才进行渲染
-                    return 'node';
-                }
-                return 'nothing';
-            }
-        },
         methods: {
             handleApproverDivClick() {
                 this.approverForm = {
@@ -109,8 +97,10 @@
             },
             onToolbarSaveBranch(condition) {
                 let destination = null;
-                if (this.next === 'branch') {
+                if (this.node.transitions.length > 1) {
                     destination = getIntersection(this.node.transitions);
+                } else if (this.intersection) {
+                    destination = this.intersection;
                 } else {
                     let paths = pathing(this.node);
                     destination = paths[0].pop();
