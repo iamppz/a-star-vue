@@ -52,10 +52,12 @@
                 }]);
                 this.endings.forEach(item => {
                     let root = this.transitions[0].source;
-                    let transition = item === root
-                        ? item.transitions.find(item => item.destination === this.innerIntersection)
-                        : item.transitions[0];
-                    transition.destination = node;
+                    let transitions = item === root
+                        ? item.transitions.filter(item => item.destination === this.innerIntersection)
+                        : item.transitions;
+                    transitions.forEach(item => {
+                        item.destination = node;
+                    });
                 });
             },
             onConditionRemove(transition) {
@@ -70,10 +72,12 @@
                 let innerIntersectionCopy = Object.assign({}, this.innerIntersection);
                 this.endings.forEach(item => {
                     let root = this.transitions[0].source;
-                    let transition = item === root
-                        ? item.transitions.find(item => item.destination.id === innerIntersectionCopy.id)
-                        : item.transitions[0];
-                    transition.destination = innerIntersectionCopy.transitions[0].destination;
+                    let transitions = item === root
+                        ? item.transitions.filter(item => item.destination === this.innerIntersection)
+                        : item.transitions;
+                    transitions.forEach(item => {
+                        item.destination = innerIntersectionCopy.transitions[0].destination;
+                    });
                 });
             }
         },
