@@ -19,7 +19,8 @@
             </toolbar>
         </div>
         <template v-if="node.transitions.length > 1">
-            <branch :transitions="node.transitions" :intersection="intersection"></branch>
+            <branch :transitions="node.transitions" :intersection="intersection"
+                    @onconditionremove="onNextBranchConditionRemove"></branch>
         </template>
         <template v-else-if="!intersection || node.transitions[0].destination.id !== intersection.id">
             <template v-if="node.transitions[0].destination.state === 'end'">
@@ -126,6 +127,9 @@
                         expression: item.expression
                     }
                 });
+            },
+            onNextBranchConditionRemove(transition) {
+                this.node.transitions = this.node.transitions.filter(t => t !== transition);
             }
         }
     }

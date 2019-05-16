@@ -6,7 +6,7 @@
                     <div class="title-wrapper">
                         <span class="editable-title">{{transition.name}}</span>
                         <span class="priority-title">{{'分支'}}</span>
-                        <i class="anticon anticon-close close"></i>
+                        <i class="anticon anticon-close close" @click="remove"></i>
                     </div>
                     <div class="content">{{transition.expression || '无条件'}}</div>
                 </div>
@@ -64,6 +64,9 @@
                 }
 
                 this.transition.destination = this.transition.destination.transitions[0].destination;
+            },
+            remove() {
+                this.$emit('onremove', this.transition);
             }
         },
         computed: {

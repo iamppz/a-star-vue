@@ -17,7 +17,7 @@
             </toolbar>
         </div>
         <template v-if="showNextBranch">
-            <branch :transitions="node.transitions"></branch>
+            <branch :transitions="node.transitions" @onconditionremove="onNextBranchConditionRemove"></branch>
         </template>
         <template v-else>
             <template v-if="node.transitions[0].destination.state === 'end'">
@@ -105,6 +105,9 @@
                         expression: item.expression
                     }
                 });
+            },
+            onNextBranchConditionRemove(transition) {
+                this.node.transitions = this.node.transitions.filter(t => t !== transition);
             }
         }
     }
