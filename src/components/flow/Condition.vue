@@ -17,11 +17,13 @@
         <div :class="{'top-left-cover-line': index === 0, 'top-right-cover-line': index === transitions.length - 1}"></div>
         <div :class="{'bottom-left-cover-line': index === 0, 'bottom-right-cover-line': index === transitions.length - 1}"></div>
         <template v-if="transition.destination.id !== intersection.id">
-            <operation :node="transition.destination" :intersection="intersection"></operation>
+            <operation :node="transition.destination" :intersection="intersection" @onremove="onNextRemove"></operation>
         </template>
     </div>
 </template>
 <script>
+    import {Message} from "element-ui";
+
     import Toolbar from "./Toolbar";
     import Operation from "./Operation";
 
@@ -54,6 +56,14 @@
                     expression: null
                 }]);
                 this.transition.destination = node;
+            },
+            onNextRemove() {
+                if (this.transition.destination.transitions.length > 1) {
+                    Message.error('不可删除，分支条件无法直连分支条件');
+                    return;
+                }
+
+                this.transition.destination = this.transition.destination.transitions[0].destination;
             }
         },
         computed: {
@@ -64,9 +74,3 @@
     }
 </script>
 <style scoped src="../../assets/flow-design.css"></style>
-<style scoped>
-    .condition {
-        display: inline-flex;
-        flex-direction: column;
-    }
-</style>
