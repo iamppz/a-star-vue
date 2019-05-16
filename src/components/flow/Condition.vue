@@ -1,30 +1,48 @@
 <template>
-    <div class="condition-node">
-        <div class="condition-node-box">
-            <div class="auto-judge">
-                <div class="title-wrapper">
-                    <span class="editable-title">{{transition.name}}</span>
-                    <span class="priority-title">{{'分支'}}</span>
-                    <i class="anticon anticon-close close"></i>
+    <div class="col-box">
+        <div class="condition-node">
+            <div class="condition-node-box">
+                <div class="auto-judge">
+                    <div class="title-wrapper">
+                        <span class="editable-title">{{transition.name}}</span>
+                        <span class="priority-title">{{'分支'}}</span>
+                        <i class="anticon anticon-close close"></i>
+                    </div>
+                    <div class="content">{{transition.expression || '无条件'}}</div>
                 </div>
-                <div class="content">{{transition.expression || '无条件'}}</div>
+                <toolbar :source="[transition.source]" :destination="[transition.destination]"
+                         @onnodecreated="onToolbarSave"></toolbar>
             </div>
-            <toolbar :source="[transition.source]" :destination="[transition.destination]" @onnodecreated="onToolbarSave"></toolbar>
         </div>
+        <div :class="{'top-left-cover-line': index === 0, 'top-right-cover-line': index === transitions.length - 1}"></div>
+        <div :class="{'bottom-left-cover-line': index === 0, 'bottom-right-cover-line': index === transitions.length - 1}"></div>
+        <template v-if="transition.destination.id !== intersection.id">
+            <operation :node="transition.destination" :intersection="intersection"></operation>
+        </template>
     </div>
 </template>
 <script>
     import Toolbar from "./Toolbar";
+    import Operation from "./Operation";
 
     export default {
         components: {
-            Toolbar
+            Toolbar,
+            Operation
         },
         name: 'condition',
         props: {
-            transition: {
+            intersection: {
                 type: Object,
                 default: null
+            },
+            index: {
+                type: Number,
+                default: null
+            },
+            transitions: {
+                type: Array,
+                default: () => []
             }
         },
         methods: {
@@ -37,7 +55,18 @@
                 }]);
                 this.transition.destination = node;
             }
+        },
+        computed: {
+            transition() {
+                return this.transitions[this.index];
+            }
         }
     }
 </script>
 <style scoped src="../../assets/flow-design.css"></style>
+<style scoped>
+    .condition {
+        display: inline-flex;
+        flex-direction: column;
+    }
+</style>

@@ -4,14 +4,8 @@
             <div class="branch-box-wrap">
                 <div class="branch-box">
                     <template v-for="(transition, index) in transitions">
-                        <div class="col-box" v-bind:key="transition.id">
-                            <condition :transition="transition"></condition>
-                            <div :class="{'top-left-cover-line': index === 0, 'top-right-cover-line': index === transitions.length - 1}"></div>
-                            <div :class="{'bottom-left-cover-line': index === 0, 'bottom-right-cover-line': index === transitions.length - 1}"></div>
-                            <template v-if="transition.destination.id !== innerIntersection.id">
-                                <operation :node="transition.destination" :intersection="innerIntersection"></operation>
-                            </template>
-                        </div>
+                        <condition v-bind:key="transition.id" :transitions="transitions" :index="index"
+                                   :intersection="innerIntersection"></condition>
                     </template>
                 </div>
                 <toolbar :btn-add-condition-visible="true" :source="endings" :destination="[innerIntersection]"
