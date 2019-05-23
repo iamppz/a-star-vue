@@ -5,6 +5,8 @@ import Home from "../views/Home";
 import User from "../views/User";
 import Role from "../views/Role";
 import App from "../views/App";
+import AStar from "../views/process/AStar";
+
 import Flowchart from "../components/flow/Canvas";
 import EChartsTest from "../views/EChartsTest";
 import Dictionary from "../views/Dictionary";
@@ -15,6 +17,7 @@ Vue.use(VueRouter);
 const routes = [
     {path: '/', component: Login},
     {path: '/login', component: Login},
+    {path: '/aStar', component: AStar},
     {path: '/flowDesign', component: Flowchart},
     {
         path: '/app', component: App, children: [
