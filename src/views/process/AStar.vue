@@ -1,19 +1,25 @@
 <template>
-    <table id="table">
-        <tr v-for="i in row" v-bind:key="i">
-            <td v-for="j in col" v-bind:key="i + ',' + j"
-                :class="{
+    <div>
+        <table id="table">
+            <tr v-for="i in row" v-bind:key="i">
+                <td v-for="j in col" v-bind:key="i + ',' + j" :class="{
                     cell: true,
                     block: blocks.find(b => b.x === i && b.y === j) != null,
                     from: from.x === i && from.y === j,
-                    to: to.x === i && to.y === j
+                    to: to.x === i && to.y === j,
+                    open: openList.findIndex(item => item.x === i && item.y === j) > 0,
+                    close: closedList.findIndex(item => item.x === i && item.y === j) > 0
                 }">
-                {{i + ',' + j}}
-            </td>
-        </tr>
-    </table>
+                    {{i + ',' + j}}
+                </td>
+            </tr>
+        </table>
+        <button @click="start">Start</button>
+    </div>
 </template>
 <script>
+    import _ from 'lodash';
+
     export default {
         data() {
             return {
@@ -21,6 +27,25 @@
                 col: 30,
                 from: {x: 15, y: 8},
                 to: {x: 14, y: 30},
+                current: null,
+                closedList: [],
+                openList: [],
+                hvCost: 10,
+                diagonalCost: 14,
+                offsets: [
+                    {
+                        x: 0, y: -1
+                    },
+                    {
+                        x: 0, y: 1
+                    },
+                    {
+                        x: -1, y: 0
+                    },
+                    {
+                        x: 1, y: 0
+                    }
+                ],
                 blocks: [
                     {x: 1, y: 1},
                     {x: 12, y: 22},
@@ -54,6 +79,15 @@
                     {x: 17, y: 21}
                 ]
             };
+        },
+        methods: {
+            start() {
+                this.openList.push(this.from);
+                while (this.openList.length > 0) {
+                    this.openList = _.sortBy(this.openList, item => item.f);
+                    this.current = this.openList.pop();
+                }
+            }
         }
     }
 </script>
@@ -77,6 +111,11 @@
 
     .to {
         background: green;
+        color: white;
+    }
+
+    .open {
+        background: gray;
         color: white;
     }
 
