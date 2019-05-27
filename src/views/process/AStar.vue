@@ -32,7 +32,7 @@
                 openList: [],
                 hvCost: 10,
                 diagonalCost: 14,
-                offsets: [
+                adjacentOffsets: [
                     {
                         x: 0, y: -1
                     },
@@ -86,6 +86,25 @@
                 while (this.openList.length > 0) {
                     this.openList = _.sortBy(this.openList, item => item.f);
                     this.current = this.openList.pop();
+
+                    this.adjacentOffsets.forEach(offset => {
+                        let adjacentNode = {
+                            x: this.current.x + offset.x,
+                            y: this.current.y + offset.y
+                        };
+                        if (!this.openList.find(item => item.x === adjacentNode.x && item.y === adjacentNode.y)) {
+                            adjacentNode.previous = this.current;
+                            let cost = offset.x === 0 || offset.y === 0 ? 10 : 14;
+                            adjacentNode.g = adjacentNode.previous.g + cost;
+                            adjacentNode.h = Math.abs(this.to.x - adjacentNode.x) + Math.abs(this.to.y - adjacentNode.y);
+                            adjacentNode.f = adjacentNode.g + adjacentNode.h;
+                            this.openList.push(adjacentNode);
+                        } else {
+
+                        }
+                    });
+
+                    this.closedList.push(this.current);
                 }
             }
         }
@@ -116,6 +135,11 @@
 
     .open {
         background: gray;
+        color: white;
+    }
+
+    .close {
+        background: black;
         color: white;
     }
 
