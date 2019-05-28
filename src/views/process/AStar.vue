@@ -7,14 +7,16 @@
                     block: blocks.find(b => b.x === i && b.y === j) != null,
                     from: from.x === i && from.y === j,
                     to: to.x === i && to.y === j,
-                    open: openList.findIndex(item => item.x === i && item.y === j) > 0,
-                    close: closedList.findIndex(item => item.x === i && item.y === j) > 0
+                    open: openList.findIndex(item => item.x === i && item.y === j) >= 0,
+                    close: closedList.findIndex(item => item.x === i && item.y === j) >= 0,
+                    path: path.findIndex(item => item.x === i && item.y === j) >= 0,
                 }">
                     {{i + ',' + j}}
                 </td>
             </tr>
         </table>
-        <button @click="start">Start</button>
+        <button @click="forward">Forward</button>
+        <button @click="forwardAutomatically">Auto Forward</button>
     </div>
 </template>
 <script>
@@ -27,25 +29,11 @@
                 col: 30,
                 from: {x: 15, y: 8},
                 to: {x: 14, y: 30},
-                current: null,
                 closedList: [],
                 openList: [],
                 hvCost: 10,
                 diagonalCost: 14,
-                adjacentOffsets: [
-                    {
-                        x: 0, y: -1
-                    },
-                    {
-                        x: 0, y: 1
-                    },
-                    {
-                        x: -1, y: 0
-                    },
-                    {
-                        x: 1, y: 0
-                    }
-                ],
+                path: [],
                 blocks: [
                     {x: 1, y: 1},
                     {x: 12, y: 22},
@@ -76,35 +64,90 @@
                     {x: 17, y: 18},
                     {x: 17, y: 19},
                     {x: 17, y: 20},
-                    {x: 17, y: 21}
+                    {x: 17, y: 21},
+                    {x: 6, y: 25},
+                    {x: 7, y: 25},
+                    {x: 8, y: 25},
+                    {x: 9, y: 25},
+                    {x: 10, y: 25},
+                    {x: 11, y: 25},
+                    {x: 12, y: 25},
+                    {x: 13, y: 25},
+                    {x: 14, y: 25},
+                    {x: 15, y: 25},
+                    {x: 16, y: 25},
+                    {x: 17, y: 25},
+                    {x: 18, y: 25},
+                    {x: 19, y: 25},
                 ]
             };
         },
+        created: function () {
+            this.from.g = 0;
+            this.from.h = (Math.abs(this.to.x - this.from.x) + Math.abs(this.to.y - this.from.y)) * this.hvCost;
+            this.from.f = this.from.g + this.from.h;
+            this.openList.push(this.from);
+        },
         methods: {
-            start() {
-                this.openList.push(this.from);
-                while (this.openList.length > 0) {
-                    this.openList = _.sortBy(this.openList, item => item.f);
-                    this.current = this.openList.pop();
+            forwardAutomatically() {
+                setInterval(this.forward, 30);
+            },
+            forward() {
+                if (this.path.length > 0) {
+                    return;
+                }
 
-                    this.adjacentOffsets.forEach(offset => {
-                        let adjacentNode = {
-                            x: this.current.x + offset.x,
-                            y: this.current.y + offset.y
-                        };
-                        if (!this.openList.find(item => item.x === adjacentNode.x && item.y === adjacentNode.y)) {
-                            adjacentNode.previous = this.current;
-                            let cost = offset.x === 0 || offset.y === 0 ? 10 : 14;
+                if (this.openList.length > 0) {
+                    this.openList = _.sortBy(this.openList, item => -item.f);
+                    let current = this.openList.pop();
+
+                    if (current.x === this.to.x && current.y === this.to.y) {
+                        this.path.push(current);
+                        while (current.previous && (current.previous.x !== this.from.x || current.previous.y !== this.from.y)) {
+                            this.path.push(current.previous);
+                            current = current.previous;
+                        }
+                        return;
+                    }
+
+                    for (const offset of [{x: 0, y: -1}, {x: 0, y: 1}, {x: -1, y: 0}, {x: 1, y: 0}]) {
+                        let position = {x: current.x + offset.x, y: current.y + offset.y};
+
+                        if (this.blocks.find(b => b.x === position.x && b.y === position.y)
+                            || this.closedList.find(b => b.x === position.x && b.y === position.y)) {
+                            continue;
+                        }
+
+                        let hvMove = offset.x === 0 || offset.y === 0;
+                        let changeDirection = false;
+                        if (current.previous) {
+                            let previousOffset = {
+                                x: current.x - current.previous.x,
+                                y: current.y - current.previous.y
+                            };
+                            if (previousOffset.x !== offset.x || previousOffset.y !== offset.y) {
+                                changeDirection = true;
+                            }
+                        }
+                        let cost = hvMove ? (changeDirection ? 11 : this.hvCost) : this.diagonalCost;
+                        let adjacentNode = this.openList.find(item => item.x === position.x && item.y === position.y);
+                        if (!adjacentNode) {
+                            adjacentNode = Object.assign({}, position);
+                            adjacentNode.previous = current;
                             adjacentNode.g = adjacentNode.previous.g + cost;
-                            adjacentNode.h = Math.abs(this.to.x - adjacentNode.x) + Math.abs(this.to.y - adjacentNode.y);
+                            adjacentNode.h = (Math.abs(this.to.x - adjacentNode.x) + Math.abs(this.to.y - adjacentNode.y)) * this.hvCost;
                             adjacentNode.f = adjacentNode.g + adjacentNode.h;
                             this.openList.push(adjacentNode);
-                        } else {
-
+                        } else if (current.g + cost <= adjacentNode.g) {
+                            // 如果当前节点到该节点路径更优，则将当前节点设置为该节点的父节点
+                            adjacentNode.previous = current;
+                            adjacentNode.g = adjacentNode.previous.g + cost;
+                            adjacentNode.h = (Math.abs(this.to.x - adjacentNode.x) + Math.abs(this.to.y - adjacentNode.y)) * this.hvCost;
+                            adjacentNode.f = adjacentNode.g + adjacentNode.h;
                         }
-                    });
+                    }
 
-                    this.closedList.push(this.current);
+                    this.closedList.push(current);
                 }
             }
         }
@@ -124,13 +167,13 @@
     }
 
     .from {
-        background: yellow;
-        color: black;
+        background: yellow !important;
+        color: black !important;
     }
 
     .to {
-        background: green;
-        color: white;
+        background: orange !important;
+        color: white !important;
     }
 
     .open {
@@ -139,7 +182,12 @@
     }
 
     .close {
-        background: black;
+        background: red;
+        color: white;
+    }
+
+    .path {
+        background: green;
         color: white;
     }
 
