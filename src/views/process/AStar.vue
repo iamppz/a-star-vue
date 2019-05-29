@@ -107,6 +107,21 @@
                             this.path.push(current.previous);
                             current = current.previous;
                         }
+
+                        let turningPoints = [];
+                        for (let i = 0; i < this.path.length; i++) {
+                            if (i === 0 || i === this.path.length - 1) {
+                                continue;
+                            }
+
+                            let point = this.path[i];
+                            let previous = point.previous;
+                            let next = this.path[i + 1];
+                            if (!(point.x - previous.x === next.x - point.x && point.y - previous.y === next.y - point.y)) {
+                                turningPoints.push(point);
+                            }
+                        }
+
                         return;
                     }
 
