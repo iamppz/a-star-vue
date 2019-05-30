@@ -33,6 +33,7 @@
                 openList: [],
                 hvCost: 10,
                 diagonalCost: 14,
+                terrainCost: 100,
                 path: [],
                 blocks: [
                     {x: 1, y: 1},
@@ -107,21 +108,6 @@
                             this.path.push(current.previous);
                             current = current.previous;
                         }
-
-                        let turningPoints = [];
-                        for (let i = 0; i < this.path.length; i++) {
-                            if (i === 0 || i === this.path.length - 1) {
-                                continue;
-                            }
-
-                            let point = this.path[i];
-                            let previous = point.previous;
-                            let next = this.path[i + 1];
-                            if (!(point.x - previous.x === next.x - point.x && point.y - previous.y === next.y - point.y)) {
-                                turningPoints.push(point);
-                            }
-                        }
-
                         return;
                     }
 
@@ -145,6 +131,15 @@
                             }
                         }
                         let cost = hvMove ? (changeDirection ? 11 : this.hvCost) : this.diagonalCost;
+
+                        for (const offset of [{x: 0, y: -1}, {x: 0, y: 1}, {x: -1, y: 0}, {x: 1, y: 0}]) {
+                            let aoa = {x: position.x + offset.x, y: position.y + offset.y};
+
+                            if (this.blocks.find(b => b.x === aoa.x && b.y === aoa.y)) {
+                                cost += this.terrainCost;
+                            }
+                        }
+
                         let adjacentNode = this.openList.find(item => item.x === position.x && item.y === position.y);
                         if (!adjacentNode) {
                             adjacentNode = Object.assign({}, position);
@@ -164,6 +159,24 @@
 
                     this.closedList.push(current);
                 }
+            },
+            findTurningPoints(path) {
+                let turningPoints = [];
+                for (let i = 0; i < path.length; i++) {
+                    let point = path[i];
+
+                    if (i === 0 || i === path.length - 1) {
+                        turningPoints.push(point);
+                        continue;
+                    }
+
+                    let previous = point.previous;
+                    let next = path[i + 1];
+                    if (!(point.x - previous.x === next.x - point.x && point.y - previous.y === next.y - point.y)) {
+                        turningPoints.push(point);
+                    }
+                }
+                return turningPoints;
             }
         }
     }
