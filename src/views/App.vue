@@ -2,7 +2,7 @@
     <el-container>
         <el-header class="joyce-header">
             <div>
-                <p class="joyce-title">JCloud</p>
+                <p class="joyce-title">Joyce</p>
                 <div>
                     <el-dropdown @command="handleCommand">
                         <span class="el-dropdown-link">

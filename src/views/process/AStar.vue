@@ -33,7 +33,7 @@
                 openList: [],
                 hvCost: 10,
                 diagonalCost: 14,
-                terrainCost: 100,
+                terrainCost: 1,
                 path: [],
                 blocks: [
                     {x: 1, y: 1},
@@ -120,21 +120,10 @@
                         }
 
                         let hvMove = offset.x === 0 || offset.y === 0;
-                        let changeDirection = false;
-                        if (current.previous) {
-                            let previousOffset = {
-                                x: current.x - current.previous.x,
-                                y: current.y - current.previous.y
-                            };
-                            if (previousOffset.x !== offset.x || previousOffset.y !== offset.y) {
-                                changeDirection = true;
-                            }
-                        }
+                        let changeDirection = current.previous && !this.areCollinear(current.previous, current, position);
                         let cost = hvMove ? (changeDirection ? 11 : this.hvCost) : this.diagonalCost;
-
                         for (const offset of [{x: 0, y: -1}, {x: 0, y: 1}, {x: -1, y: 0}, {x: 1, y: 0}]) {
                             let aoa = {x: position.x + offset.x, y: position.y + offset.y};
-
                             if (this.blocks.find(b => b.x === aoa.x && b.y === aoa.y)) {
                                 cost += this.terrainCost;
                             }
@@ -160,23 +149,8 @@
                     this.closedList.push(current);
                 }
             },
-            findTurningPoints(path) {
-                let turningPoints = [];
-                for (let i = 0; i < path.length; i++) {
-                    let point = path[i];
-
-                    if (i === 0 || i === path.length - 1) {
-                        turningPoints.push(point);
-                        continue;
-                    }
-
-                    let previous = point.previous;
-                    let next = path[i + 1];
-                    if (!(point.x - previous.x === next.x - point.x && point.y - previous.y === next.y - point.y)) {
-                        turningPoints.push(point);
-                    }
-                }
-                return turningPoints;
+            areCollinear(p1, p2, p3) {
+                return p3.x - p2.x === p2.x - p1.x && p3.y - p2.y === p2.y - p1.y;
             }
         }
     }
