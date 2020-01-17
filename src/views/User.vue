@@ -67,8 +67,8 @@
                 </div>
             </el-main>
         </el-container>
-        <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="80px">
+        <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="440px">
+            <el-form ref="form" :model="form" label-width="80px" v-if="dialogVisible">
                 <general-form :form-id="1" :data-id="this.form.id"/>
             </el-form>
         </el-dialog>

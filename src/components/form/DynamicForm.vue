@@ -14,9 +14,9 @@
                                       placeholder="请输入内容"/>
                             <el-input v-if="getCell(i, j).type === 'textarea'" type="textarea" autosize
                                       v-model="data[getCell(i, j).binding]" placeholder="请输入内容"/>
-                            <tree-select v-if="getCell(i, j).type === 'treeselect'" :options="department"
-                                        :normalizer="function(node) { return { label: node.name } }"
-                                        v-model="data[getCell(i, j).binding]"/>
+                            <cascader v-if="getCell(i, j).type === 'cascader'" :options="department" :props="{
+                                value: 'id', label: 'name'
+                            }" v-model="data[getCell(i, j).binding]" style="width: 100%;"/>
                         </template>
                     </td>
                 </template>
@@ -25,7 +25,7 @@
     </div>
 </template>
 <script>
-    import {Message} from "element-ui";
+    import {Message, Cascader} from "element-ui";
     import TreeSelect from "@riophae/vue-treeselect";
 
     import dynamicFormService from "../../service/dynamicFormService";
@@ -49,7 +49,14 @@
                 department: []
             }
         },
-        async mounted() {
+        async created() {
+            let departmentResp = await departmentService.get();
+            if (departmentResp.data.success) {
+                if (departmentResp.data.data) {
+                    this.department.push(departmentResp.data.data);
+                }
+            }
+
             let resp = await dynamicFormService.get(this.formId);
             if (resp.data.success) {
                 this.form = resp.data.data;
@@ -59,13 +66,14 @@
                 resp = await dynamicFormService.getData(this.form.id, this.dataId);
                 if (resp.data.success) {
                     this.data = resp.data.data;
-                }
-            }
-
-            let departmentResp = await departmentService.get();
-            if (departmentResp.data.success) {
-                if (departmentResp.data.data) {
-                    this.department.push(departmentResp.data.data);
+                    for (let prop in this.data) {
+                        let result = this.cells.filter(function (cell) {
+                            return cell.binding === prop && cell.type === 'cascader';
+                        });
+                        if (result.length > 0) {
+                            this.data[prop] = [this.data[prop]];
+                        }
+                    }
                 }
             }
         },
@@ -116,7 +124,7 @@
             }
         },
         components: {
-            TreeSelect
+            TreeSelect, Cascader
         }
     }
 </script>
