@@ -68,9 +68,8 @@
             </el-main>
         </el-container>
         <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="440px">
-            <el-form ref="form" :model="form" label-width="80px" v-if="dialogVisible">
-                <general-form :form-id="1" :data-id="this.form.id"/>
-            </el-form>
+            {{form['department_id']}}
+            <general-form v-if="dialogVisible" :form-id="1" :data-id="this.form.id || null" :default-values="form"/>
         </el-dialog>
         <el-dialog :title="departmentForm.id > 0 ? '编辑部门' : '新建部门'" :visible.sync="departmentDialogVisible" width="30%">
             <el-form ref="form" :model="form" label-width="80px">
@@ -124,7 +123,8 @@
             },
             handleClickCreate() {
                 this.form = {
-                    departmentId: this.$refs.tree.getCurrentKey()
+                    departmentId: this.$refs.tree.getCurrentKey(),
+                    id: null
                 };
                 this.dialogVisible = true;
             },

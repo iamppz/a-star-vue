@@ -1,6 +1,6 @@
 <template>
     <div>
-        <dynamic-form :data-id="formId" :form-id="dataId"/>
+        <dynamic-form :data-id="dataId" :form-id="formId"/>
         <el-button @click="handleClickSave">保存</el-button>
     </div>
 </template>
@@ -28,6 +28,10 @@
             },
             dataId: {
                 type: Number,
+                default: null
+            },
+            defaultValues: {
+                type: Object,
                 default: null
             }
         },

@@ -16,7 +16,8 @@
                                       v-model="data[getCell(i, j).binding]" placeholder="请输入内容"/>
                             <cascader v-if="getCell(i, j).type === 'cascader'" :options="department" :props="{
                                 value: 'id', label: 'name'
-                            }" v-model="data[getCell(i, j).binding]" style="width: 100%;"/>
+                            }" v-model="data[getCell(i, j).binding]" style="width: 100%;" expand-trigger="hover"
+                                      :change-on-select="true"/>
                         </template>
                     </td>
                 </template>
@@ -26,8 +27,6 @@
 </template>
 <script>
     import {Message, Cascader} from "element-ui";
-    import TreeSelect from "@riophae/vue-treeselect";
-
     import dynamicFormService from "../../service/dynamicFormService";
     import departmentService from "../../service/departmentService";
 
@@ -39,6 +38,10 @@
             },
             dataId: {
                 type: Number,
+                default: null
+            },
+            defaultValues: {
+                type: Object,
                 default: null
             }
         },
@@ -66,16 +69,11 @@
                 resp = await dynamicFormService.getData(this.form.id, this.dataId);
                 if (resp.data.success) {
                     this.data = resp.data.data;
-                    for (let prop in this.data) {
-                        let result = this.cells.filter(function (cell) {
-                            return cell.binding === prop && cell.type === 'cascader';
-                        });
-                        if (result.length > 0) {
-                            this.data[prop] = [this.data[prop]];
-                        }
-                    }
                 }
+            } else if (this.defaultValues) {
+                this.data = this.defaultValues;
             }
+            this.formatCascaderValues(this.data);
         },
         computed: {
             widthPixel() {
@@ -113,6 +111,18 @@
                 return this.data.id;
             },
             validate() {
+            },
+            formatCascaderValues(data) {
+                for (let prop in data) {
+                    if (data.hasOwnProperty(prop)) {
+                        let result = this.cells.filter(function (cell) {
+                            return cell.binding === prop && cell.type === 'cascader';
+                        });
+                        if (result.length > 0) {
+                            data[prop] = [data[prop]];
+                        }
+                    }
+                }
             }
         },
         watch: {
@@ -124,7 +134,7 @@
             }
         },
         components: {
-            TreeSelect, Cascader
+            Cascader
         }
     }
 </script>
