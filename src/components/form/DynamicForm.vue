@@ -6,10 +6,18 @@
                     <td v-if="getCell(i, j) !== null" v-bind:key="j" :colspan="getCell(i, j).colspan"
                         :rowspan="getCell(i, j).rowspan" :width="cellWidth * getCell(i, j).colspan + 'px'"
                         :height="cellHeight * getCell(i, j).rowspan + 'px'">
-                        <label v-if="getCell(i, j).type === 'label'">{{getCell(i, j).text}}</label>
-                        <input v-if="getCell(i, j).type === 'input'" v-model="data[getCell(i, j).binding]"/>
-                        <textarea v-if="getCell(i, j).type === 'textarea'"
-                                  v-model="data[getCell(i, j).binding]"></textarea>
+                        <template v-if="getCell(i, j).type === 'label'">
+                            <label>{{getCell(i, j).text}}</label>
+                        </template>
+                        <template v-else>
+                            <el-input v-if="getCell(i, j).type === 'input'" v-model="data[getCell(i, j).binding]"
+                                      placeholder="请输入内容"/>
+                            <el-input v-if="getCell(i, j).type === 'textarea'" type="textarea" autosize
+                                      v-model="data[getCell(i, j).binding]" placeholder="请输入内容"/>
+                            <tree-select v-if="getCell(i, j).type === 'treeselect'" :options="department"
+                                        :normalizer="function(node) { return { label: node.name } }"
+                                        v-model="data[getCell(i, j).binding]"/>
+                        </template>
                     </td>
                 </template>
             </tr>
@@ -18,14 +26,16 @@
 </template>
 <script>
     import {Message} from "element-ui";
+    import TreeSelect from "@riophae/vue-treeselect";
 
-    import dynamicFormService from "../service/dynamicFormService";
+    import dynamicFormService from "../../service/dynamicFormService";
+    import departmentService from "../../service/departmentService";
 
     export default {
         props: {
             formId: {
                 type: Number,
-                default: 0
+                default: null
             },
             dataId: {
                 type: Number,
@@ -35,7 +45,8 @@
         data() {
             return {
                 form: {},
-                data: {}
+                data: {},
+                department: []
             }
         },
         async mounted() {
@@ -50,13 +61,20 @@
                     this.data = resp.data.data;
                 }
             }
+
+            let departmentResp = await departmentService.get();
+            if (departmentResp.data.success) {
+                if (departmentResp.data.data) {
+                    this.department.push(departmentResp.data.data);
+                }
+            }
         },
         computed: {
             widthPixel() {
                 return (this.form.width || 720) + 'px';
             },
             cellWidth() {
-                return this.width / this.col;
+                return this.form.width / this.form.col;
             },
             cellHeight() {
                 return 36;
@@ -96,30 +114,19 @@
                 },
                 deep: true
             }
+        },
+        components: {
+            TreeSelect
         }
     }
 </script>
 <style scoped>
-    .dynamic-form {
-        border-collapse: collapse;
-    }
-
     .dynamic-form > tr > td {
-        box-sizing: border-box;
-        border: 1px solid #d3d3d3;
-    }
-
-    .dynamic-form > tr > td > input, textarea {
-        width: 100%;
-        height: 100%;
-        border: 0;
-        padding: 8px;
-        box-sizing: border-box;
-        display: block;
-        font-family: inherit;
+        padding: 5px 0;
     }
 
     .dynamic-form > tr > td > label {
         margin: 0 8px;
+        text-align: right;
     }
 </style>

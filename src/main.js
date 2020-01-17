@@ -14,7 +14,7 @@ new Vue({
     mounted() {
         this.$on('login', async () => {
             let redirect = this.$route.query.redirect;
-            this.$router.push(redirect || '/app/home');
+            this.$router.push(redirect || '/app/user');
         });
     }
 });

@@ -31,11 +31,11 @@
             </el-aside>
             <el-main>
                 <el-table :data="formattedTableData" style="width: 100%" ref="table" border stripe>
-                    <el-table-column prop="name" label="姓名" min-width="120" width="120"></el-table-column>
-                    <el-table-column prop="departmentName" label="部门" min-width="120" width="120"></el-table-column>
-                    <el-table-column prop="roleNames" label="角色" min-width="200" width="200"></el-table-column>
-                    <el-table-column prop="mobile" label="手机" min-width="110" width="110"></el-table-column>
-                    <el-table-column prop="createdAt" label="创建时间" min-width="135" width="135"></el-table-column>
+                    <el-table-column prop="name" label="姓名" min-width="120" width="120"/>
+                    <el-table-column prop="departmentName" label="部门" min-width="120" width="120"/>
+                    <el-table-column prop="roleNames" label="角色" min-width="200" width="200"/>
+                    <el-table-column prop="mobile" label="手机" min-width="110" width="110"/>
+                    <el-table-column prop="createdAt" label="创建时间" min-width="135" width="135"/>
                     <el-table-column label="操作" fixed="right" min-width="205px">
                         <template slot-scope="scope">
                             <el-button @click="handleClickEdit(scope.row)" type="text" size="small"
@@ -69,28 +69,15 @@
         </el-container>
         <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="30%">
             <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="姓名">
-                    <input type="hidden" v-model="form.id"/>
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item label="部门">
-                    <treeselect v-model="form.departmentId" :options="department" :normalizer="normalizer"></treeselect>
-                </el-form-item>
-                <el-form-item label="手机">
-                    <el-input v-model="form.mobile"></el-input>
-                </el-form-item>
+                <general-form :form-id="1" :data-id="this.form.id"/>
             </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="handleClickSave">确定</el-button>
-            </span>
         </el-dialog>
         <el-dialog :title="departmentForm.id > 0 ? '编辑部门' : '新建部门'" :visible.sync="departmentDialogVisible" width="30%">
             <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="名称">
                     <input type="hidden" v-model="departmentForm.id"/>
                     <input type="hidden" v-model="departmentForm.parentId"/>
-                    <el-input v-model="departmentForm.name"></el-input>
+                    <el-input v-model="departmentForm.name"/>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -106,12 +93,12 @@
     import userService from "../service/userService";
     import {Loading, Message, MessageBox} from 'element-ui';
     import moment from 'moment';
-    import Treeselect from '@riophae/vue-treeselect';
     import '@riophae/vue-treeselect/dist/vue-treeselect.css';
+    import GeneralForm from "../components/form/GeneralForm";
 
     export default {
         components: {
-            Treeselect
+            GeneralForm
         },
         watch: {
             filterText(val) {
@@ -133,9 +120,6 @@
             },
             handleClickEdit(row) {
                 this.form.id = row.id;
-                this.form.name = row.name;
-                this.form.mobile = row.mobile;
-                this.form.departmentId = row.departmentId;
                 this.dialogVisible = true;
             },
             handleClickCreate() {
@@ -264,7 +248,7 @@
                 tableData: [],
                 department: [],
                 dialogVisible: false,
-                form: {id: null, name: null, departmentId: null, mobile: null},
+                form: {id: null},
                 normalizer(node) {
                     return {
                         label: node.name

@@ -10,7 +10,6 @@ import AStar from "../views/process/AStar";
 import Flowchart from "../components/flow/Canvas";
 import EChartsTest from "../views/EChartsTest";
 import Dictionary from "../views/Dictionary";
-import DynamicFormTest from "../views/DynamicFormTest";
 
 Vue.use(VueRouter);
 
@@ -25,7 +24,6 @@ const routes = [
             {path: 'user', component: User},
             {path: 'role', component: Role},
             {path: 'echartsTest', component: EChartsTest},
-            {path: 'dynamicFormTest', component: DynamicFormTest},
             {path: 'process/flowDesign', component: Flowchart},
             {path: 'dictionary', component: Dictionary}
         ]

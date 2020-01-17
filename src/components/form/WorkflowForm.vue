@@ -3,7 +3,8 @@
         <div class="title">
             <h1>{{definition.name}}</h1>
         </div>
-        <dynamic-form v-if="definition !== null" :form-id="definition.form.id" :data-id="instance ? instance.dataId : null" ref="form"></dynamic-form>
+        <dynamic-form v-if="definition !== null" :form-id="definition.form.id"
+                      :data-id="instance ? instance.dataId : null" ref="form"/>
         <div class="toolbar">
             <el-button v-if="btnSaveVisible" @click="handleClickSave">保存</el-button>
             <el-button v-if="btnSubmitVisible" @click="handleClickSubmit">提交</el-button>
@@ -14,9 +15,8 @@
 </template>
 <script>
     import {Message} from "element-ui";
-
     import DynamicForm from "./DynamicForm";
-    import processService from "../service/processService";
+    import processService from "../../service/processService";
 
     export default {
         components: {DynamicForm},
