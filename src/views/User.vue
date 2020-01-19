@@ -68,8 +68,8 @@
             </el-main>
         </el-container>
         <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="440px">
-            {{form['department_id']}}
-            <general-form v-if="dialogVisible" :form-id="1" :data-id="this.form.id || null" :default-values="form"/>
+            <general-form v-if="dialogVisible" :form-id="1" :data-id="this.form.id || null" :default-values="form"
+                @onsave="handleOnSaveUser"/>
         </el-dialog>
         <el-dialog :title="departmentForm.id > 0 ? '编辑部门' : '新建部门'" :visible.sync="departmentDialogVisible" width="30%">
             <el-form ref="form" :model="form" label-width="80px">
@@ -234,6 +234,9 @@
                 }).catch(() => {
                     Message.info('取消操作');
                 });
+            },
+            handleOnSaveUser() {
+                alert('123');
             }
         },
         data() {

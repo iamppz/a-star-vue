@@ -1,6 +1,6 @@
 <template>
     <div>
-        <dynamic-form :data-id="dataId" :form-id="formId"/>
+        <dynamic-form :data-id="dataId" :form-id="formId" :default-values="defaultValues" ref="form"/>
         <el-button @click="handleClickSave">保存</el-button>
     </div>
 </template>
@@ -18,6 +18,7 @@
                 let dataId = await this.$refs.form.add();
                 if (dataId) {
                     Message.success("保存成功");
+                    this.$emit('onsave');
                 }
             }
         },
