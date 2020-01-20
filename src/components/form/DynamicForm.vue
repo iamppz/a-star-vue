@@ -12,11 +12,12 @@
                         <template v-else>
                             <el-input v-if="getCell(i, j).type === 'input'" v-model="data[getCell(i, j).binding]"
                                       placeholder="请输入内容"/>
-                            <el-input v-if="getCell(i, j).type === 'textarea'" type="textarea" autosize
+                            <el-input v-else-if="getCell(i, j).type === 'textarea'" type="textarea" autosize
                                       v-model="data[getCell(i, j).binding]" placeholder="请输入内容"/>
                             <tree-select v-model="data[getCell(i, j).binding]" :options="department"
-                                         v-if="getCell(i, j).type === 'cascader'"
-                                         :normalizer="function(node) { return { label: node.name } }" style="width: 100%;"/>
+                                         v-else-if="getCell(i, j).type === 'cascader'" style="width: 100%;"
+                                         :normalizer="function(node) { return { label: node.name } }"/>
+                            <label v-else>{{ 'unknown type: ' +  getCell(i, j).type}}</label>
                         </template>
                     </td>
                 </template>

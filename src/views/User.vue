@@ -128,23 +128,6 @@
                 };
                 this.dialogVisible = true;
             },
-            async handleClickSave() {
-                if (this.form.id > 0) {
-                    let resp = await userService.update(this.form);
-                    if (resp.data.success) {
-                        Message.success(resp.data.message);
-                        this.dialogVisible = false;
-                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                    }
-                } else {
-                    let resp = await userService.add(this.form);
-                    if (resp.data.success) {
-                        Message.success(resp.data.message);
-                        this.dialogVisible = false;
-                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                    }
-                }
-            },
             async handleClickSaveDepartment() {
                 if (this.departmentForm.id > 0) {
                     let resp = await departmentService.update(this.departmentForm);
@@ -236,7 +219,8 @@
                 });
             },
             handleOnSaveUser() {
-                alert('123');
+                this.dialogVisible = false;
+                this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
             }
         },
         data() {
@@ -252,11 +236,6 @@
                 department: [],
                 dialogVisible: false,
                 form: {id: null},
-                normalizer(node) {
-                    return {
-                        label: node.name
-                    }
-                },
                 departmentForm: {
                     id: null,
                     name: null,
