@@ -89,6 +89,7 @@
 </template>
 <script>
     import departmentService from "../service/departmentService";
+    import treeService from '../service/treeService';
     import userService from "../service/userService";
     import {Loading, Message, MessageBox} from 'element-ui';
     import moment from 'moment';
@@ -245,7 +246,7 @@
             };
         },
         async mounted() {
-            let resp = await departmentService.get();
+            let resp = await treeService.get('department');
             if (resp.data.success) {
                 if (resp.data.data) {
                     this.department = [resp.data.data];

@@ -14,9 +14,11 @@
                                       placeholder="请输入内容"/>
                             <el-input v-else-if="getCell(i, j).type === 'textarea'" type="textarea" autosize
                                       v-model="data[getCell(i, j).binding]" placeholder="请输入内容"/>
-                            <tree-select v-model="data[getCell(i, j).binding]" :options="department"
-                                         v-else-if="getCell(i, j).type === 'cascader'" style="width: 100%;"
-                                         :normalizer="function(node) { return { label: node.name } }"/>
+                            <template v-else-if="getCell(i, j).type === 'cascader'">
+                                <tree-select v-if="trees[getCell(i, j).dictionary]" v-model="data[getCell(i, j).binding]" 
+                                            :options="trees[getCell(i, j).dictionary]" style="width: 100%;" 
+                                            :normalizer="function(node) { return { label: node.name } }"/>
+                            </template>
                             <label v-else>{{ 'unknown type: ' +  getCell(i, j).type}}</label>
                         </template>
                     </td>
@@ -30,7 +32,7 @@
     import TreeSelect from "@riophae/vue-treeselect";
 
     import dynamicFormService from "../../service/dynamicFormService";
-    import departmentService from "../../service/departmentService";
+    import treeService from '../../service/treeService';
 
     export default {
         props: {
@@ -51,20 +53,21 @@
             return {
                 form: {},
                 data: {},
-                department: []
+                trees: {}
             }
         },
         async created() {
-            let departmentResp = await departmentService.get();
-            if (departmentResp.data.success) {
-                if (departmentResp.data.data) {
-                    this.department.push(departmentResp.data.data);
-                }
-            }
-
             let resp = await dynamicFormService.get(this.formId);
             if (resp.data.success) {
                 this.form = resp.data.data;
+            }
+
+            for (var i = this.cells.length - 1; i >= 0; i--) {
+                let cell = this.cells[i];
+                if (cell.type === 'cascader') {
+                    let treeResp = await treeService.get(cell.dictionary);
+                    this.trees[cell.dictionary] = [treeResp.data.data];
+                }
             }
 
             if (this.dataId) {
