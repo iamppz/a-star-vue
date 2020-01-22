@@ -15,11 +15,18 @@
         },
         methods: {
             async handleClickSave() {
-                let dataId = await this.$refs.form.add();
-                if (dataId) {
+                if (!this.dataId) {
+                    let id = await this.$refs.form.add();
+                    if (id) {
+                        Message.success("保存成功");
+                        this.$emit('onsave');
+                    }
+                } else {
+                    await this.$refs.form.update();
                     Message.success("保存成功");
                     this.$emit('onsave');
                 }
+                
             }
         },
         props: {
