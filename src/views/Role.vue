@@ -45,9 +45,9 @@
                 </el-tab-pane>
             </el-tabs>
             <span slot="footer" class="dialog-footer">
-                        <el-button @click="dialogVisible = false">取消</el-button>
-                        <el-button type="primary" @click="handleClickSave">确定</el-button>
-                    </span>
+                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleClickSaveDictionaryItem">确定</el-button>
+            </span>
         </el-dialog>
         <el-dialog :title="form.id > 0 ? '编辑角色' : '新建角色'" :visible.sync="roleDialogVisible" width="30%">
             <el-form ref="form" :model="form" label-width="80px">
@@ -111,7 +111,7 @@
                 }
                 resp = await roleService.getNav(roleId);
                 if (resp.data.success) {
-                    this.$refs.navTree.setCheckedKeys(resp.data.data.map(item => item.navId));
+                    this.$refs.navTree.setCheckedKeys(resp.data.data.map(item => item.nav.id));
                 }
             },
             async handleClickSaveRole() {
