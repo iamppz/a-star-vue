@@ -6,6 +6,7 @@ import User from "../views/User";
 import Role from "../views/Role";
 import App from "../views/App";
 import AStar from "../views/process/AStar";
+import Workflow from "../views/Workflow";
 
 import Flowchart from "../components/flow/Canvas";
 import EChartsTest from "../views/EChartsTest";
@@ -25,7 +26,8 @@ const routes = [
             {path: 'role', component: Role},
             {path: 'echartsTest', component: EChartsTest},
             {path: 'process/flowDesign', component: Flowchart},
-            {path: 'dictionary', component: Dictionary}
+            {path: 'dictionary', component: Dictionary},
+            {path: 'workflow', component: Workflow}
         ]
     }
 ];
