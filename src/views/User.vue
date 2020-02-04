@@ -68,8 +68,22 @@
             </el-main>
         </el-container>
         <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="440px">
-            <general-form v-if="dialogVisible" :form-id="1" :data-id="this.form.id || null" :default-values="form"
-                @onsave="handleOnSaveUser"/>
+            <el-form ref="form" :model="form" label-width="80px">
+                <el-form-item label="姓名">
+                    <input type="hidden" v-model="form.id"/>    
+                    <el-input v-model="form.name"></el-input>   
+                </el-form-item> 
+                <el-form-item label="部门">   
+                    <treeselect v-model="form.departmentId" :options="department" :normalizer="normalizer"></treeselect>    
+                </el-form-item>
+                <el-form-item label="手机">   
+                    <el-input v-model="form.mobile"></el-input> 
+                </el-form-item> 
+            </el-form>
+            <span slot="footer" class="dialog-footer">  
+                <el-button @click="dialogVisible = false">取消</el-button>    
+                <el-button type="primary" @click="handleClickSave">确定</el-button>   
+            </span>
         </el-dialog>
         <el-dialog :title="departmentForm.id > 0 ? '编辑部门' : '新建部门'" :visible.sync="departmentDialogVisible" width="30%">
             <el-form ref="form" :model="form" label-width="80px">
@@ -94,11 +108,11 @@
     import {Loading, Message, MessageBox} from 'element-ui';
     import moment from 'moment';
     import '@riophae/vue-treeselect/dist/vue-treeselect.css';
-    import GeneralForm from "../components/form/GeneralForm";
+    import Treeselect from '@riophae/vue-treeselect';
 
     export default {
         components: {
-            GeneralForm
+            Treeselect
         },
         watch: {
             filterText(val) {
@@ -120,6 +134,9 @@
             },
             handleClickEdit(row) {
                 this.form.id = row.id;
+                this.form.name = row.name;  
+                this.form.mobile = row.mobile;  
+                this.form.departmentId = row.departmentId;
                 this.dialogVisible = true;
             },
             handleClickCreate() {
@@ -128,6 +145,23 @@
                     id: null
                 };
                 this.dialogVisible = true;
+            },
+            async handleClickSave() {
+                if (this.form.id > 0) {
+                    let resp = await userService.update(this.form);
+                    if (resp.data.success) {
+                        Message.success(resp.data.message);
+                        this.dialogVisible = false;
+                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
+                    }
+                } else {
+                    let resp = await userService.add(this.form);
+                    if (resp.data.success) {
+                        Message.success(resp.data.message);
+                        this.dialogVisible = false;
+                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
+                    }
+                }
             },
             async handleClickSaveDepartment() {
                 if (this.departmentForm.id > 0) {
@@ -219,9 +253,10 @@
                     Message.info('取消操作');
                 });
             },
-            handleOnSaveUser() {
-                this.dialogVisible = false;
-                this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
+            normalizer(node) {
+                return {
+                    label: node.name
+                }
             }
         },
         data() {
@@ -236,7 +271,7 @@
                 tableData: [],
                 department: [],
                 dialogVisible: false,
-                form: {id: null},
+                form: {id: null, name: null, departmentId: null, mobile: null},
                 departmentForm: {
                     id: null,
                     name: null,
