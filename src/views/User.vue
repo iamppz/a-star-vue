@@ -7,30 +7,31 @@
         </el-breadcrumb>
         <el-container>
             <el-aside style="width: 250px">
-                <el-input placeholder="输入关键字进行过滤" v-model="filterText">
+                <el-input placeholder="输入关键字进行过滤" v-model="filterDepartmentText">
                 </el-input>
-                <el-tree :data="department" :props="defaultProps" default-expand-all node-key="id" id="tree"
-                         :filter-node-method="filterTreeNode" ref="tree" @node-click="handleClickTreeNode"
+                <el-tree :data="department" :props="{ children: 'children', label: 'name' }" efault-expand-all
+                         node-key="id" id="tree"
+                         :filter-node-method="filterDepartment" ref="tree" @node-click="handleClickDepartment"
                          :expand-on-click-node="false" highlight-current>
                     <span class="flexible" slot-scope="{ node, data }">
                         <span>{{ node.label }}</span>
                         &nbsp;
-                         <span>
-                            <el-button type="text" size="mini" @click="() => edit(data)"
-                                       icon="el-icon-edit-outline">
-                            </el-button>
-                            <el-button type="text" size="mini" @click="() => append(data)"
-                                       icon="el-icon-plus">
-                            </el-button>
-                            <el-button type="text" size="mini" @click="() => remove(node, data)"
-                                       icon="el-icon-close">
-                            </el-button>
-                        </span>
+                    <span>
+                        <el-button type="text" size="mini" @click="() => editDepartment(data)"
+                                   icon="el-icon-edit-outline">
+                        </el-button>
+                        <el-button type="text" size="mini" @click="() => appendDepartment(data)"
+                                   icon="el-icon-plus">
+                        </el-button>
+                        <el-button type="text" size="mini" @click="() => removeDepartment(node, data)"
+                                   icon="el-icon-close">
+                        </el-button>
+                    </span>
                     </span>
                 </el-tree>
             </el-aside>
             <el-main>
-                <el-table :data="formattedTableData" style="width: 100%" ref="table" border stripe>
+                <el-table :data="formattedUsers" style="width: 100%" ref="table" border stripe>
                     <el-table-column prop="name" label="姓名" min-width="120" width="120"/>
                     <el-table-column prop="departmentName" label="部门" min-width="120" width="120"/>
                     <el-table-column prop="roleNames" label="角色" min-width="200" width="200"/>
@@ -38,15 +39,15 @@
                     <el-table-column prop="createdAt" label="创建时间" min-width="135" width="135"/>
                     <el-table-column label="操作" fixed="right" min-width="205px">
                         <template slot-scope="scope">
-                            <el-button @click="handleClickEdit(scope.row)" type="text" size="small"
+                            <el-button @click="handleClickEditUser(scope.row)" type="text" size="small"
                                        icon="el-icon-edit-outline">
                                 编辑
                             </el-button>
-                            <el-button v-if="scope.row.disabled" @click="handleClickEnable(scope.row)" type="text"
+                            <el-button v-if="scope.row.disabled" @click="handleClickEnableUser(scope.row)" type="text"
                                        size="small" icon="el-icon-edit-outline">
                                 启用
                             </el-button>
-                            <el-button v-if="!scope.row.disabled" @click="handleClickDisable(scope.row)" type="text"
+                            <el-button v-if="!scope.row.disabled" @click="handleClickDisableUser(scope.row)" type="text"
                                        size="small" icon="el-icon-edit-outline">
                                 禁用
                             </el-button>
@@ -62,31 +63,32 @@
                                layout="total, sizes, prev, pager, next, jumper" :total="total">
                 </el-pagination>
                 <div id="toolbar">
-                    <el-button type="primary" icon="el-icon-search" @click="handleClickCreate" size="small">新建
+                    <el-button type="primary" icon="el-icon-search" @click="handleClickCreateUser" size="small">新建
                     </el-button>
                 </div>
             </el-main>
         </el-container>
-        <el-dialog :title="form.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="dialogVisible" width="440px">
-            <el-form ref="form" :model="form" label-width="80px">
+        <el-dialog :title="userForm.id > 0 ? '编辑用户' : '新建用户'" :visible.sync="userDialogVisible" width="440px">
+            <el-form ref="form" :model="userForm" label-width="80px">
                 <el-form-item label="姓名">
-                    <input type="hidden" v-model="form.id"/>    
-                    <el-input v-model="form.name"></el-input>   
-                </el-form-item> 
-                <el-form-item label="部门">   
-                    <treeselect v-model="form.departmentId" :options="department" :normalizer="normalizer"></treeselect>    
+                    <input type="hidden" v-model="userForm.id"/>
+                    <el-input v-model="userForm.name"/>
                 </el-form-item>
-                <el-form-item label="手机">   
-                    <el-input v-model="form.mobile"></el-input> 
-                </el-form-item> 
+                <el-form-item label="部门">
+                    <treeselect v-model="userForm.departmentId" :options="department"
+                                :normalizer="() => ({ label: node.name })"/>
+                </el-form-item>
+                <el-form-item label="手机">
+                    <el-input v-model="userForm.mobile"/>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">  
-                <el-button @click="dialogVisible = false">取消</el-button>    
-                <el-button type="primary" @click="handleClickSave">确定</el-button>   
+                <el-button @click="userDialogVisible = false">取消</el-button>    
+                <el-button type="primary" @click="handleClickSaveUser">确定</el-button>
             </span>
         </el-dialog>
         <el-dialog :title="departmentForm.id > 0 ? '编辑部门' : '新建部门'" :visible.sync="departmentDialogVisible" width="30%">
-            <el-form ref="form" :model="form" label-width="80px">
+            <el-form ref="form" :model="departmentForm" label-width="80px">
                 <el-form-item label="名称">
                     <input type="hidden" v-model="departmentForm.id"/>
                     <input type="hidden" v-model="departmentForm.parentId"/>
@@ -115,52 +117,48 @@
             Treeselect
         },
         watch: {
-            filterText(val) {
+            filterDepartmentText(val) {
                 this.$refs.tree.filter(val);
             }
         },
         computed: {
-            formattedTableData() {
-                return this.tableData.map(item => {
+            formattedUsers() {
+                return this.users.map(item => {
                     item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm');
                     return item;
                 });
             }
         },
         methods: {
-            filterTreeNode(value, data) {
+            filterDepartment(value, data) {
                 if (!value) return true;
                 return data.name.indexOf(value) !== -1;
             },
-            handleClickEdit(row) {
-                this.form.id = row.id;
-                this.form.name = row.name;  
-                this.form.mobile = row.mobile;  
-                this.form.departmentId = row.departmentId;
-                this.dialogVisible = true;
+            handleClickEditUser(row) {
+                this.userForm.id = row.id;
+                this.userForm.name = row.name;
+                this.userForm.mobile = row.mobile;
+                this.userForm.departmentId = row.departmentId;
+                this.userDialogVisible = true;
             },
-            handleClickCreate() {
-                this.form = {
+            handleClickCreateUser() {
+                this.userForm = {
                     departmentId: this.$refs.tree.getCurrentKey(),
                     id: null
                 };
-                this.dialogVisible = true;
+                this.userDialogVisible = true;
             },
-            async handleClickSave() {
-                if (this.form.id > 0) {
-                    let resp = await userService.update(this.form);
-                    if (resp.data.success) {
-                        Message.success(resp.data.message);
-                        this.dialogVisible = false;
-                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                    }
+            async handleClickSaveUser() {
+                let resp;
+                if (this.userForm.id > 0) {
+                    resp = await userService.update(this.userForm);
                 } else {
-                    let resp = await userService.add(this.form);
-                    if (resp.data.success) {
-                        Message.success(resp.data.message);
-                        this.dialogVisible = false;
-                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
-                    }
+                    resp = await userService.add(this.userForm);
+                }
+                if (resp.data.success) {
+                    Message.success(resp.data.message);
+                    this.userDialogVisible = false;
+                    this.handleClickDepartment(this.$refs.tree.getCurrentNode());
                 }
             },
             async handleClickSaveDepartment() {
@@ -183,27 +181,27 @@
                     }
                 }
             },
-            async handleClickEnable(user) {
+            async handleClickEnableUser(user) {
                 let resp = await userService.enable(user.id);
                 if (resp.data.success) {
                     Message.success(resp.data.message);
                     user.disabled = false;
                 }
             },
-            async handleClickDisable(user) {
+            async handleClickDisableUser(user) {
                 let resp = await userService.disable(user.id);
                 if (resp.data.success) {
                     Message.success(resp.data.message);
                     user.disabled = true;
                 }
             },
-            async handleClickTreeNode(department) {
+            async handleClickDepartment(department) {
                 let options = {target: this.$refs.table.$el};
                 let loading = Loading.service(options);
                 let resp = await userService.getByDepartment(department.id, this.currentPage);
                 loading.close();
                 if (resp.data.success) {
-                    this.tableData = resp.data.data.content;
+                    this.users = resp.data.data.content;
                     this.total = resp.data.data.totalElements;
                 }
             },
@@ -211,17 +209,17 @@
             },
             handleCurrentChange(current) {
                 this.currentPage = current;
-                this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
+                this.handleClickDepartment(this.$refs.tree.getCurrentNode());
             },
-            append(data) {
+            appendDepartment(data) {
                 this.departmentDialogVisible = true;
                 this.departmentForm = {parentId: data.id};
             },
-            edit(data) {
+            editDepartment(data) {
                 this.departmentDialogVisible = true;
                 this.departmentForm = {...data};
             },
-            remove(node, data) {
+            removeDepartment(node, data) {
                 MessageBox.confirm('确定要删除部门"' + data.name + '"?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -252,31 +250,18 @@
                 }).catch(() => {
                     Message.info('取消操作');
                 });
-            },
-            normalizer(node) {
-                return {
-                    label: node.name
-                }
             }
         },
         data() {
             return {
-                filterText: '',
+                filterDepartmentText: '',
                 currentPage: 1,
                 total: 0,
-                defaultProps: {
-                    children: 'children',
-                    label: 'name'
-                },
-                tableData: [],
+                users: [],
                 department: [],
-                dialogVisible: false,
-                form: {id: null, name: null, departmentId: null, mobile: null},
-                departmentForm: {
-                    id: null,
-                    name: null,
-                    parentId: null
-                },
+                userDialogVisible: false,
+                userForm: {id: null, name: null, departmentId: null, mobile: null},
+                departmentForm: {id: null, name: null, parentId: null},
                 departmentDialogVisible: false
             };
         },
@@ -287,7 +272,7 @@
                     this.department = [resp.data.data];
                     this.$nextTick(function () {
                         this.$refs.tree.setCurrentKey(resp.data.data.id);
-                        this.handleClickTreeNode(this.$refs.tree.getCurrentNode());
+                        this.handleClickDepartment(this.$refs.tree.getCurrentNode());
                     });
                 }
             }
@@ -297,12 +282,6 @@
 <style scoped>
     #tree, #pager, #toolbar {
         margin-top: 20px;
-    }
-
-    .el-tree-node .flexible {
-        display: flex;
-        align-items: center;
-        padding-right: 8px;
     }
 
     .el-tree-node .el-button {
