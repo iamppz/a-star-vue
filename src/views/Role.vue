@@ -6,8 +6,8 @@
             <el-breadcrumb-item>角色管理</el-breadcrumb-item>
         </el-breadcrumb>
         <el-table :data="roles" style="width: 100%" ref="table" border stripe id="table">
-            <el-table-column prop="name" label="角色" width="150"></el-table-column>
-            <el-table-column prop="description" label="说明"></el-table-column>
+            <el-table-column prop="name" label="角色" width="150"/>
+            <el-table-column prop="description" label="说明"/>
             <el-table-column label="操作" width="210">
                 <template slot-scope="scope">
                     <el-button @click="handleClickEdit(scope.row.id)" type="text"
@@ -32,13 +32,13 @@
         <el-dialog title="设置权限" :visible.sync="dialogVisible" width="30%">
             <el-tabs v-model="tab">
                 <el-tab-pane label="权限" name="permission">
-                    <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+                    <el-input placeholder="输入关键字进行过滤" v-model="filterText"/>
                     <el-tree :data="permission" :props="defaultProps" default-expand-all node-key="id"
                              show-checkbox ref="tree" :filter-node-method="filterTreeNode" id="tree">
                     </el-tree>
                 </el-tab-pane>
                 <el-tab-pane label="菜单" name="nav">
-                    <el-input placeholder="输入关键字进行过滤" v-model="filterTextNav"></el-input>
+                    <el-input placeholder="输入关键字进行过滤" v-model="filterTextNav"/>
                     <el-tree :data="navs" :props="defaultProps" default-expand-all node-key="id"
                              show-checkbox ref="navTree" :filter-node-method="filterTreeNode" id="navTree">
                     </el-tree>
@@ -53,10 +53,10 @@
             <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="角色">
                     <input type="hidden" v-model="form.id"/>
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name"/>
                 </el-form-item>
                 <el-form-item label="说明">
-                    <el-input v-model="form.description"></el-input>
+                    <el-input v-model="form.description"/>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

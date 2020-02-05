@@ -78,6 +78,12 @@
                     <treeselect v-model="userForm.departmentId" :options="department"
                                 :normalizer="(node) => ({ label: node.name })"/>
                 </el-form-item>
+                <el-form-item label="角色">
+                    <el-select v-model="userForm.roleIds" multiple placeholder="请选择" style="width: 100%;">
+                        <el-option v-for="item in roles" :key="'role-' + item.id" :label="item.name" :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="手机">
                     <el-input v-model="userForm.mobile"/>
                 </el-form-item>
@@ -111,6 +117,7 @@
     import moment from 'moment';
     import '@riophae/vue-treeselect/dist/vue-treeselect.css';
     import Treeselect from '@riophae/vue-treeselect';
+    import roleService from "../service/roleService";
 
     export default {
         components: {
@@ -128,6 +135,7 @@
                     item.departmentName = item.department.name;
                     item.departmentId = item.department.id;
                     item.roleNames = item.userRoles.map(ur => ur.role.name).join();
+                    item.roleIds = item.userRoles.map(ur => ur.role.id);
                     return item;
                 });
             }
@@ -142,6 +150,7 @@
                 this.userForm.name = row.name;
                 this.userForm.mobile = row.mobile;
                 this.userForm.departmentId = row.departmentId;
+                this.userForm.roleIds = row.roleIds;
                 this.userDialogVisible = true;
             },
             handleClickCreateUser() {
@@ -262,8 +271,9 @@
                 total: 0,
                 users: [],
                 department: [],
+                roles: [],
                 userDialogVisible: false,
-                userForm: {id: null, name: null, departmentId: null, mobile: null},
+                userForm: {id: null, name: null, departmentId: null, mobile: null, roleIds: null},
                 departmentForm: {id: null, name: null, parentId: null},
                 departmentDialogVisible: false
             };
@@ -278,6 +288,10 @@
                         this.handleClickDepartment(this.$refs.tree.getCurrentNode());
                     });
                 }
+            }
+            let roleResp = await roleService.get();
+            if (roleResp.data.success) {
+                this.roles = roleResp.data.data;
             }
         }
     };
