@@ -76,7 +76,7 @@
                 </el-form-item>
                 <el-form-item label="部门">
                     <treeselect v-model="userForm.departmentId" :options="department"
-                                :normalizer="() => ({ label: node.name })"/>
+                                :normalizer="(node) => ({ label: node.name })"/>
                 </el-form-item>
                 <el-form-item label="手机">
                     <el-input v-model="userForm.mobile"/>
@@ -125,6 +125,9 @@
             formattedUsers() {
                 return this.users.map(item => {
                     item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm');
+                    item.departmentName = item.department.name;
+                    item.departmentId = item.department.id;
+                    item.roleNames = item.userRoles.map(ur => ur.role.name).join();
                     return item;
                 });
             }
