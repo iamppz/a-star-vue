@@ -9,12 +9,17 @@ class UserService {
         return instance.get(`/api/user/`);
     }
 
+    buildUserURL(form) {
+        let roleIds = form.roleIds.join();
+        return `/api/user/?name=${form.name || ''}&userId=${form.id || ''}&mobile=${form.mobile || ''}&departmentId=${form.departmentId}&roleIds=${roleIds}`;
+    }
+
     async add(form) {
-        return instance.post('/api/user/', form);
+        return instance.post(this.buildUserURL(form));
     }
 
     async update(form) {
-        return instance.put(`/api/user/?name=${form.name || ''}&userId=${form.id || ''}&mobile=${form.mobile || ''}&departmentId=${form.departmentId}`);
+        return instance.put(this.buildUserURL(form));
     }
 
     async enable(id) {
