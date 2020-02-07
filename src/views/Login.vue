@@ -6,8 +6,8 @@
                     Welcome
                 </p>
                 <p id="link">
-                    <a href="mailto:zsl@joyceinnovations.com">Contact</a>
-                    <a href="https://www.jianshu.com/u/f5527e87925e">Blog</a>
+                    <a href="mailto:iamppz@hotmail.com">Contact</a>
+                    <a href="#">Blog</a>
                 </p>
             </div>
         </el-header>

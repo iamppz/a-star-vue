@@ -15,18 +15,17 @@
                          :expand-on-click-node="false" highlight-current>
                     <span class="flexible" slot-scope="{ node, data }">
                         <span>{{ node.label }}</span>
-                        &nbsp;
-                    <span>
-                        <el-button type="text" size="mini" @click="() => editDepartment(data)"
-                                   icon="el-icon-edit-outline">
-                        </el-button>
-                        <el-button type="text" size="mini" @click="() => appendDepartment(data)"
-                                   icon="el-icon-plus">
-                        </el-button>
-                        <el-button type="text" size="mini" @click="() => removeDepartment(node, data)"
-                                   icon="el-icon-close">
-                        </el-button>
-                    </span>
+                        <span>
+                            <el-button type="text" size="mini" @click="() => editDepartment(data)"
+                                       icon="el-icon-edit-outline">
+                            </el-button>
+                            <el-button type="text" size="mini" @click="() => appendDepartment(data)"
+                                       icon="el-icon-plus">
+                            </el-button>
+                            <el-button type="text" size="mini" @click="() => removeDepartment(node, data)"
+                                       icon="el-icon-close">
+                            </el-button>
+                        </span>
                     </span>
                 </el-tree>
             </el-aside>
@@ -93,12 +92,21 @@
                 <el-button type="primary" @click="handleClickSaveUser">确定</el-button>
             </span>
         </el-dialog>
-        <el-dialog :title="departmentForm.id > 0 ? '编辑部门' : '新建部门'" :visible.sync="departmentDialogVisible" width="30%">
+        <el-dialog :title="departmentForm.id > 0 ? '编辑部门' : '新建部门'" :visible.sync="departmentDialogVisible" width="440px">
             <el-form ref="form" :model="departmentForm" label-width="80px">
                 <el-form-item label="名称">
                     <input type="hidden" v-model="departmentForm.id"/>
                     <input type="hidden" v-model="departmentForm.parentId"/>
                     <el-input v-model="departmentForm.name"/>
+                </el-form-item>
+                <el-form-item label="负责人">
+                    <el-select v-model="departmentForm.leaderId" filterable remote placeholder="请输入关键词"
+                               :remote-method="getDepartmentLeaderOptions" :loading="gettingDepartmentOptions"
+                               style="width: 100%;">
+                        <el-option v-for="item in departmentLeaderOptions" :key="'user-' + item.id" :label="item.name"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -144,6 +152,12 @@
             filterDepartment(value, data) {
                 if (!value) return true;
                 return data.name.indexOf(value) !== -1;
+            },
+            async getDepartmentLeaderOptions(kw) {
+                let resp = await userService.search(kw);
+                if (resp.data.success) {
+                    this.departmentLeaderOptions = resp.data.data;
+                }
             },
             handleClickEditUser(row) {
                 this.userForm.id = row.id;
@@ -274,8 +288,10 @@
                 roles: [],
                 userDialogVisible: false,
                 userForm: {id: null, name: null, departmentId: null, mobile: null, roleIds: null},
-                departmentForm: {id: null, name: null, parentId: null},
-                departmentDialogVisible: false
+                departmentForm: {id: null, name: null, parentId: null, leaderId: null},
+                departmentDialogVisible: false,
+                departmentLeaderOptions: [],
+                gettingDepartmentOptions: false
             };
         },
         async mounted() {

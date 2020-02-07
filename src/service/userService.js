@@ -37,6 +37,10 @@ class UserService {
     async changePassword(form) {
         return instance.put(`/api/account/password?currentPassword=${form.currentPassword}&password=${form.password}`);
     }
+
+    async search(nameKeyword) {
+        return instance.get(`/api/user/search?nameKeyword=${nameKeyword}`)
+    }
 }
 
 export default new UserService();
