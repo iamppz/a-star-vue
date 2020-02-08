@@ -5,8 +5,12 @@ class UserService {
         return instance.get(`/api/user/department?departmentId=${departmentId}&pageIndex=${pageIndex}`);
     }
 
-    async get() {
-        return instance.get(`/api/user/`);
+    async getCurrent() {
+        return instance.get(`/api/user/current`);
+    }
+
+    async get(id) {
+        return instance.get(`/api/user/?id=${id}`)
     }
 
     buildUserURL(form) {

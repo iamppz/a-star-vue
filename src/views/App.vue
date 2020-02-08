@@ -154,7 +154,7 @@
                 this.navs = resp.data.data;
             }
 
-            resp = await userService.get();
+            resp = await userService.getCurrent();
             if (resp.data.success) {
                 this.name = resp.data.data.name;
             }

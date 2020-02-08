@@ -241,9 +241,18 @@
                 this.departmentDialogVisible = true;
                 this.departmentForm = {parentId: data.id};
             },
-            editDepartment(data) {
+            async editDepartment(data) {
                 this.departmentDialogVisible = true;
-                this.departmentForm = {...data};
+                let resp = await departmentService.get(data.id);
+                if (resp.data.success) {
+                    if (resp.data.data.leaderId) {
+                        let userResp = await userService.get(resp.data.data.leaderId);
+                        if (userResp.data.success) {
+                            this.departmentLeaderOptions = [userResp.data.data];
+                        }
+                    }
+                    this.departmentForm = {...resp.data.data};
+                }
             },
             removeDepartment(node, data) {
                 MessageBox.confirm('确定要删除部门"' + data.name + '"?', '提示', {

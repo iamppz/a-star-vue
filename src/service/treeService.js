@@ -2,7 +2,7 @@ import instance from "../utils/instance";
 
 class TreeService {
     async get(name) {
-        return await instance.get('/api/tree/?name=' + name);
+        return instance.get('/api/tree/?name=' + name);
     }
 }
 
