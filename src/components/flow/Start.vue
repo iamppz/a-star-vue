@@ -8,7 +8,7 @@
                     </div>
                     <div class="content" @click="handleApproverDivClick">
                         <div class="text">{{ node.name }}</div>
-                        <i class="anticon anticon-right arrow"></i>
+                        <i class="anticon anticon-right arrow"/>
                     </div>
                 </div>
             </div>
@@ -17,18 +17,18 @@
             </toolbar>
         </div>
         <template v-if="showNextBranch">
-            <branch :transitions="node.transitions" @onconditionremove="onNextBranchConditionRemove"></branch>
+            <branch :transitions="node.transitions" @onconditionremove="onNextBranchConditionRemove"/>
         </template>
         <template v-else>
             <template v-if="node.transitions[0].destination.state === 'end'">
-                <end></end>
+                <end/>
             </template>
             <template v-else>
-                <operation :node="node.transitions[0].destination" @onremove="onNextRemove"></operation>
+                <operation :node="node.transitions[0].destination" @onremove="onNextRemove"/>
             </template>
         </template>
         <el-dialog title="编辑节点" :visible.sync="dialogApproverVisible" :append-to-body="true" width="500px">
-            <operation-form :approver-form="approverForm"></operation-form>
+            <operation-form :approver-form="approverForm"/>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogApproverVisible = false">取 消</el-button>
                 <el-button type="primary" @click="dialogApproverVisible = false">确 定</el-button>
@@ -112,4 +112,4 @@
         }
     }
 </script>
-<style scoped src="../../assets/flow-design.css"></style>
+<style scoped src="../../assets/flow-design.css"/>
