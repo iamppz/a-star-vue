@@ -6,11 +6,12 @@ import User from "../views/User";
 import Role from "../views/Role";
 import App from "../views/App";
 import AStar from "../views/process/AStar";
-import Workflow from "../views/Workflow";
+import WorkflowIndex from "../views/workflow/Index";
 
 import Flowchart from "../components/flow/Canvas";
 import EChartsTest from "../views/EChartsTest";
 import Dictionary from "../views/Dictionary";
+import WorkflowConfig from "../views/workflow/Config";
 
 Vue.use(VueRouter);
 
@@ -27,7 +28,8 @@ const routes = [
             {path: 'echartsTest', component: EChartsTest},
             {path: 'process/flowDesign', component: Flowchart},
             {path: 'dictionary', component: Dictionary},
-            {path: 'workflow', component: Workflow}
+            {path: 'workflow/index', component: WorkflowIndex},
+            {path: 'workflow/config', component: WorkflowConfig}
         ]
     }
 ];

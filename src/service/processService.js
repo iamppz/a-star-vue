@@ -5,6 +5,10 @@ class ProcessService {
         return instance.get(`/api/process/definition?id=${id}`);
     }
 
+    async getAllDefinitions() {
+        return instance.get(`/api/process/definition/all`);
+    }
+
     async getInstance(id) {
         return instance.get(`/api/process/instance?id=${id}`);
     }
