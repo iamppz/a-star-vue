@@ -26,6 +26,9 @@
     </div>
 </template>
 <script>
+    import {arrowTo, clearCanvas} from "../../utils/canvas";
+    import {getOffsetLeft, getOffsetTop} from "../../utils/dom";
+
     export default {
         data() {
             return {
@@ -77,14 +80,14 @@
             },
             handleChartMouseMove(event) {
                 let element = document.getElementById('chart');
-                this.cursorToChartOffset.x = event.pageX - this.getOffsetLeft(element);
-                this.cursorToChartOffset.y = event.pageY - this.getOffsetTop(element);
+                this.cursorToChartOffset.x = event.pageX - getOffsetLeft(element);
+                this.cursorToChartOffset.y = event.pageY - getOffsetTop(element);
                 if (this.movingNode.target) {
                     this.movingNode.target.x = this.cursorToChartOffset.x - this.movingNode.offsetX;
                     this.movingNode.target.y = this.cursorToChartOffset.y - this.movingNode.offsetY;
                 } else if (this.connectingInfo.source) {
                     this.refresh();
-                    this.arrowTo('canvas', this.connectingInfo.sourceX, this.connectingInfo.sourceY,
+                    arrowTo('canvas', this.connectingInfo.sourceX, this.connectingInfo.sourceY,
                         this.cursorToChartOffset.x, this.cursorToChartOffset.y, '#a3a3a3', true);
                 }
             },
@@ -93,82 +96,11 @@
                 this.connectingInfo.source = source;
                 this.connectingInfo.direction = direction;
                 let element = document.getElementById('chart');
-                this.connectingInfo.sourceX = this.getOffsetLeft(event.currentTarget) - this.getOffsetLeft(element);
-                this.connectingInfo.sourceY = this.getOffsetTop(event.currentTarget) - this.getOffsetTop(element);
+                this.connectingInfo.sourceX = getOffsetLeft(event.currentTarget) - getOffsetLeft(element);
+                this.connectingInfo.sourceY = getOffsetTop(event.currentTarget) - getOffsetTop(element);
             },
             refresh() {
-                this.clearCanvas('canvas');
-            },
-            getOffsetLeft(elem) {
-                let offsetLeft = 0;
-                do {
-                    if (!isNaN(elem.offsetLeft)) {
-                        offsetLeft += elem.offsetLeft;
-                        elem = elem.offsetParent;
-                    }
-                } while (elem.offsetParent);
-                return offsetLeft;
-            },
-            getOffsetTop(elem) {
-                let offsetTop = 0;
-                do {
-                    if (!isNaN(elem.offsetTop)) {
-                        offsetTop += elem.offsetTop;
-                        elem = elem.offsetParent;
-                    }
-                } while (elem.offsetParent);
-                return offsetTop;
-            },
-            arrowTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint) {
-                this.lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint);
-                let sta = [x1, y1];
-                let end = [x2, y2];
-                let canvas = document.getElementById(canId);
-                let ctx = canvas.getContext('2d');
-                ctx.translate(end[0], end[1]);
-                let ang = (end[0] - sta[0]) / (end[1] - sta[1]);
-                ang = Math.atan(ang);
-                if (end[1] - sta[1] >= 0) {
-                    ctx.rotate(-ang);
-                } else {
-                    ctx.rotate(Math.PI - ang);
-                }
-                ctx.lineTo(-5, -10);
-                ctx.lineTo(0, -5);
-                ctx.lineTo(5, -10);
-                ctx.lineTo(0, 0);
-                ctx.fillStyle = strokeStyle;
-                ctx.fill();
-                ctx.restore();
-                ctx.closePath();
-            },
-            lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint) {
-                let sta = [x1, y1];
-                let end = [x2, y2];
-                let canvas = document.getElementById(canId);
-                let ctx = canvas.getContext('2d');
-                //画线
-                ctx.beginPath();
-                ctx.lineWidth = lineWidth;
-                ctx.strokeStyle = strokeStyle;
-                ctx.translate(0, 0, 0); //坐标源点
-                ctx.moveTo(sta[0], sta[1]);
-                if (isStartPoint) {
-                    ctx.arc(sta[0], sta[1], 2, 0, 2 * Math.PI);
-                    ctx.fill();
-                }
-                ctx.translate(0, 0, 0); //坐标源点
-                ctx.moveTo(sta[0], sta[1]);
-                ctx.translate(0, 0, 0); //坐标源点
-                ctx.lineTo(end[0], end[1]);
-                ctx.fill();
-                ctx.stroke();
-                ctx.save();
-            },
-            clearCanvas(canId) {
-                let c = document.getElementById(canId);
-                let cxt = c.getContext("2d");
-                cxt.clearRect(0, 0, 800, 600);
+                clearCanvas('canvas');
             }
         }
     }
