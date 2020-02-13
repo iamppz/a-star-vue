@@ -3,22 +3,27 @@
         <div id="toolbar">
             <el-button type="primary" @click="add">添加节点</el-button>
         </div>
-        <div id="chart" @mousemove="handleChartMouseMove">
+        <div id="chart" @mousemove="handleChartMouseMove" @mouseup="handleChartMouseUp">
             <span id="position">{{cursorToChartOffset.x + ', ' + cursorToChartOffset.y}}</span>
             <canvas id="canvas" width="800" height="600"/>
             <template v-for="node in nodes">
                 <div class="node" :key="node.id" :style="{top: node.y + 'px', left: node.x + 'px'}"
-                     @mousedown="handleNodeMouseDown(node, $event)" @mouseup="handleNodeMouseUp(node)">
+                     :name="'node-' + node.id" @mousedown="handleNodeMouseDown(node, $event)"
+                     @mouseup="handleNodeMouseUp(node)">
                     <div class="node-header">
                         {{node.name}}
                     </div>
                     <div class="node-connector node-connector-top"
+                         @mouseup="handleNodeConnectorMouseUp(node, 'top', $event)"
                          @mousedown="handleNodeConnectorMouseDown(node, 'top', $event)"></div>
                     <div class="node-connector node-connector-bottom"
+                         @mouseup="handleNodeConnectorMouseUp(node, 'bottom', $event)"
                          @mousedown="handleNodeConnectorMouseDown(node, 'bottom', $event)"></div>
                     <div class="node-connector node-connector-left"
+                         @mouseup="handleNodeConnectorMouseUp(node, 'left', $event)"
                          @mousedown="handleNodeConnectorMouseDown(node, 'left', $event)"></div>
                     <div class="node-connector node-connector-right"
+                         @mouseup="handleNodeConnectorMouseUp(node, 'right', $event)"
                          @mousedown="handleNodeConnectorMouseDown(node, 'right', $event)"></div>
                 </div>
             </template>
@@ -26,7 +31,7 @@
     </div>
 </template>
 <script>
-    import {arrowTo, clearCanvas} from "../../utils/canvas";
+    import {arrow2, clearCanvas} from "../../utils/canvas";
     import {getOffsetLeft, getOffsetTop} from "../../utils/dom";
 
     export default {
@@ -46,6 +51,7 @@
                         name: '结束'
                     }
                 ],
+                connections: [],
                 movingNode: {
                     target: null,
                     offsetX: null,
@@ -53,7 +59,7 @@
                 },
                 connectingInfo: {
                     source: null,
-                    direction: null,
+                    sourcePosition: null,
                     sourceX: null,
                     sourceY: null
                 },
@@ -72,11 +78,17 @@
                 this.movingNode.offsetY = event.offsetY;
             },
             handleNodeMouseUp() {
-                this.movingNode.target.x = Math.round(Math.round(this.movingNode.target.x) / 10) * 10;
-                this.movingNode.target.y = Math.round(Math.round(this.movingNode.target.y) / 10) * 10;
-                this.movingNode.target = null;
-                this.movingNode.offsetX = null;
-                this.movingNode.offsetY = null;
+                if (this.movingNode.target) {
+                    this.movingNode.target.x = Math.round(Math.round(this.movingNode.target.x) / 10) * 10;
+                    this.movingNode.target.y = Math.round(Math.round(this.movingNode.target.y) / 10) * 10;
+                    this.movingNode.target = null;
+                    this.movingNode.offsetX = null;
+                    this.movingNode.offsetY = null;
+                    let that = this;
+                    that.$nextTick(function () {
+                        that.refresh()
+                    });
+                }
             },
             handleChartMouseMove(event) {
                 let element = document.getElementById('chart');
@@ -85,22 +97,64 @@
                 if (this.movingNode.target) {
                     this.movingNode.target.x = this.cursorToChartOffset.x - this.movingNode.offsetX;
                     this.movingNode.target.y = this.cursorToChartOffset.y - this.movingNode.offsetY;
+                    this.refresh();
                 } else if (this.connectingInfo.source) {
                     this.refresh();
-                    arrowTo('canvas', this.connectingInfo.sourceX, this.connectingInfo.sourceY,
-                        this.cursorToChartOffset.x, this.cursorToChartOffset.y, '#a3a3a3', true);
+                    arrow2('canvas', this.connectingInfo.sourceX, this.connectingInfo.sourceY,
+                        this.cursorToChartOffset.x, this.cursorToChartOffset.y, '#a3a3a3', true,
+                        this.connectingInfo.sourcePosition);
                 }
             },
-            handleNodeConnectorMouseDown(source, direction, event) {
+            handleChartMouseUp(event) {
+                if (this.connectingInfo.source) {
+                    this.connectingInfo.source = null;
+                    this.connectingInfo.sourcePosition = null;
+                    this.connectingInfo.sourceX = null;
+                    this.connectingInfo.sourceY = null;
+                    this.refresh();
+                }
+            },
+            handleNodeConnectorMouseDown(source, position, event) {
                 event.stopPropagation();
                 this.connectingInfo.source = source;
-                this.connectingInfo.direction = direction;
-                let element = document.getElementById('chart');
-                this.connectingInfo.sourceX = getOffsetLeft(event.currentTarget) - getOffsetLeft(element);
-                this.connectingInfo.sourceY = getOffsetTop(event.currentTarget) - getOffsetTop(element);
+                this.connectingInfo.sourcePosition = position;
+                let offset = this.getNodeConnectorOffset(source.id, position);
+                this.connectingInfo.sourceX = offset.left;
+                this.connectingInfo.sourceY = offset.top;
+            },
+            handleNodeConnectorMouseUp(destination, position, event) {
+                if (this.connectingInfo.source) {
+                    this.connections.push({
+                        source: {
+                            id: this.connectingInfo.source.id,
+                            position: this.connectingInfo.sourcePosition
+                        },
+                        destination: {
+                            id: destination.id,
+                            position: position
+                        }
+                    });
+                    this.refresh();
+                }
             },
             refresh() {
                 clearCanvas('canvas');
+                this.connections.forEach(conn => {
+                    let sourceOffset = this.getNodeConnectorOffset(conn.source.id, conn.source.position);
+                    let destinationOffset = this.getNodeConnectorOffset(conn.destination.id, conn.destination.position);
+                    arrow2('canvas', sourceOffset.left, sourceOffset.top,
+                        destinationOffset.left, destinationOffset.top, '#a3a3a3', true,
+                        conn.source.position, conn.destination.position);
+                });
+            },
+            getNodeConnectorOffset(nodeId, connectorPosition) {
+                let nodeElement = document.getElementsByName('node-' + nodeId)[0];
+                let connector = nodeElement.querySelector('.node-connector-' + connectorPosition);
+                let chartElement = document.getElementById('chart');
+                return {
+                    left: getOffsetLeft(connector) - getOffsetLeft(chartElement),
+                    top: getOffsetTop(connector) - getOffsetTop(chartElement)
+                }
             }
         }
     }
@@ -147,18 +201,16 @@
     }
 
     .node-connector {
-        display: none;
         position: absolute;
-        color: white;
-        border: 1px solid #a3a3a3;
         width: 5px;
         height: 5px;
         border-radius: 4px;
-        background-color: white;
     }
 
     .node:hover .node-connector {
         display: block;
+        border: 1px solid #a3a3a3;
+        background-color: white;
     }
 
     .node-connector-top {
