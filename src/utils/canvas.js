@@ -32,7 +32,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
     let points = [];
     let start = [x1, y1];
     let end = [x2, y2];
-    let second = null;
+    let second;
     switch (startPosition) {
         case 'left':
             second = [start[0] - 20, start[1]];
@@ -193,62 +193,83 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 points.push(forth);
             }
             break;
-        case 'rd':
-            if (startPosition === 'right' && endPosition === 'left') {
-                let centerX = (penult[0] - second[0]) / 2;
-                let third = [second[0] + centerX, second[1]];
-                let forth = [second[0] + centerX, penult[1]];
-                if (second[0] > third[0]) {
-                    second[0] = third[0];
+        case 'rd': {
+            let centerX = start[0] + (end[0] - start[0]) / 2;
+            if (startPosition === 'right' || endPosition === 'left') {
+                if (second[0] > centerX) {
+                    second[0] = centerX;
                 }
-                if (penult[0] < third[0]) {
-                    penult[0] = third[0];
+                if (penult[0] < centerX) {
+                    penult[0] = centerX;
                 }
+            }
+            let centerY = start[1] + (end[1] - start[1]) / 2;
+            if (startPosition === 'bottom' || endPosition === 'top') {
+                if (second[1] > centerY) {
+                    second[1] = centerY;
+                }
+                if (penult[1] < centerY) {
+                    penult[1] = centerY;
+                }
+            }
+            if ((startPosition === 'right' && endPosition === 'left')
+                || (startPosition === 'right' && endPosition === 'bottom')) {
+                let third = [centerX, second[1]];
+                let forth = [centerX, penult[1]];
                 points.push(third);
                 points.push(forth);
-            } else if (startPosition === 'right' && endPosition === 'top') {
+            } else if ((startPosition === 'right' && endPosition === 'top')
+                || (startPosition === 'right' && endPosition === 'right')) {
                 let third = [penult[0], second[1]];
                 points.push(third);
-            } else if (startPosition === 'right' && endPosition === 'right') {
-                let third = [penult[0], second[1]];
-                points.push(third);
-            } else if (startPosition === 'right' && endPosition === 'bottom') {
-                let centerX = (penult[0] - start[0]) / 2;
-                let third = [start[0] + centerX, second[1]];
-                let forth = [start[0] + centerX, penult[1]];
-                if (second[0] > third[0]) {
-                    second[0] = third[0];
-                }
-                if (penult[0] < third[0]) {
-                    penult[0] = third[0];
-                }
-                points.push(third);
-                points.push(forth);
             } else if (startPosition === 'bottom' && endPosition === 'left') {
-                if (penult[0] < second[0]) {
-                    penult[0] = second[0];
-                }
                 let third = [second[0], penult[1]];
                 points.push(third);
             } else if (startPosition === 'bottom' && endPosition === 'right') {
                 let third = [penult[0], second[1]];
                 points.push(third);
             } else if (startPosition === 'bottom' && endPosition === 'top') {
-                let centerY = (end[1] - start[1]) / 2;
-                let third = [second[0], start[1] + centerY];
-                let forth = [penult[0], start[1] + centerY];
-                if (second[1] > third[1]) {
-                    second[1] = third[1];
-                }
-                if (penult[1] < third[1]) {
-                    penult[1] = third[1];
-                }
+                let third = [second[0], centerY];
+                let forth = [penult[0], centerY];
                 points.push(third);
                 points.push(forth);
+            } else if (startPosition === 'bottom' && endPosition === 'bottom') {
+                let third = [second[0], penult[1]];
+                points.push(third);
             } else if (startPosition === 'top' && endPosition === 'left') {
                 let third = [penult[0], second[1]];
                 points.push(third);
+            } else if (startPosition === 'top' && endPosition === 'right') {
+                let third = [penult[0], second[1]];
+                points.push(third);
+            } else if (startPosition === 'top' && endPosition === 'top') {
+                let third = [centerX, second[1]];
+                let forth = [centerX, penult[1]];
+                points.push(third);
+                points.push(forth);
+            } else if (startPosition === 'top' && endPosition === 'bottom') {
+                let third = [centerX, second[1]];
+                let forth = [centerX, penult[1]];
+                points.push(third);
+                points.push(forth);
+            } else if (startPosition === 'left' && endPosition === 'left') {
+                let third = [second[0], penult[1]];
+                points.push(third);
+            } else if (startPosition === 'left' && endPosition === 'right') {
+                let third = [second[0], centerY];
+                let forth = [penult[0], centerY];
+                points.push(third);
+                points.push(forth);
+            } else if (startPosition === 'left' && endPosition === 'top') {
+                let third = [second[0], centerY];
+                let forth = [penult[0], centerY];
+                points.push(third);
+                points.push(forth);
+            } else if (startPosition === 'left' && endPosition === 'bottom') {
+                let third = [second[0], penult[1]];
+                points.push(third);
             }
+        }
             break;
     }
     points.push(penult);
