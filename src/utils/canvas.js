@@ -32,6 +32,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
     let points = [];
     let start = [x1, y1];
     let end = [x2, y2];
+    let centerX = start[0] + (end[0] - start[0]) / 2;
+    let centerY = start[1] + (end[1] - start[1]) / 2;
     let second;
     switch (startPosition) {
         case 'left':
@@ -71,11 +73,26 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
     endPosition = endPosition || 'left';
     let direction = getDirection(x1, y1, x2, y2);
     switch (direction) {
-        case 'lu':
+        case 'lu': {
+            if (startPosition === 'top' || endPosition === 'bottom') {
+                if (second[1] < centerY) {
+                    second[1] = centerY;
+                }
+                if (penult[1] > centerY) {
+                    penult[1] = centerY;
+                }
+            }
+            if (startPosition === 'left' || endPosition === 'right') {
+                if (second[0] < centerX) {
+                    second[0] = centerX;
+                }
+                if (penult[0] > centerX) {
+                    penult[0] = centerX;
+                }
+            }
             if (startPosition === 'right' && endPosition === 'left') {
-                let centerY = (second[1] - penult[1]) / 2;
-                let third = [second[0], second[1] - centerY];
-                let forth = [penult[0], second[1] - centerY];
+                let third = [second[0], centerY];
+                let forth = [penult[0], centerY];
                 points.push(third);
                 points.push(forth);
             } else if (startPosition === 'bottom' && endPosition === 'left') {
@@ -84,8 +101,12 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             } else if (startPosition === 'top' && endPosition === 'left') {
                 let third = [penult[0], second[1]];
                 points.push(third);
+            } else if (startPosition === 'left' && endPosition === 'bottom') {
+                let third = [penult[0], second[1]];
+                points.push(third);
             }
             break;
+        }
         case 'u':
             if (startPosition === 'right' && endPosition === 'left') {
                 let centerY = (second[1] - penult[1]) / 2;
@@ -194,7 +215,6 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             }
             break;
         case 'rd': {
-            let centerX = start[0] + (end[0] - start[0]) / 2;
             if (startPosition === 'right' || endPosition === 'left') {
                 if (second[0] > centerX) {
                     second[0] = centerX;
@@ -203,7 +223,6 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                     penult[0] = centerX;
                 }
             }
-            let centerY = start[1] + (end[1] - start[1]) / 2;
             if (startPosition === 'bottom' || endPosition === 'top') {
                 if (second[1] > centerY) {
                     second[1] = centerY;
@@ -269,8 +288,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 let third = [second[0], penult[1]];
                 points.push(third);
             }
-        }
             break;
+        }
     }
     points.push(penult);
     points.push(end);
