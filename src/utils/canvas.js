@@ -35,6 +35,18 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
     let centerX = start[0] + (end[0] - start[0]) / 2;
     let centerY = start[1] + (end[1] - start[1]) / 2;
     let second;
+    let addVerticalCenterLine = function () {
+        let third = [centerX, second[1]];
+        let forth = [centerX, end[1]];
+        points.push(third);
+        points.push(forth);
+    }
+    let addHorizontalCenterLine = function () {
+        let third = [start[0], centerY];
+        let forth = [penult[0], centerY];
+        points.push(third);
+        points.push(forth);
+    }
     switch (startPosition) {
         case 'left':
             second = [start[0] - 20, start[1]];
@@ -88,10 +100,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 }
             }
             if (startPosition === 'right' && endPosition === 'left') {
-                let third = [second[0], centerY];
-                let forth = [penult[0], centerY];
-                points.push(third);
-                points.push(forth);
+                addHorizontalCenterLine();
             } else if (startPosition === 'right' && endPosition === 'right') {
                 let third = [second[0], penult[1]];
                 points.push(third);
@@ -99,10 +108,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 let third = [second[0], penult[1]];
                 points.push(third);
             } else if (startPosition === 'right' && endPosition === 'bottom') {
-                let third = [second[0], centerY];
-                let forth = [penult[0], centerY];
-                points.push(third);
-                points.push(forth);
+                addHorizontalCenterLine();
             } else if (startPosition === 'bottom' && endPosition === 'left') {
                 let third = [penult[0], second[1]];
                 points.push(third);
@@ -110,21 +116,44 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 let third = [penult[0], second[1]];
                 points.push(third);
             } else if (startPosition === 'bottom' && endPosition === 'right') {
-                let third = [centerX, second[1]];
-                let forth = [centerX, penult[1]];
-                points.push(third);
-                points.push(forth);
+                addVerticalCenterLine();
             } else if (startPosition === 'bottom' && endPosition === 'top') {
-                let third = [centerX, second[1]];
-                let forth = [centerX, penult[1]];
+                addVerticalCenterLine();
+            } else if (startPosition === 'top' && endPosition === 'right') {
+                let third = [start[0], end[1]];
                 points.push(third);
-                points.push(forth);
             } else if (startPosition === 'top' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
+                addHorizontalCenterLine();
+            } else if (startPosition === 'top' && endPosition === 'top') {
+                let third = [start[0], end[1]];
                 points.push(third);
-            } else if (startPosition === 'left' && endPosition === 'bottom') {
-                let third = [penult[0], second[1]];
-                points.push(third);
+            } else if (startPosition === 'top' && endPosition === 'bottom') {
+                addHorizontalCenterLine();
+            } else {    // startPosition is left
+                switch (endPosition) {
+                    case 'bottom':
+                        {
+                            let third = [penult[0], start[1]];
+                            points.push(third);
+                            break;
+                        }
+                    case 'top':
+                        {
+                            addVerticalCenterLine();
+                            break;
+                        }
+                    case 'right':
+                        {
+                            addHorizontalCenterLine();
+                            break;
+                        }
+                    default:
+                        {
+                            let third = [penult[0], start[1]];
+                            points.push(third);
+                            break;
+                        }
+                }
             }
             break;
         }
@@ -254,10 +283,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             }
             if ((startPosition === 'right' && endPosition === 'left')
                 || (startPosition === 'right' && endPosition === 'bottom')) {
-                let third = [centerX, second[1]];
-                let forth = [centerX, penult[1]];
-                points.push(third);
-                points.push(forth);
+                addVerticalCenterLine();
             } else if ((startPosition === 'right' && endPosition === 'top')
                 || (startPosition === 'right' && endPosition === 'right')) {
                 let third = [penult[0], second[1]];
@@ -269,10 +295,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 let third = [penult[0], second[1]];
                 points.push(third);
             } else if (startPosition === 'bottom' && endPosition === 'top') {
-                let third = [second[0], centerY];
-                let forth = [penult[0], centerY];
-                points.push(third);
-                points.push(forth);
+                addHorizontalCenterLine();
             } else if (startPosition === 'bottom' && endPosition === 'bottom') {
                 let third = [second[0], penult[1]];
                 points.push(third);
@@ -283,28 +306,16 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 let third = [penult[0], second[1]];
                 points.push(third);
             } else if (startPosition === 'top' && endPosition === 'top') {
-                let third = [centerX, second[1]];
-                let forth = [centerX, penult[1]];
-                points.push(third);
-                points.push(forth);
+                addVerticalCenterLine();
             } else if (startPosition === 'top' && endPosition === 'bottom') {
-                let third = [centerX, second[1]];
-                let forth = [centerX, penult[1]];
-                points.push(third);
-                points.push(forth);
+                addVerticalCenterLine();
             } else if (startPosition === 'left' && endPosition === 'left') {
                 let third = [second[0], penult[1]];
                 points.push(third);
             } else if (startPosition === 'left' && endPosition === 'right') {
-                let third = [second[0], centerY];
-                let forth = [penult[0], centerY];
-                points.push(third);
-                points.push(forth);
+                addHorizontalCenterLine();
             } else if (startPosition === 'left' && endPosition === 'top') {
-                let third = [second[0], centerY];
-                let forth = [penult[0], centerY];
-                points.push(third);
-                points.push(forth);
+                addHorizontalCenterLine();
             } else if (startPosition === 'left' && endPosition === 'bottom') {
                 let third = [second[0], penult[1]];
                 points.push(third);
