@@ -42,10 +42,14 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
         points.push(forth);
     }
     let addHorizontalCenterLine = function () {
-        let third = [start[0], centerY];
+        let third = [second[0], centerY];
         let forth = [penult[0], centerY];
         points.push(third);
         points.push(forth);
+    }
+    let addVerticalRightLine = function () {
+        points.push([second[0] + 80, second[1]]);
+        points.push([second[0] + 80, penult[1]]);
     }
     switch (startPosition) {
         case 'left':
@@ -158,15 +162,44 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             break;
         }
         case 'u':
-            if (startPosition === 'right' && endPosition === 'left') {
-                let centerY = (second[1] - penult[1]) / 2;
-                let third = [second[0], second[1] - centerY];
-                let forth = [penult[0], second[1] - centerY];
-                points.push(third);
-                points.push(forth);
-            } else if (startPosition === 'bottom' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
-                points.push(third);
+            if (startPosition === 'right') {
+                switch (endPosition) {
+                    case 'left': {
+                        addHorizontalCenterLine();
+                        break;
+                    }
+                    case 'right': {
+                        break;
+                    }
+                    case "top": {
+                        let third = [second[0], penult[1]];
+                        points.push(third);
+                        break;
+                    }
+                    default: {
+                        addHorizontalCenterLine();
+                        break;
+                    }
+                }
+            } else if (startPosition === 'bottom') {
+                switch (endPosition) {
+                    case 'left': {
+                        points.push([penult[0], second[1]]);
+                        break;
+                    }
+                    case 'right': {
+                        points.push([penult[0], second[1]]);
+                        break;
+                    }
+                    case 'top': {
+                        addVerticalRightLine();
+                        break;
+                    }
+                    default: {
+                        addVerticalRightLine();
+                        break;
+                    }
+                }
             } else if (startPosition === 'top' && endPosition === 'left') {
                 let third = [penult[0], second[1]];
                 points.push(third);

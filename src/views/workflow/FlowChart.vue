@@ -189,8 +189,8 @@ export default {
             );
             let chartElement = document.getElementById("chart");
             return {
-                left: getOffsetLeft(connector) - getOffsetLeft(chartElement),
-                top: getOffsetTop(connector) - getOffsetTop(chartElement)
+                left: getOffsetLeft(connector) - getOffsetLeft(chartElement) + 3,
+                top: getOffsetTop(connector) - getOffsetTop(chartElement) + 3
             };
         }
     }
@@ -220,6 +220,7 @@ export default {
     height: 60px;
     position: absolute;
     border: 1px solid #a3a3a3;
+    box-sizing: border-box;
     font-size: 12px;
     background-color: white;
     cursor: pointer;
@@ -253,12 +254,12 @@ export default {
 
 .node-connector-top {
     top: -4px;
-    left: 58px;
+    left: 57px;
 }
 
 .node-connector-bottom {
     bottom: -4px;
-    left: 58px;
+    left: 57px;
 }
 
 .node-connector-left {
