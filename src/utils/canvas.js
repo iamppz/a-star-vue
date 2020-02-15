@@ -60,11 +60,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
         case 'bottom':
             penult = [end[0], end[1] + 20];
             break;
-        case 'left' :
-            penult = [end[0] - 20, end[1]];
-            break;
         default:
-            penult = [end[0], second[1]];
+            penult = [end[0] - 20, end[1]];
             break;
     }
     points.push(start);
@@ -95,9 +92,33 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 let forth = [penult[0], centerY];
                 points.push(third);
                 points.push(forth);
+            } else if (startPosition === 'right' && endPosition === 'right') {
+                let third = [second[0], penult[1]];
+                points.push(third);
+            } else if (startPosition === 'right' && endPosition === 'top') {
+                let third = [second[0], penult[1]];
+                points.push(third);
+            } else if (startPosition === 'right' && endPosition === 'bottom') {
+                let third = [second[0], centerY];
+                let forth = [penult[0], centerY];
+                points.push(third);
+                points.push(forth);
             } else if (startPosition === 'bottom' && endPosition === 'left') {
                 let third = [penult[0], second[1]];
                 points.push(third);
+            } else if (startPosition === 'bottom' && endPosition === 'bottom') {
+                let third = [penult[0], second[1]];
+                points.push(third);
+            } else if (startPosition === 'bottom' && endPosition === 'right') {
+                let third = [centerX, second[1]];
+                let forth = [centerX, penult[1]];
+                points.push(third);
+                points.push(forth);
+            } else if (startPosition === 'bottom' && endPosition === 'top') {
+                let third = [centerX, second[1]];
+                let forth = [centerX, penult[1]];
+                points.push(third);
+                points.push(forth);
             } else if (startPosition === 'top' && endPosition === 'left') {
                 let third = [penult[0], second[1]];
                 points.push(third);
