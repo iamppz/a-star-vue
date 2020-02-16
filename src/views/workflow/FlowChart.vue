@@ -244,6 +244,7 @@ export default {
     width: 5px;
     height: 5px;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 .node:hover .node-connector {
@@ -253,23 +254,23 @@ export default {
 }
 
 .node-connector-top {
-    top: -4px;
+    top: -3px;
     left: 57px;
 }
 
 .node-connector-bottom {
-    bottom: -4px;
+    bottom: -3px;
     left: 57px;
 }
 
 .node-connector-left {
-    top: 28px;
-    left: -4px;
+    top: 27px;
+    left: -3px;
 }
 
 .node-connector-right {
-    top: 28px;
-    right: -4px;
+    top: 27px;
+    right: -3px;
 }
 
 #position {
