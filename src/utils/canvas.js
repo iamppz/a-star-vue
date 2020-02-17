@@ -37,7 +37,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
     let second;
     let addVerticalCenterLine = function () {
         let third = [centerX, second[1]];
-        let forth = [centerX, end[1]];
+        let forth = [centerX, penult[1]];
         points.push(third);
         points.push(forth);
     }
@@ -47,9 +47,27 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
         points.push(third);
         points.push(forth);
     }
+    let addHorizontalTopLine = function () {
+        points.push([second[0], start[1] - 50]);
+        points.push([penult[0], start[1] - 50]);
+    }
+    let addHorizontalBottomLine = function () {
+        points.push([second[0], start[1] + 50]);
+        points.push([penult[0], start[1] + 50]);
+    }
     let addVerticalRightLine = function () {
-        points.push([second[0] + 80, second[1]]);
-        points.push([second[0] + 80, penult[1]]);
+        points.push([start[0] + 80, second[1]]);
+        points.push([start[0] + 80, penult[1]]);
+    }
+    let addVerticalLeftLine = function () {
+        points.push([start[0] - 80, second[1]]);
+        points.push([start[0] - 80, penult[1]]);
+    }
+    let addSecondXPenultY = function () {
+        points.push([second[0], penult[1]]);
+    }
+    let addPenultXSecondY = function () {
+        points.push([penult[0], second[1]])
     }
     switch (startPosition) {
         case 'left':
@@ -144,7 +162,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 let third = [penult[0], second[1]];
                 points.push(third);
             } else if (startPosition === 'bottom' && endPosition === 'right') {
-                addVerticalCenterLine();
+                addPenultXSecondY();
             } else if (startPosition === 'bottom' && endPosition === 'top') {
                 addVerticalCenterLine();
             } else if (startPosition === 'top' && endPosition === 'right') {
@@ -153,34 +171,29 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             } else if (startPosition === 'top' && endPosition === 'left') {
                 addHorizontalCenterLine();
             } else if (startPosition === 'top' && endPosition === 'top') {
-                let third = [start[0], end[1]];
-                points.push(third);
+                addSecondXPenultY();
             } else if (startPosition === 'top' && endPosition === 'bottom') {
                 addHorizontalCenterLine();
             } else {    // startPosition is left
                 switch (endPosition) {
-                    case 'bottom':
-                        {
-                            let third = [penult[0], start[1]];
-                            points.push(third);
-                            break;
-                        }
-                    case 'top':
-                        {
-                            addVerticalCenterLine();
-                            break;
-                        }
-                    case 'right':
-                        {
-                            addHorizontalCenterLine();
-                            break;
-                        }
-                    default:
-                        {
-                            let third = [penult[0], start[1]];
-                            points.push(third);
-                            break;
-                        }
+                    case 'bottom': {
+                        let third = [penult[0], start[1]];
+                        points.push(third);
+                        break;
+                    }
+                    case 'top': {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                    case 'right': {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                    default: {
+                        let third = [penult[0], start[1]];
+                        points.push(third);
+                        break;
+                    }
                 }
             }
             break;
@@ -207,18 +220,10 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 }
             } else if (startPosition === 'bottom') {
                 switch (endPosition) {
-                    case 'left': {
+                    case 'left':
+                    case 'right':
                         points.push([penult[0], second[1]]);
                         break;
-                    }
-                    case 'right': {
-                        points.push([penult[0], second[1]]);
-                        break;
-                    }
-                    case 'top': {
-                        addVerticalRightLine();
-                        break;
-                    }
                     default: {
                         addVerticalRightLine();
                         break;
@@ -241,56 +246,98 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
+            } else {    // left
+                switch (endPosition) {
+                    case 'left':
+                    case 'right':
+                        break;
+                    default: {
+                        points.push([second[0], penult[1]]);
+                        break;
+                    }
+                }
             }
             break;
         case 'ru':
-            if (startPosition === 'right' && endPosition === 'left') {
-                let centerX = (penult[0] - second[0]) / 2;
-                let third = [second[0] + centerX, second[1]];
-                let forth = [second[0] + centerX, penult[1]];
-                if (second[0] > third[0]) {
-                    second[0] = third[0];
-                }
-                if (penult[0] < third[0]) {
-                    penult[0] = third[0];
-                }
-                points.push(third);
-                points.push(forth);
-            } else if (startPosition === 'bottom' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
-                points.push(third);
-            } else if (startPosition === 'top' && endPosition === 'left') {
-                let third = [second[0], penult[1]];
-                points.push(third);
-            }
-            break;
-        case 'l':
-            if (startPosition === 'right' && endPosition === 'left') {
-                let third = [second[0], second[1] - 60];
-                let forth = [penult[0], second[1] - 60];
-                points.push(third);
-                points.push(forth);
-            } else if (startPosition === 'bottom' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
-                points.push(third);
-            } else if (startPosition === 'top' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
-                points.push(third);
-            }
-            break;
-        case 'r':
             if (startPosition === 'right') {
                 switch (endPosition) {
                     case 'left': {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                    case 'top': {
+                        addSecondXPenultY();
                         break;
                     }
                     default: {
+                        addPenultXSecondY();
+                        break;
+                    }
+                }
+            } else if (startPosition === 'bottom') {
+                switch (endPosition) {
+                    case 'top': {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                    default: {
+                        addPenultXSecondY();
+                        break;
+                    }
+                }
+            } else if (startPosition === 'top') {
+                switch (endPosition) {
+                    case 'left': {
+                        addSecondXPenultY();
+                        break;
+                    }
+                    case 'right': {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                    default: {
+                        addSecondXPenultY();
+                        break;
+                    }
+                }
+            } else {    // left
+                switch (endPosition) {
+                    case 'left':
+                    case 'top':
+                        addSecondXPenultY();
+                        break;
+                    default: {
+                        addHorizontalCenterLine();
+                        break;
+                    }
+                }
+            }
+            break;
+        case 'l':
+            if (startPosition === 'right') {
+                switch (endPosition) {
+                    case 'left':
+                    case 'right':
+                    case 'top':
+                        addHorizontalTopLine();
+                        break;
+                    default: {
+                        addHorizontalBottomLine();
                         break;
                     }
                 }
             } else if (startPosition === 'bottom') {
                 switch (endPosition) {
                     case 'left': {
+                        addHorizontalBottomLine();
+                        break;
+                    }
+                    case 'right': {
+                        addSecondXPenultY();
+                        break;
+                    }
+                    case 'top': {
+                        addVerticalCenterLine();
                         break;
                     }
                     default: {
@@ -300,6 +347,63 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             } else if (startPosition === 'top') {
                 switch (endPosition) {
                     case 'left': {
+                        addHorizontalTopLine();
+                        break;
+                    }
+                    case 'right': {
+                        addSecondXPenultY();
+                        break;
+                    }
+                    case 'top': {
+                        break;
+                    }
+                    default: {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                }
+            } else {    // left
+                switch (endPosition) {
+                    case 'left': {
+                        addHorizontalTopLine();
+                        break;
+                    }
+                    case 'right': {
+                        break;
+                    }
+                    default: {
+                        addSecondXPenultY();
+                        break;
+                    }
+                }
+            }
+            break;
+        case 'r':
+            if (startPosition === 'right') {
+                switch (endPosition) {
+                    case 'left': {
+                        break;
+                    }
+                    case 'right': {
+                        addHorizontalTopLine();
+                        break;
+                    }
+                    default: {
+                        addSecondXPenultY();
+                        break;
+                    }
+                }
+            } else if (startPosition === 'bottom') {
+                switch (endPosition) {
+                    case 'left': {
+                        addSecondXPenultY();
+                        break;
+                    }
+                    case 'right': {
+                        addHorizontalBottomLine();
+                        break;
+                    }
+                    case 'top': {
                         addVerticalCenterLine();
                         break;
                     }
@@ -307,38 +411,157 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
+            } else if (startPosition === 'top') {
+                switch (endPosition) {
+                    case 'left': {
+                        addPenultXSecondY();
+                        break;
+                    }
+                    case 'right': {
+                        addHorizontalTopLine();
+                        break;
+                    }
+                    case 'top': {
+                        break;
+                    }
+                    default: {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                }
+            } else {    // left
+                switch (endPosition) {
+                    case 'left':
+                    case 'right':
+                    case 'top':
+                        addHorizontalTopLine();
+                        break;
+                    default: {
+                        addHorizontalBottomLine();
+                        break;
+                    }
+                }
             }
             break;
         case 'ld':
-            if (startPosition === 'right' && endPosition === 'left') {
-                let centerY = (second[1] - penult[1]) / 2;
-                let third = [second[0], second[1] - centerY];
-                let forth = [penult[0], second[1] - centerY];
-                points.push(third);
-                points.push(forth);
-            } else if (startPosition === 'bottom' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
-                points.push(third);
-            } else if (startPosition === 'top' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
-                points.push(third);
+            if (startPosition === 'right') {
+                switch (endPosition) {
+                    case 'left': {
+                        addHorizontalCenterLine();
+                        break;
+                    }
+                    default: {
+                        addSecondXPenultY();
+                        break;
+                    }
+                }
+            } else if (startPosition === 'bottom') {
+                switch (endPosition) {
+                    case 'left': {
+                        addPenultXSecondY();
+                        break;
+                    }
+                    case 'top': {
+                        addHorizontalCenterLine();
+                        break;
+                    }
+                    default: {
+                        addSecondXPenultY();
+                        break;
+                    }
+                }
+            } else if (startPosition === 'top') {
+                switch (endPosition) {
+                    case 'left':
+                    case 'right':
+                    case 'top':
+                        addPenultXSecondY();
+                        break;
+                    default: {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                }
+            } else {    // left
+                switch (endPosition) {
+                    case 'left':
+                    case 'top':
+                        addPenultXSecondY();
+                        break;
+                    case 'right': {
+                        addVerticalCenterLine();
+                        break;
+                    }
+                    default: {
+                        addSecondXPenultY();
+                        break;
+                    }
+                }
             }
             break;
         case 'd':
-            if (startPosition === 'right' && endPosition === 'left') {
-                let centerY = (second[1] - penult[1]) / 2;
-                let third = [second[0], second[1] - centerY];
-                let forth = [penult[0], second[1] - centerY];
-                points.push(third);
-                points.push(forth);
-            } else if (startPosition === 'bottom' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
-                points.push(third);
-            } else if (startPosition === 'top' && endPosition === 'left') {
-                let third = [second[0] - 90, second[1]];
-                let forth = [second[0] - 90, penult[1]];
-                points.push(third);
-                points.push(forth);
+            if (startPosition === 'right') {
+                switch (endPosition) {
+                    case 'left': {
+                        addHorizontalCenterLine();
+                        break;
+                    }
+                    case 'right': {
+                        points.push([penult[0], second[1]]);
+                        break;
+                    }
+                    case 'top': {
+                        points.push([second[0], penult[1]]);
+                        break;
+                    }
+                    default: {
+                        addVerticalRightLine();
+                        break;
+                    }
+                }
+            } else if (startPosition === 'bottom') {
+                switch (endPosition) {
+                    case 'left':
+                    case 'right':
+                        addPenultXSecondY();
+                        break;
+                    case 'top': {
+                        break;
+                    }
+                    default: {
+                        addVerticalRightLine();
+                        break;
+                    }
+                }
+            } else if (startPosition === 'top') {
+                switch (endPosition) {
+                    case 'left': {
+                        addVerticalLeftLine();
+                        break;
+                    }
+                    default: {
+                        addVerticalRightLine();
+                        break;
+                    }
+                }
+            } else {    // left
+                switch (endPosition) {
+                    case 'left': {
+                        break;
+                    }
+                    case 'right': {
+                        addHorizontalCenterLine();
+                        break;
+                    }
+                    case 'top': {
+                        addSecondXPenultY();
+                        break;
+                    }
+                    default: {
+                        addVerticalLeftLine();
+                        break;
+                    }
+                }
             }
             break;
         case 'rd': {
@@ -367,7 +590,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 let third = [penult[0], second[1]];
                 points.push(third);
             } else if (startPosition === 'top' && endPosition === 'top') {
-                addVerticalCenterLine();
+                addPenultXSecondY();
             } else if (startPosition === 'top' && endPosition === 'bottom') {
                 addVerticalCenterLine();
             } else if (startPosition === 'left' && endPosition === 'left') {
