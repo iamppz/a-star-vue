@@ -95,7 +95,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             }
         }
     }
-    if (direction.indexOf('d')) {
+    if (direction.indexOf('d') > -1) {
         if (startPosition === 'bottom' || endPosition === 'top') {
             if (second[1] > centerY) {
                 second[1] = centerY;
@@ -105,7 +105,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             }
         }
     }
-    if (direction.indexOf('l')) {
+    if (direction.indexOf('l') > -1) {
         if (startPosition === 'left' || endPosition === 'right') {
             if (second[0] < centerX) {
                 second[0] = centerX;
@@ -115,7 +115,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             }
         }
     }
-    if (direction.indexOf('u')) {
+    if (direction.indexOf('u') > -1) {
         if (startPosition === 'top' || endPosition === 'bottom') {
             if (second[1] < centerY) {
                 second[1] = centerY;
@@ -224,9 +224,23 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
-            } else if (startPosition === 'top' && endPosition === 'left') {
-                let third = [penult[0], second[1]];
-                points.push(third);
+            } else if (startPosition === 'top') {
+                switch (endPosition) {
+                    case 'left': {
+                        points.push([penult[0], second[1]]);
+                        break;
+                    }
+                    case 'right': {
+                        addHorizontalCenterLine();
+                        break;
+                    }
+                    case 'top':
+                        addVerticalRightLine();
+                        break;
+                    default: {
+                        break;
+                    }
+                }
             }
             break;
         case 'ru':
@@ -414,30 +428,34 @@ function arrowTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint) {
 }
 
 function getDirection(x1, y1, x2, y2) {
+    // Use approximatelyEquals to fix the problem of css position presicion
+    if (x2 < x1 && approximatelyEquals(y2, y1)) {
+        return 'l';
+    }
+    if (x2 > x1 && approximatelyEquals(y2, y1)) {
+        return 'r';
+    }
+    if (approximatelyEquals(x2, x1) && y2 < y1) {
+        return 'u';
+    }
+    if (approximatelyEquals(x2, x1) && y2 > y1) {
+        return 'd';
+    }
     if (x2 < x1 && y2 < y1) {
         return 'lu';
-    }
-    if (x2 === x1 && y2 < y1) {
-        return 'u';
     }
     if (x2 > x1 && y2 < y1) {
         return 'ru'
     }
-    if (x2 < x1 && y2 === y1) {
-        return 'l';
-    }
-    if (x2 > x1 && y2 === y1) {
-        return 'r';
-    }
     if (x2 < x1 && y2 > y1) {
         return 'ld';
-    }
-    if (x2 === x1 && y2 > y1) {
-        return 'd';
     }
     return 'rd';
 }
 
+function approximatelyEquals(n, m) {
+    return Math.abs(m - n) <= 3;
+}
 export {
     arrowTo, lineTo, clearCanvas, getDirection, arrow2
 }
