@@ -48,7 +48,7 @@
     </div>
 </template>
 <script>
-import { lineTo, arrow2, clearCanvas, rect } from '../../utils/canvas';
+import { lineTo, arrow2, clearCanvas, rect, fillRect } from '../../utils/canvas';
 import { getOffsetLeft, getOffsetTop } from '../../utils/dom';
 
 export default {
@@ -122,7 +122,65 @@ export default {
                 this.refresh();
                 let expectX = Math.round(Math.round(this.movingNode.target.x) / 10) * 10;
                 let expectY = Math.round(Math.round(this.movingNode.target.y) / 10) * 10;
-                rect('canvas', expectX, expectY, 120, 60, 1, '#a3a3a3');
+                fillRect('canvas', expectX, expectY, 120, 60, '#d2e3fc');
+                this.nodes.forEach(item => {
+                    if (item.x === expectX) {
+                        // vertical guideline
+                        if (item.y < expectY) {
+                            lineTo(
+                                'canvas',
+                                item.x,
+                                item.y + 60,
+                                expectX,
+                                expectY,
+                                1,
+                                '#a3a3a3',
+                                false,
+                                [5, 3]
+                            );
+                        } else {
+                            lineTo(
+                                'canvas',
+                                expectX,
+                                expectY + 60,
+                                item.x,
+                                item.y,
+                                1,
+                                '#a3a3a3',
+                                false,
+                                [5, 3]
+                            );
+                        }
+                    }
+                    if (item.y === expectY) {
+                        // horizontal guideline
+                        if (item.x < expectX) {
+                            lineTo(
+                                'canvas',
+                                item.x + 120,
+                                item.y,
+                                expectX,
+                                expectY,
+                                1,
+                                '#a3a3a3',
+                                false,
+                                [5, 3]
+                            );
+                        } else {
+                            lineTo(
+                                'canvas',
+                                expectX + 120,
+                                expectY,
+                                item.x,
+                                item.y,
+                                1,
+                                '#a3a3a3',
+                                false,
+                                [5, 3]
+                            );
+                        }
+                    }
+                });
             } else if (this.connectingInfo.source) {
                 this.refresh();
                 arrow2(
@@ -277,7 +335,7 @@ export default {
     width: 120px;
     height: 60px;
     position: absolute;
-    border: 1px solid #a3a3a3;
+    border: 1px solid #dadce0;
     box-sizing: border-box;
     font-size: 12px;
     background-color: white;
@@ -291,12 +349,12 @@ export default {
 }
 
 .node.active {
-    border-color: #888888;
-    box-shadow: 3px 2px 2px #d3d3d3;
+    box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.2);
 }
 
 .node-header {
-    background-color: #f3f3f3;
+    background-color: #f1f3f4;
+    color: #3c4043;
     height: 20px;
     line-height: 20px;
     padding: 0 6px;

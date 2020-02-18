@@ -1,8 +1,11 @@
-function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint) {
+function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint, dash) {
     let sta = [x1, y1];
     let end = [x2, y2];
     let canvas = document.getElementById(canId);
     let ctx = canvas.getContext('2d');
+    if (dash) {
+        ctx.setLineDash(dash);
+    }
     ctx.beginPath();
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = strokeStyle;
@@ -18,7 +21,21 @@ function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint) {
     ctx.lineTo(end[0], end[1]);
     ctx.fill();
     ctx.stroke();
+    if (dash) {
+        ctx.setLineDash([]);
+    }
     ctx.save();
+}
+
+function drawDashedLine(x, y, destX, destY) {
+    var canvas = document.getElementById('bgCanvas');
+    var ctx = canvas.getContext('2d');
+    ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(destX, destY);
+    ctx.stroke();
+    ctx.setLineDash([]);
 }
 
 function clearCanvas(canId) {
@@ -690,10 +707,18 @@ function approximatelyEquals(n, m) {
     return Math.abs(m - n) <= 3;
 }
 
-function rect(canId, x, y, width, height, lineWidth, strokeStyle) {
-    lineTo(canId, x, y, x + width, y, lineWidth, strokeStyle, false);
-    lineTo(canId, x + width, y, x + width, y + height, lineWidth, strokeStyle, false);
-    lineTo(canId, x + width, y + height, x, y + height, lineWidth, strokeStyle, false);
-    lineTo(canId, x, y + height, x, y, lineWidth, strokeStyle, false);
+function rect(canId, x, y, width, height, lineWidth, strokeStyle, dash) {
+    lineTo(canId, x, y, x + width, y, lineWidth, strokeStyle, false, dash);
+    lineTo(canId, x + width, y, x + width, y + height, lineWidth, strokeStyle, false, dash);
+    lineTo(canId, x + width, y + height, x, y + height, lineWidth, strokeStyle, false, dash);
+    lineTo(canId, x, y + height, x, y, lineWidth, strokeStyle, false, dash);
 }
-export { arrowTo, lineTo, clearCanvas, getDirection, arrow2, rect };
+
+function fillRect(canId, x, y, width, height, color) {
+    let canvas = document.getElementById(canId);
+    let ctx = canvas.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, width, height);
+}
+
+export { arrowTo, lineTo, clearCanvas, getDirection, arrow2, rect, fillRect };
