@@ -1,9 +1,14 @@
 <template>
     <div>
         <div id="toolbar">
-            <el-button type="primary" @click="add">添加节点</el-button>
+            <el-button type="primary" @click="add(10, 10)">添加节点</el-button>
         </div>
-        <div id="chart" @mousemove="handleChartMouseMove" @mouseup="handleChartMouseUp">
+        <div
+            id="chart"
+            @mousemove="handleChartMouseMove"
+            @mouseup="handleChartMouseUp"
+            @dblclick="handleChartDblClick"
+        >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600" />
             <template v-for="node in nodes">
@@ -13,6 +18,7 @@
                     :style="{ top: node.y + 'px', left: node.x + 'px' }"
                     :name="'node-' + node.id"
                     @mousedown="handleNodeMouseDown(node, $event)"
+                    @dblclick="$event.stopPropagation()"
                     @mouseup="handleNodeMouseUp(node)"
                 >
                     <div class="node-header">{{ node.name }}</div>
@@ -42,7 +48,7 @@
     </div>
 </template>
 <script>
-import { arrow2, clearCanvas } from '../../utils/canvas';
+import { lineTo, arrow2, clearCanvas, rect } from '../../utils/canvas';
 import { getOffsetLeft, getOffsetTop } from '../../utils/dom';
 
 export default {
@@ -82,13 +88,8 @@ export default {
         };
     },
     methods: {
-        add() {
-            this.nodes.push({
-                id: +new Date(),
-                x: 10,
-                y: 10,
-                name: '新建节点'
-            });
+        add(x, y) {
+            this.nodes.push({ id: +new Date(), x: x, y: y, name: '新建节点' });
         },
         handleNodeMouseDown(node, event) {
             this.currentNode = node;
@@ -119,6 +120,9 @@ export default {
                 this.movingNode.target.x = this.cursorToChartOffset.x - this.movingNode.offsetX;
                 this.movingNode.target.y = this.cursorToChartOffset.y - this.movingNode.offsetY;
                 this.refresh();
+                let expectX = Math.round(Math.round(this.movingNode.target.x) / 10) * 10;
+                let expectY = Math.round(Math.round(this.movingNode.target.y) / 10) * 10;
+                rect('canvas', expectX, expectY, 120, 60, 1, '#a3a3a3');
             } else if (this.connectingInfo.source) {
                 this.refresh();
                 arrow2(
@@ -127,8 +131,8 @@ export default {
                     this.connectingInfo.sourceY,
                     this.cursorToChartOffset.x,
                     this.cursorToChartOffset.y,
+                    1,
                     '#a3a3a3',
-                    true,
                     this.connectingInfo.sourcePosition
                 );
             }
@@ -141,6 +145,12 @@ export default {
                 this.connectingInfo.sourceY = null;
                 this.refresh();
             }
+        },
+        handleChartDblClick() {
+            let element = document.getElementById('chart');
+            let x = event.pageX - getOffsetLeft(element) - 60;
+            let y = event.pageY - getOffsetTop(element) - 30;
+            this.add(x, y);
         },
         handleNodeConnectorMouseDown(source, position, event) {
             event.stopPropagation();
@@ -182,8 +192,8 @@ export default {
                     sourceOffset.top,
                     destinationOffset.left,
                     destinationOffset.top,
+                    1,
                     '#a3a3a3',
-                    true,
                     conn.source.position,
                     conn.destination.position
                 );
@@ -198,6 +208,49 @@ export default {
                 top: getOffsetTop(connector) - getOffsetTop(chartElement) + 3
             };
         }
+    },
+    mounted() {
+        let that = this;
+
+        document.onkeydown = function(event) {
+            switch (event.keyCode) {
+                case 37:
+                    if (that.currentNode != null) {
+                        that.currentNode.x -= 10;
+                    }
+                    break;
+                case 38:
+                    if (that.currentNode != null) {
+                        that.currentNode.y -= 10;
+                    }
+                    break;
+                case 39:
+                    if (that.currentNode != null) {
+                        that.currentNode.x += 10;
+                    }
+                    break;
+                case 40:
+                    if (that.currentNode != null) {
+                        that.currentNode.y += 10;
+                    }
+                    break;
+                case 27:
+                    if (that.currentNode) {
+                        that.currentNode = null;
+                    }
+                    break;
+                case 46:
+                    if (that.currentNode) {
+                        that.nodes.splice(that.nodes.indexOf(that.currentNode), 1);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            that.$nextTick(function() {
+                that.refresh();
+            });
+        };
     }
 };
 </script>
@@ -238,7 +291,8 @@ export default {
 }
 
 .node.active {
-    border-width: 2px;
+    border-color: #888888;
+    box-shadow: 3px 2px 2px #d3d3d3;
 }
 
 .node-header {
