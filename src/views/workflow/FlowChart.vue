@@ -4,18 +4,18 @@
             <el-button type="primary" @click="add">添加节点</el-button>
         </div>
         <div id="chart" @mousemove="handleChartMouseMove" @mouseup="handleChartMouseUp">
-            <span id="position">{{cursorToChartOffset.x + ', ' + cursorToChartOffset.y}}</span>
+            <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600" />
             <template v-for="node in nodes">
                 <div
-                    class="node"
+                    :class="{ node: true, active: currentNode && currentNode.id === node.id }"
                     :key="node.id"
-                    :style="{top: node.y + 'px', left: node.x + 'px'}"
+                    :style="{ top: node.y + 'px', left: node.x + 'px' }"
                     :name="'node-' + node.id"
                     @mousedown="handleNodeMouseDown(node, $event)"
                     @mouseup="handleNodeMouseUp(node)"
                 >
-                    <div class="node-header">{{node.name}}</div>
+                    <div class="node-header">{{ node.name }}</div>
                     <div
                         class="node-connector node-connector-top"
                         @mouseup="handleNodeConnectorMouseUp(node, 'top', $event)"
@@ -42,8 +42,8 @@
     </div>
 </template>
 <script>
-import { arrow2, clearCanvas } from "../../utils/canvas";
-import { getOffsetLeft, getOffsetTop } from "../../utils/dom";
+import { arrow2, clearCanvas } from '../../utils/canvas';
+import { getOffsetLeft, getOffsetTop } from '../../utils/dom';
 
 export default {
     data() {
@@ -51,15 +51,15 @@ export default {
             nodes: [
                 {
                     id: 1,
-                    x: 10,
-                    y: 10,
-                    name: "开始"
+                    x: 140,
+                    y: 270,
+                    name: '开始'
                 },
                 {
                     id: 2,
-                    x: 100,
-                    y: 100,
-                    name: "结束"
+                    x: 540,
+                    y: 270,
+                    name: '结束'
                 }
             ],
             connections: [],
@@ -74,6 +74,7 @@ export default {
                 sourceX: null,
                 sourceY: null
             },
+            currentNode: null,
             cursorToChartOffset: {
                 x: 0,
                 y: 0
@@ -81,8 +82,16 @@ export default {
         };
     },
     methods: {
-        add() {},
+        add() {
+            this.nodes.push({
+                id: +new Date(),
+                x: 10,
+                y: 10,
+                name: '新建节点'
+            });
+        },
         handleNodeMouseDown(node, event) {
+            this.currentNode = node;
             this.movingNode.target = node;
             this.movingNode.offsetX = event.offsetX;
             this.movingNode.offsetY = event.offsetY;
@@ -103,24 +112,22 @@ export default {
             }
         },
         handleChartMouseMove(event) {
-            let element = document.getElementById("chart");
+            let element = document.getElementById('chart');
             this.cursorToChartOffset.x = event.pageX - getOffsetLeft(element);
             this.cursorToChartOffset.y = event.pageY - getOffsetTop(element);
             if (this.movingNode.target) {
-                this.movingNode.target.x =
-                    this.cursorToChartOffset.x - this.movingNode.offsetX;
-                this.movingNode.target.y =
-                    this.cursorToChartOffset.y - this.movingNode.offsetY;
+                this.movingNode.target.x = this.cursorToChartOffset.x - this.movingNode.offsetX;
+                this.movingNode.target.y = this.cursorToChartOffset.y - this.movingNode.offsetY;
                 this.refresh();
             } else if (this.connectingInfo.source) {
                 this.refresh();
                 arrow2(
-                    "canvas",
+                    'canvas',
                     this.connectingInfo.sourceX,
                     this.connectingInfo.sourceY,
                     this.cursorToChartOffset.x,
                     this.cursorToChartOffset.y,
-                    "#a3a3a3",
+                    '#a3a3a3',
                     true,
                     this.connectingInfo.sourcePosition
                 );
@@ -159,7 +166,7 @@ export default {
             }
         },
         refresh() {
-            clearCanvas("canvas");
+            clearCanvas('canvas');
             this.connections.forEach(conn => {
                 let sourceOffset = this.getNodeConnectorOffset(
                     conn.source.id,
@@ -170,12 +177,12 @@ export default {
                     conn.destination.position
                 );
                 arrow2(
-                    "canvas",
+                    'canvas',
                     sourceOffset.left,
                     sourceOffset.top,
                     destinationOffset.left,
                     destinationOffset.top,
-                    "#a3a3a3",
+                    '#a3a3a3',
                     true,
                     conn.source.position,
                     conn.destination.position
@@ -183,11 +190,9 @@ export default {
             });
         },
         getNodeConnectorOffset(nodeId, connectorPosition) {
-            let nodeElement = document.getElementsByName("node-" + nodeId)[0];
-            let connector = nodeElement.querySelector(
-                ".node-connector-" + connectorPosition
-            );
-            let chartElement = document.getElementById("chart");
+            let nodeElement = document.getElementsByName('node-' + nodeId)[0];
+            let connector = nodeElement.querySelector('.node-connector-' + connectorPosition);
+            let chartElement = document.getElementById('chart');
             return {
                 left: getOffsetLeft(connector) - getOffsetLeft(chartElement) + 3,
                 top: getOffsetTop(connector) - getOffsetTop(chartElement) + 3
@@ -230,6 +235,10 @@ export default {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.node.active {
+    border-width: 2px;
 }
 
 .node-header {

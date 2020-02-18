@@ -23,10 +23,9 @@ function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint) {
 
 function clearCanvas(canId) {
     let c = document.getElementById(canId);
-    let cxt = c.getContext("2d");
+    let cxt = c.getContext('2d');
     cxt.clearRect(0, 0, 800, 600);
 }
-
 
 function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, endPosition) {
     let points = [];
@@ -35,40 +34,40 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
     let centerX = start[0] + (end[0] - start[0]) / 2;
     let centerY = start[1] + (end[1] - start[1]) / 2;
     let second;
-    let addVerticalCenterLine = function () {
+    let addVerticalCenterLine = function() {
         let third = [centerX, second[1]];
         let forth = [centerX, penult[1]];
         points.push(third);
         points.push(forth);
-    }
-    let addHorizontalCenterLine = function () {
+    };
+    let addHorizontalCenterLine = function() {
         let third = [second[0], centerY];
         let forth = [penult[0], centerY];
         points.push(third);
         points.push(forth);
-    }
-    let addHorizontalTopLine = function () {
+    };
+    let addHorizontalTopLine = function() {
         points.push([second[0], start[1] - 50]);
         points.push([penult[0], start[1] - 50]);
-    }
-    let addHorizontalBottomLine = function () {
+    };
+    let addHorizontalBottomLine = function() {
         points.push([second[0], start[1] + 50]);
         points.push([penult[0], start[1] + 50]);
-    }
-    let addVerticalRightLine = function () {
+    };
+    let addVerticalRightLine = function() {
         points.push([start[0] + 80, second[1]]);
         points.push([start[0] + 80, penult[1]]);
-    }
-    let addVerticalLeftLine = function () {
+    };
+    let addVerticalLeftLine = function() {
         points.push([start[0] - 80, second[1]]);
         points.push([start[0] - 80, penult[1]]);
-    }
-    let addSecondXPenultY = function () {
+    };
+    let addSecondXPenultY = function() {
         points.push([second[0], penult[1]]);
-    }
-    let addPenultXSecondY = function () {
-        points.push([penult[0], second[1]])
-    }
+    };
+    let addPenultXSecondY = function() {
+        points.push([penult[0], second[1]]);
+    };
     switch (startPosition) {
         case 'left':
             second = [start[0] - 20, start[1]];
@@ -174,7 +173,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 addSecondXPenultY();
             } else if (startPosition === 'top' && endPosition === 'bottom') {
                 addHorizontalCenterLine();
-            } else {    // startPosition is left
+            } else {
+                // startPosition is left
                 switch (endPosition) {
                     case 'bottom': {
                         let third = [penult[0], start[1]];
@@ -208,7 +208,7 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                     case 'right': {
                         break;
                     }
-                    case "top": {
+                    case 'top': {
                         let third = [second[0], penult[1]];
                         points.push(third);
                         break;
@@ -246,7 +246,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
-            } else {    // left
+            } else {
+                // left
                 switch (endPosition) {
                     case 'left':
                     case 'right':
@@ -300,7 +301,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
-            } else {    // left
+            } else {
+                // left
                 switch (endPosition) {
                     case 'left':
                     case 'top':
@@ -362,7 +364,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
-            } else {    // left
+            } else {
+                // left
                 switch (endPosition) {
                     case 'left': {
                         addHorizontalTopLine();
@@ -429,7 +432,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
-            } else {    // left
+            } else {
+                // left
                 switch (endPosition) {
                     case 'left':
                     case 'right':
@@ -482,7 +486,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
-            } else {    // left
+            } else {
+                // left
                 switch (endPosition) {
                     case 'left':
                     case 'top':
@@ -544,7 +549,8 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                         break;
                     }
                 }
-            } else {    // left
+            } else {
+                // left
                 switch (endPosition) {
                     case 'left': {
                         break;
@@ -565,11 +571,9 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             }
             break;
         case 'rd': {
-            if ((startPosition === 'right' && endPosition === 'left')
-                || (startPosition === 'right' && endPosition === 'bottom')) {
+            if ((startPosition === 'right' && endPosition === 'left') || (startPosition === 'right' && endPosition === 'bottom')) {
                 addVerticalCenterLine();
-            } else if ((startPosition === 'right' && endPosition === 'top')
-                || (startPosition === 'right' && endPosition === 'right')) {
+            } else if ((startPosition === 'right' && endPosition === 'top') || (startPosition === 'right' && endPosition === 'right')) {
                 let third = [penult[0], second[1]];
                 points.push(third);
             } else if (startPosition === 'bottom' && endPosition === 'left') {
@@ -668,7 +672,7 @@ function getDirection(x1, y1, x2, y2) {
         return 'lu';
     }
     if (x2 > x1 && y2 < y1) {
-        return 'ru'
+        return 'ru';
     }
     if (x2 < x1 && y2 > y1) {
         return 'ld';
@@ -679,6 +683,4 @@ function getDirection(x1, y1, x2, y2) {
 function approximatelyEquals(n, m) {
     return Math.abs(m - n) <= 3;
 }
-export {
-    arrowTo, lineTo, clearCanvas, getDirection, arrow2
-}
+export { arrowTo, lineTo, clearCanvas, getDirection, arrow2 };
