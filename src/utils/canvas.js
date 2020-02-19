@@ -1,4 +1,4 @@
-function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint, dash) {
+function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, dash) {
     let sta = [x1, y1];
     let end = [x2, y2];
     let canvas = document.getElementById(canId);
@@ -11,10 +11,6 @@ function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint, das
     ctx.strokeStyle = strokeStyle;
     ctx.translate(0, 0, 0);
     ctx.moveTo(sta[0], sta[1]);
-    if (isStartPoint) {
-        ctx.arc(sta[0], sta[1], 2, 0, 2 * Math.PI);
-        ctx.fill();
-    }
     ctx.translate(0, 0, 0);
     ctx.moveTo(sta[0], sta[1]);
     ctx.translate(0, 0, 0);
@@ -25,17 +21,6 @@ function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint, das
         ctx.setLineDash([]);
     }
     ctx.save();
-}
-
-function drawDashedLine(x, y, destX, destY) {
-    var canvas = document.getElementById('bgCanvas');
-    var ctx = canvas.getContext('2d');
-    ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(destX, destY);
-    ctx.stroke();
-    ctx.setLineDash([]);
 }
 
 function clearCanvas(canId) {
@@ -642,19 +627,18 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
         let from = points[i];
         let to = points[i + 1];
         lines.push([from[0], from[1], to[0], to[1]]);
-        let isStartPoint = i === 0;
         if (i === points.length - 2) {
-            arrowTo(canId, from[0], from[1], to[0], to[1], lineWidth, strokeStyle, isStartPoint);
+            arrowTo(canId, from[0], from[1], to[0], to[1], lineWidth, strokeStyle);
             break;
         } else {
-            lineTo(canId, from[0], from[1], to[0], to[1], lineWidth, strokeStyle, isStartPoint);
+            lineTo(canId, from[0], from[1], to[0], to[1], lineWidth, strokeStyle);
         }
     }
     return lines;
 }
 
-function arrowTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint) {
-    lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, isStartPoint);
+function arrowTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle) {
+    lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle);
     let sta = [x1, y1];
     let end = [x2, y2];
     let canvas = document.getElementById(canId);
@@ -708,10 +692,10 @@ function approximatelyEquals(n, m) {
 }
 
 function rect(canId, x, y, width, height, lineWidth, strokeStyle, dash) {
-    lineTo(canId, x, y, x + width, y, lineWidth, strokeStyle, false, dash);
-    lineTo(canId, x + width, y, x + width, y + height, lineWidth, strokeStyle, false, dash);
-    lineTo(canId, x + width, y + height, x, y + height, lineWidth, strokeStyle, false, dash);
-    lineTo(canId, x, y + height, x, y, lineWidth, strokeStyle, false, dash);
+    lineTo(canId, x, y, x + width, y, lineWidth, strokeStyle, dash);
+    lineTo(canId, x + width, y, x + width, y + height, lineWidth, strokeStyle, dash);
+    lineTo(canId, x + width, y + height, x, y + height, lineWidth, strokeStyle, dash);
+    lineTo(canId, x, y + height, x, y, lineWidth, strokeStyle, dash);
 }
 
 function fillRect(canId, x, y, width, height, color) {

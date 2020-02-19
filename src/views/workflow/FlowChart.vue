@@ -18,7 +18,7 @@
                     :style="{ top: node.y + 'px', left: node.x + 'px' }"
                     :name="'node-' + node.id"
                     @mousedown="handleNodeMouseDown(node, $event)"
-                    @dblclick="$event.stopPropagation()"
+                    @dblclick.stop="handleNodeMouseDblClick(node, $event)"
                     @mouseup="handleNodeMouseUp(node)"
                 >
                     <div class="node-header">{{ node.name }}</div>
@@ -45,67 +45,90 @@
                 </div>
             </template>
         </div>
+        <drawer-wrapper
+            :visible="nodeDialogVisible"
+            @cancel="handleClickCancelSaveNode"
+            @ok="handleClickSaveNode"
+        >
+            <template slot="body">
+                <el-form ref="form" :model="nodeForm" label-width="80px">
+                    <el-form-item label="名称">
+                        <input type="hidden" v-model="nodeForm.id" />
+                        <el-input v-model="nodeForm.name" />
+                    </el-form-item>
+                    <el-form-item label="类型">
+                        <el-select
+                            v-model="nodeForm.type"
+                            placeholder="请选择"
+                            style="width: 100%;"
+                        >
+                            <el-option
+                                v-for="item in [
+                                    { name: '开始', id: 'start' },
+                                    { name: '结束', id: 'end' },
+                                    { name: '审批', id: 'operation' }
+                                ]"
+                                :key="'node-type-' + item.id"
+                                :label="item.name"
+                                :value="item.id"
+                            >
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
+            </template>
+        </drawer-wrapper>
     </div>
 </template>
 <script>
-import { lineTo, arrow2, clearCanvas, rect, fillRect } from '../../utils/canvas';
+import { lineTo, arrow2, clearCanvas, fillRect } from '../../utils/canvas';
 import { getOffsetLeft, getOffsetTop } from '../../utils/dom';
+import DrawerWrapper from '../../components/DrawerWrapper';
+import '../../assets/flowchart.css';
 
 export default {
     data() {
         return {
             nodes: [
-                {
-                    id: 1,
-                    x: 140,
-                    y: 270,
-                    name: '开始'
-                },
-                {
-                    id: 2,
-                    x: 540,
-                    y: 270,
-                    name: '结束'
-                }
+                { id: 1, x: 140, y: 270, name: '开始', type: 'start' },
+                { id: 2, x: 540, y: 270, name: '结束', type: 'end' }
             ],
             connections: [],
-            movingNode: {
-                target: null,
-                offsetX: null,
-                offsetY: null
-            },
-            connectingInfo: {
-                source: null,
-                sourcePosition: null,
-                sourceX: null,
-                sourceY: null
-            },
+            movingInfo: { target: null, offsetX: null, offsetY: null },
+            connectingInfo: { source: null, sourcePosition: null, sourceX: null, sourceY: null },
             currentNode: null,
-            cursorToChartOffset: {
-                x: 0,
-                y: 0
-            }
+            cursorToChartOffset: { x: 0, y: 0 },
+            nodeDialogVisible: false,
+            nodeForm: { name: null, id: null, type: null },
+            connectionForm: { type: null }
         };
     },
+    components: { DrawerWrapper },
     methods: {
         add(x, y) {
             this.nodes.push({ id: +new Date(), x: x, y: y, name: '新建节点' });
         },
         handleNodeMouseDown(node, event) {
             this.currentNode = node;
-            this.movingNode.target = node;
-            this.movingNode.offsetX = event.offsetX;
-            this.movingNode.offsetY = event.offsetY;
+            this.movingInfo.target = node;
+            this.movingInfo.offsetX = event.offsetX;
+            this.movingInfo.offsetY = event.offsetY;
+        },
+        handleNodeMouseDblClick(node) {
+            this.nodeForm.id = node.id;
+            this.nodeForm.name = node.name;
+            this.nodeForm.type = node.type;
+            this.nodeDialogVisible = true;
         },
         handleNodeMouseUp() {
-            if (this.movingNode.target) {
-                this.movingNode.target.x =
-                    Math.round(Math.round(this.movingNode.target.x) / 10) * 10;
-                this.movingNode.target.y =
-                    Math.round(Math.round(this.movingNode.target.y) / 10) * 10;
-                this.movingNode.target = null;
-                this.movingNode.offsetX = null;
-                this.movingNode.offsetY = null;
+            if (this.movingInfo.target) {
+                this.movingInfo.target.x =
+                    Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
+                this.movingInfo.target.y =
+                    Math.round(Math.round(this.movingInfo.target.y) / 10) * 10;
+                this.movingInfo.target = null;
+                this.movingInfo.offsetX = null;
+                this.movingInfo.offsetY = null;
                 let that = this;
                 that.$nextTick(function() {
                     that.refresh();
@@ -116,86 +139,44 @@ export default {
             let element = document.getElementById('chart');
             this.cursorToChartOffset.x = event.pageX - getOffsetLeft(element);
             this.cursorToChartOffset.y = event.pageY - getOffsetTop(element);
-            if (this.movingNode.target) {
-                this.movingNode.target.x = this.cursorToChartOffset.x - this.movingNode.offsetX;
-                this.movingNode.target.y = this.cursorToChartOffset.y - this.movingNode.offsetY;
+            if (this.movingInfo.target) {
+                this.movingInfo.target.x = this.cursorToChartOffset.x - this.movingInfo.offsetX;
+                this.movingInfo.target.y = this.cursorToChartOffset.y - this.movingInfo.offsetY;
                 this.refresh();
-                let expectX = Math.round(Math.round(this.movingNode.target.x) / 10) * 10;
-                let expectY = Math.round(Math.round(this.movingNode.target.y) / 10) * 10;
+                let expectX = Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
+                let expectY = Math.round(Math.round(this.movingInfo.target.y) / 10) * 10;
                 fillRect('canvas', expectX, expectY, 120, 60, '#d2e3fc');
+                let guidelineDash = [5, 3];
                 this.nodes.forEach(item => {
                     if (item.x === expectX) {
                         // vertical guideline
                         if (item.y < expectY) {
-                            lineTo(
-                                'canvas',
-                                item.x,
-                                item.y + 60,
-                                expectX,
-                                expectY,
-                                1,
-                                '#a3a3a3',
-                                false,
-                                [5, 3]
-                            );
+                            this.lineTo(item.x, item.y + 60, expectX, expectY, guidelineDash);
                         } else {
-                            lineTo(
-                                'canvas',
-                                expectX,
-                                expectY + 60,
-                                item.x,
-                                item.y,
-                                1,
-                                '#a3a3a3',
-                                false,
-                                [5, 3]
-                            );
+                            this.lineTo(expectX, expectY + 60, item.x, item.y, guidelineDash);
                         }
                     }
                     if (item.y === expectY) {
                         // horizontal guideline
                         if (item.x < expectX) {
-                            lineTo(
-                                'canvas',
-                                item.x + 120,
-                                item.y,
-                                expectX,
-                                expectY,
-                                1,
-                                '#a3a3a3',
-                                false,
-                                [5, 3]
-                            );
+                            this.lineTo(item.x + 120, item.y, expectX, expectY, guidelineDash);
                         } else {
-                            lineTo(
-                                'canvas',
-                                expectX + 120,
-                                expectY,
-                                item.x,
-                                item.y,
-                                1,
-                                '#a3a3a3',
-                                false,
-                                [5, 3]
-                            );
+                            this.lineTo(expectX + 120, expectY, item.x, item.y, guidelineDash);
                         }
                     }
                 });
             } else if (this.connectingInfo.source) {
                 this.refresh();
-                arrow2(
-                    'canvas',
+                this.arrowTo(
                     this.connectingInfo.sourceX,
                     this.connectingInfo.sourceY,
                     this.cursorToChartOffset.x,
                     this.cursorToChartOffset.y,
-                    1,
-                    '#a3a3a3',
                     this.connectingInfo.sourcePosition
                 );
             }
         },
-        handleChartMouseUp(event) {
+        handleChartMouseUp() {
             if (this.connectingInfo.source) {
                 this.connectingInfo.source = null;
                 this.connectingInfo.sourcePosition = null;
@@ -218,17 +199,14 @@ export default {
             this.connectingInfo.sourceX = offset.left;
             this.connectingInfo.sourceY = offset.top;
         },
-        handleNodeConnectorMouseUp(destination, position, event) {
+        handleNodeConnectorMouseUp(destination, position) {
             if (this.connectingInfo.source) {
                 this.connections.push({
                     source: {
                         id: this.connectingInfo.source.id,
                         position: this.connectingInfo.sourcePosition
                     },
-                    destination: {
-                        id: destination.id,
-                        position: position
-                    }
+                    destination: { id: destination.id, position: position }
                 });
                 this.refresh();
             }
@@ -244,14 +222,11 @@ export default {
                     conn.destination.id,
                     conn.destination.position
                 );
-                arrow2(
-                    'canvas',
+                this.arrowTo(
                     sourceOffset.left,
                     sourceOffset.top,
                     destinationOffset.left,
                     destinationOffset.top,
-                    1,
-                    '#a3a3a3',
                     conn.source.position,
                     conn.destination.position
                 );
@@ -265,11 +240,26 @@ export default {
                 left: getOffsetLeft(connector) - getOffsetLeft(chartElement) + 3,
                 top: getOffsetTop(connector) - getOffsetTop(chartElement) + 3
             };
+        },
+        handleClickSaveNode() {
+            let that = this;
+            let node = this.nodes.filter(item => item.id === that.nodeForm.id)[0];
+            node.name = that.nodeForm.name;
+            node.type = that.nodeForm.type;
+            this.nodeDialogVisible = false;
+        },
+        handleClickCancelSaveNode() {
+            this.nodeDialogVisible = false;
+        },
+        lineTo(x1, y1, x2, y2, dash) {
+            lineTo('canvas', x1, y1, x2, y2, 1, '#a3a3a3', dash);
+        },
+        arrowTo(x1, y1, x2, y2, startPosition, endPosition) {
+            arrow2('canvas', x1, y1, x2, y2, 1, '#a3a3a3', startPosition, endPosition);
         }
     },
     mounted() {
         let that = this;
-
         document.onkeydown = function(event) {
             switch (event.keyCode) {
                 case 37:
@@ -312,91 +302,3 @@ export default {
     }
 };
 </script>
-<style scoped>
-#toolbar {
-    margin-bottom: 10px;
-}
-
-#canvas {
-    border: 1px solid #a3a3a3;
-    position: absolute;
-}
-
-#chart {
-    position: relative;
-    width: 800px;
-    height: 600px;
-    background-size: 10px 10px;
-    background-image: linear-gradient(to right, #f1f1f1 1px, transparent 1px),
-        linear-gradient(to bottom, #f1f1f1 1px, transparent 1px);
-}
-
-.node {
-    width: 120px;
-    height: 60px;
-    position: absolute;
-    border: 1px solid #dadce0;
-    box-sizing: border-box;
-    font-size: 12px;
-    background-color: white;
-    cursor: pointer;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.node.active {
-    box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.2);
-}
-
-.node-header {
-    background-color: #f1f3f4;
-    color: #3c4043;
-    height: 20px;
-    line-height: 20px;
-    padding: 0 6px;
-}
-
-.node-connector {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.node:hover .node-connector {
-    display: block;
-    border: 1px solid #a3a3a3;
-    background-color: white;
-}
-
-.node-connector-top {
-    top: -3px;
-    left: 57px;
-}
-
-.node-connector-bottom {
-    bottom: -3px;
-    left: 57px;
-}
-
-.node-connector-left {
-    top: 27px;
-    left: -3px;
-}
-
-.node-connector-right {
-    top: 27px;
-    right: -3px;
-}
-
-#position {
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-</style>
