@@ -53,7 +53,6 @@
             <template slot="body">
                 <el-form ref="form" :model="nodeForm" label-width="80px">
                     <el-form-item label="名称">
-                        <input type="hidden" v-model="nodeForm.id" />
                         <el-input v-model="nodeForm.name" />
                     </el-form-item>
                     <el-form-item label="类型">
@@ -78,6 +77,33 @@
                 </el-form>
             </template>
         </drawer-wrapper>
+        <el-dialog title="编辑" :visible.sync="connectionDialogVisible" width="440px" :before-close="handleClickCancelSaveConnection">
+            <el-form ref="form" :model="connectionForm" label-width="80px">
+                <el-form-item label="类型">
+                    <el-select
+                        v-model="connectionForm.type"
+                        placeholder="请选择"
+                        style="width: 100%;"
+                    >
+                        <el-option
+                            v-for="item in [
+                                { name: '通过', id: 'pass' },
+                                { name: '条件', id: 'condition' },
+                                { name: '驳回', id: 'reject' }
+                            ]"
+                            :key="'connection-type-' + item.id"
+                            :label="item.name"
+                            :value="item.id"
+                        >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="handleClickCancelSaveConnection">取消</el-button>
+                <el-button type="primary" @click="handleClickSaveConnection">确定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -100,7 +126,14 @@ export default {
             cursorToChartOffset: { x: 0, y: 0 },
             nodeDialogVisible: false,
             nodeForm: { name: null, id: null, type: null },
-            connectionForm: { type: null }
+            connectionDialogVisible: false,
+            connectionForm: {
+                type: null,
+                sourceId: null,
+                sourcePosition: null,
+                destinationId: null,
+                destinationPosition: null
+            }
         };
     },
     components: { DrawerWrapper },
@@ -201,14 +234,26 @@ export default {
         },
         handleNodeConnectorMouseUp(destination, position) {
             if (this.connectingInfo.source) {
-                this.connections.push({
-                    source: {
-                        id: this.connectingInfo.source.id,
-                        position: this.connectingInfo.sourcePosition
-                    },
-                    destination: { id: destination.id, position: position }
-                });
-                this.refresh();
+                if (this.connectingInfo.source.id !== destination.id) {
+                    // Node can't connect to itself
+                    let tempId = +new Date();
+                    this.connections.push({
+                        source: {
+                            id: this.connectingInfo.source.id,
+                            position: this.connectingInfo.sourcePosition
+                        },
+                        destination: { id: destination.id, position: position },
+                        id: tempId
+                    });
+                    this.refresh();
+
+                    this.connectionForm.sourceId = this.connectingInfo.source.id;
+                    this.connectionForm.sourcePosition = this.connectingInfo.sourcePosition;
+                    this.connectionForm.destinationId = destination.id;
+                    this.connectionForm.destinationPosition = position;
+                    this.connectionForm.id = tempId;
+                    this.connectionDialogVisible = true;
+                }
             }
         },
         refresh() {
@@ -256,6 +301,18 @@ export default {
         },
         arrowTo(x1, y1, x2, y2, startPosition, endPosition) {
             arrow2('canvas', x1, y1, x2, y2, 1, '#a3a3a3', startPosition, endPosition);
+        },
+        handleClickSaveConnection() {
+            let connection = this.connections.filter(conn => conn.id === this.connectionForm.id)[0];
+            connection.type = this.connectionForm.type;
+            this.refresh();
+            this.connectionDialogVisible = false;
+        },
+        handleClickCancelSaveConnection() {
+            this.connectionDialogVisible = false;
+            let connection = this.connections.filter(conn => conn.id === this.connectionForm.id)[0];
+            this.connections.splice(this.connections.indexOf(connection), 1);
+            this.refresh();
         }
     },
     mounted() {
