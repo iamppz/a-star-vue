@@ -9,5 +9,5 @@ yarn run serve
 
 ### Playground
 
-- [Workflow Designer](/#/app/workflow/flowchart)
-- [AStar](/#/aStar)
+- **Workflow Designer:** /#/app/workflow/flowchart
+- **AStar:** /#/aStar
