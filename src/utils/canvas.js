@@ -178,19 +178,10 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             } else {
                 // startPosition is left
                 switch (endPosition) {
-                    case 'bottom': {
-                        let third = [penult[0], start[1]];
-                        points.push(third);
-                        break;
-                    }
-                    case 'top': {
+                    case 'top':
+                    case 'right':
                         addVerticalCenterLine();
                         break;
-                    }
-                    case 'right': {
-                        addVerticalCenterLine();
-                        break;
-                    }
                     default: {
                         let third = [penult[0], start[1]];
                         points.push(third);
@@ -203,10 +194,6 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
         case 'u':
             if (startPosition === 'right') {
                 switch (endPosition) {
-                    case 'left': {
-                        addHorizontalCenterLine();
-                        break;
-                    }
                     case 'right': {
                         break;
                     }
@@ -290,10 +277,6 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
                 }
             } else if (startPosition === 'top') {
                 switch (endPosition) {
-                    case 'left': {
-                        addSecondXPenultY();
-                        break;
-                    }
                     case 'right': {
                         addVerticalCenterLine();
                         break;

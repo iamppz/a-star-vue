@@ -77,7 +77,12 @@
                 </el-form>
             </template>
         </drawer-wrapper>
-        <el-dialog title="编辑" :visible.sync="connectionDialogVisible" width="440px" :before-close="handleClickCancelSaveConnection">
+        <el-dialog
+            title="编辑"
+            :visible.sync="connectionDialogVisible"
+            width="440px"
+            :before-close="handleClickCancelSaveConnection"
+        >
             <el-form ref="form" :model="connectionForm" label-width="80px">
                 <el-form-item label="类型">
                     <el-select
@@ -123,6 +128,9 @@ export default {
             movingInfo: { target: null, offsetX: null, offsetY: null },
             connectingInfo: { source: null, sourcePosition: null, sourceX: null, sourceY: null },
             currentNode: null,
+            /**
+             * Mouse position(relative to chart div)
+             */
             cursorToChartOffset: { x: 0, y: 0 },
             nodeDialogVisible: false,
             nodeForm: { name: null, id: null, type: null },
@@ -133,7 +141,11 @@ export default {
                 sourcePosition: null,
                 destinationId: null,
                 destinationPosition: null
-            }
+            },
+            /**
+             * lines of all connections
+             */
+            lines: []
         };
     },
     components: { DrawerWrapper },
@@ -216,7 +228,10 @@ export default {
                 this.connectingInfo.sourceX = null;
                 this.connectingInfo.sourceY = null;
                 this.refresh();
+                return;
             }
+
+            // Check that position where the mouse click is near a line
         },
         handleChartDblClick() {
             let element = document.getElementById('chart');
@@ -229,8 +244,8 @@ export default {
             this.connectingInfo.source = source;
             this.connectingInfo.sourcePosition = position;
             let offset = this.getNodeConnectorOffset(source.id, position);
-            this.connectingInfo.sourceX = offset.left;
-            this.connectingInfo.sourceY = offset.top;
+            this.connectingInfo.sourceX = offset.x;
+            this.connectingInfo.sourceY = offset.y;
         },
         handleNodeConnectorMouseUp(destination, position) {
             if (this.connectingInfo.source) {
@@ -259,22 +274,31 @@ export default {
         refresh() {
             clearCanvas('canvas');
             this.connections.forEach(conn => {
-                let sourceOffset = this.getNodeConnectorOffset(
+                let sourcePosition = this.getNodeConnectorOffset(
                     conn.source.id,
                     conn.source.position
                 );
-                let destinationOffset = this.getNodeConnectorOffset(
+                let destinationPosition = this.getNodeConnectorOffset(
                     conn.destination.id,
                     conn.destination.position
                 );
-                this.arrowTo(
-                    sourceOffset.left,
-                    sourceOffset.top,
-                    destinationOffset.left,
-                    destinationOffset.top,
+                let lines = this.arrowTo(
+                    sourcePosition.x,
+                    sourcePosition.y,
+                    destinationPosition.x,
+                    destinationPosition.y,
                     conn.source.position,
                     conn.destination.position
                 );
+                this.lines = lines.map(line => {
+                    return {
+                        x1: line[0],
+                        y1: line[1],
+                        x2: line[2],
+                        y2: line[3],
+                        id: conn.id
+                    };
+                });
             });
         },
         getNodeConnectorOffset(nodeId, connectorPosition) {
@@ -282,8 +306,8 @@ export default {
             let connector = nodeElement.querySelector('.node-connector-' + connectorPosition);
             let chartElement = document.getElementById('chart');
             return {
-                left: getOffsetLeft(connector) - getOffsetLeft(chartElement) + 3,
-                top: getOffsetTop(connector) - getOffsetTop(chartElement) + 3
+                x: getOffsetLeft(connector) - getOffsetLeft(chartElement) + 3,
+                y: getOffsetTop(connector) - getOffsetTop(chartElement) + 3
             };
         },
         handleClickSaveNode() {
@@ -300,7 +324,7 @@ export default {
             lineTo('canvas', x1, y1, x2, y2, 1, '#a3a3a3', dash);
         },
         arrowTo(x1, y1, x2, y2, startPosition, endPosition) {
-            arrow2('canvas', x1, y1, x2, y2, 1, '#a3a3a3', startPosition, endPosition);
+            return arrow2('canvas', x1, y1, x2, y2, 1, '#a3a3a3', startPosition, endPosition);
         },
         handleClickSaveConnection() {
             let connection = this.connections.filter(conn => conn.id === this.connectionForm.id)[0];
