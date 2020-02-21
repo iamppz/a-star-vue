@@ -8,6 +8,7 @@
             @mousemove="handleChartMouseMove"
             @mouseup="handleChartMouseUp"
             @dblclick="handleChartDblClick"
+            :style="{ cursor: this.hoveredConnection != null ? 'pointer' : null }"
         >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600" />
@@ -114,6 +115,7 @@
 <script>
 import { lineTo, arrow2, clearCanvas, fillRect } from '../../utils/canvas';
 import { getOffsetLeft, getOffsetTop } from '../../utils/dom';
+import { between, distanceOfPointToLine } from '../../utils/math';
 import DrawerWrapper from '../../components/DrawerWrapper';
 import '../../assets/flowchart.css';
 
@@ -231,7 +233,37 @@ export default {
                 return;
             }
 
-            // Check that position where the mouse click is near a line
+            if (this.hoveredConnection != null) {
+                this.$confirm('是否删除该连线?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.connections.splice(this.connections.indexOf(this.hoveredConnection), 1);
+                    this.refresh();
+                });
+            }
+        },
+        getHoveredConnection() {
+            for (const line of this.lines) {
+                let distance = distanceOfPointToLine(
+                    line.x1,
+                    line.y1,
+                    line.x2,
+                    line.y2,
+                    this.cursorToChartOffset.x,
+                    this.cursorToChartOffset.y
+                );
+                if (
+                    distance < 5 &&
+                    between(line.x1 - 2, line.x2 + 2, this.cursorToChartOffset.x) &&
+                    between(line.y1 - 2, line.y2 + 2, this.cursorToChartOffset.y)
+                ) {
+                    let connections = this.connections.filter(item => item.id === line.id);
+                    return connections.length > 0 ? connections[0] : null;
+                }
+            }
+            return null;
         },
         handleChartDblClick() {
             let element = document.getElementById('chart');
@@ -396,6 +428,29 @@ export default {
                 that.refresh();
             });
         };
+    },
+    computed: {
+        hoveredConnection() {
+            for (const line of this.lines) {
+                let distance = distanceOfPointToLine(
+                    line.x1,
+                    line.y1,
+                    line.x2,
+                    line.y2,
+                    this.cursorToChartOffset.x,
+                    this.cursorToChartOffset.y
+                );
+                if (
+                    distance < 5 &&
+                    between(line.x1 - 2, line.x2 + 2, this.cursorToChartOffset.x) &&
+                    between(line.y1 - 2, line.y2 + 2, this.cursorToChartOffset.y)
+                ) {
+                    let connections = this.connections.filter(item => item.id === line.id);
+                    return connections.length > 0 ? connections[0] : null;
+                }
+            }
+            return null;
+        }
     }
 };
 </script>

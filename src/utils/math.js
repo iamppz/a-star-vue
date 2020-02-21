@@ -7,4 +7,4 @@ function distanceOfPointToLine(beginX, beginY, endX, endY, ptX, ptY) {
 function between(num1, num2, num) {
     return (num > num1 && num < num2) || (num > num2 && num < num1);
 }
-export default { distanceOfPointToLine, between };
+export { distanceOfPointToLine, between };
