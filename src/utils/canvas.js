@@ -29,7 +29,7 @@ function clearCanvas(canId) {
     cxt.clearRect(0, 0, 800, 600);
 }
 
-function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, endPosition) {
+function arrow2(canId, x1, y1, x2, y2, startPosition, endPosition, lineWidth, strokeStyle) {
     let points = [];
     let start = [x1, y1];
     let end = [x2, y2];
@@ -556,10 +556,9 @@ function arrow2(canId, x1, y1, x2, y2, lineWidth, strokeStyle, startPosition, en
             }
             break;
         case 'rd': {
-            if (
-                (startPosition === 'right' && endPosition === 'left') ||
-                (startPosition === 'right' && endPosition === 'bottom')
-            ) {
+            if (startPosition === 'right' && endPosition === 'left') {
+                addVerticalCenterLine();
+            } else if (startPosition === 'right' && endPosition === 'bottom') {
                 addSecondXPenultY();
             } else if (
                 (startPosition === 'right' && endPosition === 'top') ||

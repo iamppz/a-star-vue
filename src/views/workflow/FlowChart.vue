@@ -267,6 +267,7 @@ export default {
                     this.connectionForm.destinationId = destination.id;
                     this.connectionForm.destinationPosition = position;
                     this.connectionForm.id = tempId;
+                    this.connectionForm.type = 'pass';
                     this.connectionDialogVisible = true;
                 }
             }
@@ -288,7 +289,12 @@ export default {
                     destinationPosition.x,
                     destinationPosition.y,
                     conn.source.position,
-                    conn.destination.position
+                    conn.destination.position,
+                    {
+                        pass: '#52c41a',
+                        reject: 'red',
+                        condition: 'orange'
+                    }[conn.type]
                 );
                 this.lines = lines.map(line => {
                     return {
@@ -323,8 +329,18 @@ export default {
         lineTo(x1, y1, x2, y2, dash) {
             lineTo('canvas', x1, y1, x2, y2, 1, '#a3a3a3', dash);
         },
-        arrowTo(x1, y1, x2, y2, startPosition, endPosition) {
-            return arrow2('canvas', x1, y1, x2, y2, 1, '#a3a3a3', startPosition, endPosition);
+        arrowTo(x1, y1, x2, y2, startPosition, endPosition, color) {
+            return arrow2(
+                'canvas',
+                x1,
+                y1,
+                x2,
+                y2,
+                startPosition,
+                endPosition,
+                1,
+                color || '#a3a3a3'
+            );
         },
         handleClickSaveConnection() {
             let connection = this.connections.filter(conn => conn.id === this.connectionForm.id)[0];
