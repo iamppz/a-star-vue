@@ -2,7 +2,7 @@
     <div>
         <div id="toolbar">
             <el-button type="primary" @click="add(10, 10)">添加节点</el-button>
-            {{hoveredConnection}}
+            {{ hoveredConnection }}
         </div>
         <div
             id="chart"
@@ -24,26 +24,20 @@
                     @mouseup="handleNodeMouseUp(node)"
                 >
                     <div class="node-header">{{ node.name }}</div>
-                    <div
-                        class="node-connector node-connector-top"
-                        @mouseup="handleNodeConnectorMouseUp(node, 'top', $event)"
-                        @mousedown="handleNodeConnectorMouseDown(node, 'top', $event)"
-                    ></div>
-                    <div
-                        class="node-connector node-connector-bottom"
-                        @mouseup="handleNodeConnectorMouseUp(node, 'bottom', $event)"
-                        @mousedown="handleNodeConnectorMouseDown(node, 'bottom', $event)"
-                    ></div>
-                    <div
-                        class="node-connector node-connector-left"
-                        @mouseup="handleNodeConnectorMouseUp(node, 'left', $event)"
-                        @mousedown="handleNodeConnectorMouseDown(node, 'left', $event)"
-                    ></div>
-                    <div
-                        class="node-connector node-connector-right"
-                        @mouseup="handleNodeConnectorMouseUp(node, 'right', $event)"
-                        @mousedown="handleNodeConnectorMouseDown(node, 'right', $event)"
-                    ></div>
+                    <template v-for="position in ['top', 'bottom', 'left', 'right']">
+                        <div
+                            :key="'connection-' + position"
+                            :class="{
+                                'node-connector': true,
+                                'node-connector-top': position === 'top',
+                                'node-connector-bottom': position === 'bottom',
+                                'node-connector-left': position === 'left',
+                                'node-connector-right': position === 'right'
+                            }"
+                            @mouseup="handleNodeConnectorMouseUp(node, position, $event)"
+                            @mousedown.stop="handleNodeConnectorMouseDown(node, position, $event)"
+                        ></div>
+                    </template>
                 </div>
             </template>
         </div>
@@ -154,7 +148,7 @@ export default {
     components: { DrawerWrapper },
     methods: {
         add(x, y) {
-            this.nodes.push({ id: +new Date(), x: x, y: y, name: '新建节点' });
+            this.nodes.push({ id: +new Date(), x: x, y: y, name: '新建节点', type: 'operation' });
         },
         handleNodeMouseDown(node, event) {
             this.currentNode = node;
@@ -251,11 +245,13 @@ export default {
             let y = event.pageY - getOffsetTop(element) - 30;
             this.add(x, y);
         },
-        handleNodeConnectorMouseDown(source, position, event) {
-            event.stopPropagation();
-            this.connectingInfo.source = source;
+        handleNodeConnectorMouseDown(sourceNode, position) {
+            if (sourceNode.type === 'end') {
+                return;
+            }
+            this.connectingInfo.source = sourceNode;
             this.connectingInfo.sourcePosition = position;
-            let offset = this.getNodeConnectorOffset(source.id, position);
+            let offset = this.getNodeConnectorOffset(sourceNode.id, position);
             this.connectingInfo.sourceX = offset.x;
             this.connectingInfo.sourceY = offset.y;
         },
