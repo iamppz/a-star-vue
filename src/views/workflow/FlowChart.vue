@@ -2,6 +2,7 @@
     <div>
         <div id="toolbar">
             <el-button type="primary" @click="add(10, 10)">添加节点</el-button>
+            {{hoveredConnection}}
         </div>
         <div
             id="chart"
@@ -244,27 +245,6 @@ export default {
                 });
             }
         },
-        getHoveredConnection() {
-            for (const line of this.lines) {
-                let distance = distanceOfPointToLine(
-                    line.x1,
-                    line.y1,
-                    line.x2,
-                    line.y2,
-                    this.cursorToChartOffset.x,
-                    this.cursorToChartOffset.y
-                );
-                if (
-                    distance < 5 &&
-                    between(line.x1 - 2, line.x2 + 2, this.cursorToChartOffset.x) &&
-                    between(line.y1 - 2, line.y2 + 2, this.cursorToChartOffset.y)
-                ) {
-                    let connections = this.connections.filter(item => item.id === line.id);
-                    return connections.length > 0 ? connections[0] : null;
-                }
-            }
-            return null;
-        },
         handleChartDblClick() {
             let element = document.getElementById('chart');
             let x = event.pageX - getOffsetLeft(element) - 60;
@@ -306,6 +286,7 @@ export default {
         },
         refresh() {
             clearCanvas('canvas');
+            this.lines = [];
             this.connections.forEach(conn => {
                 let sourcePosition = this.getNodeConnectorOffset(
                     conn.source.id,
@@ -328,15 +309,15 @@ export default {
                         condition: 'orange'
                     }[conn.type]
                 );
-                this.lines = lines.map(line => {
-                    return {
-                        x1: line[0],
-                        y1: line[1],
-                        x2: line[2],
-                        y2: line[3],
+                for (const line of lines) {
+                    this.lines.push({
+                        sourceX: line.sourceX,
+                        souceY: line.souceY,
+                        destinationX: line.destinationX,
+                        destinationY: line.destinationY,
                         id: conn.id
-                    };
-                });
+                    });
+                }
             });
         },
         getNodeConnectorOffset(nodeId, connectorPosition) {
@@ -433,17 +414,17 @@ export default {
         hoveredConnection() {
             for (const line of this.lines) {
                 let distance = distanceOfPointToLine(
-                    line.x1,
-                    line.y1,
-                    line.x2,
-                    line.y2,
+                    line.sourceX,
+                    line.souceY,
+                    line.destinationX,
+                    line.destinationY,
                     this.cursorToChartOffset.x,
                     this.cursorToChartOffset.y
                 );
                 if (
                     distance < 5 &&
-                    between(line.x1 - 2, line.x2 + 2, this.cursorToChartOffset.x) &&
-                    between(line.y1 - 2, line.y2 + 2, this.cursorToChartOffset.y)
+                    between(line.sourceX - 2, line.destinationX + 2, this.cursorToChartOffset.x) &&
+                    between(line.souceY - 2, line.destinationY + 2, this.cursorToChartOffset.y)
                 ) {
                     let connections = this.connections.filter(item => item.id === line.id);
                     return connections.length > 0 ? connections[0] : null;
