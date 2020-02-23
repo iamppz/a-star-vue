@@ -2,14 +2,14 @@
     <div>
         <div id="toolbar">
             <el-button type="primary" @click="add(10, 10)">添加节点</el-button>
-            {{ hoveredConnection }}
+            <!-- {{ hoveredConnection }} -->
         </div>
         <div
             id="chart"
             @mousemove="handleChartMouseMove"
             @mouseup="handleChartMouseUp"
             @dblclick="handleChartDblClick"
-            :style="{ cursor: this.hoveredConnection != null ? 'pointer' : null }"
+            :style="{ cursor: cursor }"
         >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600" />
@@ -121,7 +121,14 @@ export default {
                 { id: 1, x: 140, y: 270, name: '开始', type: 'start' },
                 { id: 2, x: 540, y: 270, name: '结束', type: 'end' }
             ],
-            connections: [],
+            connections: [
+                {
+                    source: { id: 1, position: 'right' },
+                    destination: { id: 2, position: 'left' },
+                    id: 1,
+                    type: 'pass'
+                }
+            ],
             movingInfo: { target: null, offsetX: null, offsetY: null },
             connectingInfo: { source: null, sourcePosition: null, sourceX: null, sourceY: null },
             currentNode: null,
@@ -308,7 +315,7 @@ export default {
                 for (const line of lines) {
                     this.lines.push({
                         sourceX: line.sourceX,
-                        souceY: line.souceY,
+                        sourceY: line.sourceY,
                         destinationX: line.destinationX,
                         destinationY: line.destinationY,
                         id: conn.id
@@ -366,6 +373,7 @@ export default {
     },
     mounted() {
         let that = this;
+        that.refresh();
         document.onkeydown = function(event) {
             switch (event.keyCode) {
                 case 37:
@@ -411,7 +419,7 @@ export default {
             for (const line of this.lines) {
                 let distance = distanceOfPointToLine(
                     line.sourceX,
-                    line.souceY,
+                    line.sourceY,
                     line.destinationX,
                     line.destinationY,
                     this.cursorToChartOffset.x,
@@ -420,13 +428,19 @@ export default {
                 if (
                     distance < 5 &&
                     between(line.sourceX - 2, line.destinationX + 2, this.cursorToChartOffset.x) &&
-                    between(line.souceY - 2, line.destinationY + 2, this.cursorToChartOffset.y)
+                    between(line.sourceY - 2, line.destinationY + 2, this.cursorToChartOffset.y)
                 ) {
                     let connections = this.connections.filter(item => item.id === line.id);
                     return connections.length > 0 ? connections[0] : null;
                 }
             }
             return null;
+        },
+        cursor() {
+            if (this.connectingInfo.source) {
+                return 'crosshair';
+            }
+            return this.hoveredConnection != null ? 'pointer' : null;
         }
     }
 };

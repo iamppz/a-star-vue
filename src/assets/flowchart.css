@@ -51,6 +51,7 @@
     height: 5px;
     border-radius: 4px;
     box-sizing: border-box;
+    cursor: crosshair;
 }
 
 .node:hover .node-connector {
