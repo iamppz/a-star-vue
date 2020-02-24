@@ -36,6 +36,7 @@
                             }"
                             @mouseup="handleNodeConnectorMouseUp(node, position, $event)"
                             @mousedown.stop="handleNodeConnectorMouseDown(node, position, $event)"
+                            @mousemove.stop="handleNodeConnectorMouseMove(node, position, $event)"
                         ></div>
                     </template>
                 </div>
@@ -216,9 +217,13 @@ export default {
                 });
             } else if (this.connectingInfo.source) {
                 this.refresh();
+                let offset = this.getNodeConnectorOffset(
+                    this.connectingInfo.source.id,
+                    this.connectingInfo.sourcePosition
+                );
                 this.arrowTo(
-                    this.connectingInfo.sourceX,
-                    this.connectingInfo.sourceY,
+                    offset.x,
+                    offset.y,
                     this.cursorToChartOffset.x,
                     this.cursorToChartOffset.y,
                     this.connectingInfo.sourcePosition
@@ -229,8 +234,6 @@ export default {
             if (this.connectingInfo.source) {
                 this.connectingInfo.source = null;
                 this.connectingInfo.sourcePosition = null;
-                this.connectingInfo.sourceX = null;
-                this.connectingInfo.sourceY = null;
                 this.refresh();
                 return;
             }
@@ -258,9 +261,24 @@ export default {
             }
             this.connectingInfo.source = sourceNode;
             this.connectingInfo.sourcePosition = position;
-            let offset = this.getNodeConnectorOffset(sourceNode.id, position);
-            this.connectingInfo.sourceX = offset.x;
-            this.connectingInfo.sourceY = offset.y;
+        },
+        handleNodeConnectorMouseMove(node, position) {
+            if (this.connectingInfo.source) {
+                this.refresh();
+                let sourceOffset = this.getNodeConnectorOffset(
+                    this.connectingInfo.source.id,
+                    this.connectingInfo.sourcePosition
+                );
+                let destinationOffset = this.getNodeConnectorOffset(node.id, position);
+                this.arrowTo(
+                    sourceOffset.x,
+                    sourceOffset.y,
+                    destinationOffset.x,
+                    destinationOffset.y,
+                    this.connectingInfo.sourcePosition,
+                    position
+                );
+            }
         },
         handleNodeConnectorMouseUp(destination, position) {
             if (this.connectingInfo.source) {
