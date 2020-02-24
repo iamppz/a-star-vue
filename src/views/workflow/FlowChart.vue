@@ -8,7 +8,7 @@
             id="chart"
             @mousemove="handleChartMouseMove"
             @mouseup="handleChartMouseUp"
-            @dblclick="handleChartDblClick"
+            @dblclick="handleChartDblClick($event)"
             :style="{ cursor: cursor }"
         >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
@@ -249,7 +249,7 @@ export default {
                 });
             }
         },
-        handleChartDblClick() {
+        handleChartDblClick(event) {
             let element = document.getElementById('chart');
             let x = event.pageX - getOffsetLeft(element) - 60;
             let y = event.pageY - getOffsetTop(element) - 30;
