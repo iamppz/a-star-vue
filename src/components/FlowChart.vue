@@ -12,7 +12,7 @@
         >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600"/>
-            <template v-for="node in nodes">
+            <template v-for="node in internalNodes">
                 <div :class="{ node: true, active: currentNode && currentNode.id === node.id }"
                      :key="node.id"
                      :style="{ top: node.y + 'px', left: node.x + 'px' }"
@@ -33,31 +33,34 @@
                 </div>
             </template>
         </div>
-        <drawer-wrapper :visible="nodeDialogVisible"
-                        @cancel="handleClickCancelSaveNode"
-                        @ok="handleClickSaveNode"
+        <el-dialog title="编辑"
+                   :visible.sync="nodeDialogVisible"
+                   width="440px"
+                   :before-close="handleClickCancelSaveConnection"
         >
-            <template slot="body">
-                <el-form ref="form" :model="nodeForm" label-width="80px">
-                    <el-form-item label="名称">
-                        <el-input v-model="nodeForm.name"/>
-                    </el-form-item>
-                    <el-form-item label="类型">
-                        <el-select v-model="nodeForm.type"
-                                   placeholder="请选择"
-                                   style="width: 100%;"
+            <el-form ref="form" :model="nodeForm" label-width="80px">
+                <el-form-item label="名称">
+                    <el-input v-model="nodeForm.name"/>
+                </el-form-item>
+                <el-form-item label="类型">
+                    <el-select v-model="nodeForm.type"
+                               placeholder="请选择"
+                               style="width: 100%;"
+                    >
+                        <el-option :key="'node-type-' + item.id"
+                                   v-for="item in [ { name: '开始', id: 'start' }, { name: '结束', id: 'end' }, { name: '审批', id: 'operation' } ]"
+                                   :label="item.name"
+                                   :value="item.id"
                         >
-                            <el-option :key="'node-type-' + item.id"
-                                       v-for="item in [ { name: '开始', id: 'start' }, { name: '结束', id: 'end' }, { name: '审批', id: 'operation' } ]"
-                                       :label="item.name"
-                                       :value="item.id"
-                            >
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-form>
-            </template>
-        </drawer-wrapper>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="handleClickCancelSaveNode">取消</el-button>
+                <el-button type="primary" @click="handleClickSaveNode">确定</el-button>
+            </span>
+        </el-dialog>
         <el-dialog title="编辑"
                    :visible.sync="connectionDialogVisible"
                    width="440px"
@@ -87,48 +90,36 @@
 </template>
 <script>
   import {Modal} from 'ant-design-vue';
-
-  import {lineTo, arrow2, clearCanvas, fillRect} from '../../utils/canvas';
-  import {getOffsetLeft, getOffsetTop} from '../../utils/dom';
-  import {between, distanceOfPointToLine} from '../../utils/math';
-  import DrawerWrapper from '../../components/DrawerWrapper';
-  import '../../assets/flowchart.css';
+  import {lineTo, arrow2, clearCanvas, fillRect} from '../utils/canvas';
+  import {getOffsetLeft, getOffsetTop} from '../utils/dom';
+  import {between, distanceOfPointToLine} from '../utils/math';
+  import '../assets/flowchart.css';
 
   export default {
     props: {
-      // nodes: {
-      //   type: Array,
-      //   default: () => [
-      //     {id: 1, x: 140, y: 270, name: '开始', type: 'start'},
-      //     {id: 2, x: 540, y: 270, name: '结束', type: 'end'},
-      //   ]
-      // },
-      // connections: {
-      //   type: Array,
-      //   default: () => [
-      //     {
-      //       source: {id: 1, position: 'right'},
-      //       destination: {id: 2, position: 'left'},
-      //       id: 1,
-      //       type: 'pass',
-      //     },
-      //   ]
-      // }
-    },
-    data() {
-      return {
-        nodes: [
+      nodes: {
+        type: Array,
+        default: () => [
           {id: 1, x: 140, y: 270, name: '开始', type: 'start'},
           {id: 2, x: 540, y: 270, name: '结束', type: 'end'},
-        ],
-        connections: [
+        ]
+      },
+      connections: {
+        type: Array,
+        default: () => [
           {
             source: {id: 1, position: 'right'},
             destination: {id: 2, position: 'left'},
             id: 1,
             type: 'pass',
           },
-        ],
+        ]
+      }
+    },
+    data() {
+      return {
+        internalNodes: [],
+        internalConnections: [],
         movingInfo: {target: null, offsetX: null, offsetY: null},
         connectingInfo: {source: null, sourcePosition: null, sourceX: null, sourceY: null},
         currentNode: null,
@@ -147,15 +138,14 @@
           destinationPosition: null,
         },
         /**
-         * lines of all connections
+         * lines of all internalConnections
          */
         lines: [],
       };
     },
-    components: {DrawerWrapper, Modal},
     methods: {
       add(x, y) {
-        this.nodes.push({id: +new Date(), x: x, y: y, name: '新建节点', type: 'operation'});
+        this.internalNodes.push({id: +new Date(), x: x, y: y, name: '新建节点', type: 'operation'});
       },
       handleNodeMouseDown(node, event) {
         this.currentNode = node;
@@ -196,7 +186,7 @@
           let expectY = Math.round(Math.round(this.movingInfo.target.y) / 10) * 10;
           fillRect('canvas', expectX, expectY, 120, 60, '#d2e3fc');
           let guidelineDash = [5, 3];
-          this.nodes.forEach(item => {
+          this.internalNodes.forEach(item => {
             if (item.x === expectX) {
               // vertical guideline
               if (item.y < expectY) {
@@ -243,7 +233,7 @@
             title: '是否删除该连线?',
             onOk() {
               return new Promise((resolve) => {
-                that.connections.splice(that.connections.indexOf(that.hoveredConnection), 1);
+                that.internalConnections.splice(that.internalConnections.indexOf(that.hoveredConnection), 1);
                 that.refresh();
                 resolve();
               }).catch(() => {});
@@ -288,7 +278,7 @@
           if (this.connectingInfo.source.id !== destination.id) {
             // Node can't connect to itself
             let tempId = +new Date();
-            this.connections.push({
+            this.internalConnections.push({
               source: {
                 id: this.connectingInfo.source.id,
                 position: this.connectingInfo.sourcePosition,
@@ -311,7 +301,7 @@
       refresh() {
         clearCanvas('canvas');
         this.lines = [];
-        this.connections.forEach(conn => {
+        this.internalConnections.forEach(conn => {
           let sourcePosition = this.getNodeConnectorOffset(
               conn.source.id,
               conn.source.position,
@@ -355,7 +345,7 @@
       },
       handleClickSaveNode() {
         let that = this;
-        let node = this.nodes.filter(item => item.id === that.nodeForm.id)[0];
+        let node = this.internalNodes.filter(item => item.id === that.nodeForm.id)[0];
         node.name = that.nodeForm.name;
         node.type = that.nodeForm.type;
         this.nodeDialogVisible = false;
@@ -370,21 +360,29 @@
         return arrow2('canvas', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
       },
       handleClickSaveConnection() {
-        let connection = this.connections.filter(conn => conn.id === this.connectionForm.id)[0];
+        let connection = this.internalConnections.filter(conn => conn.id === this.connectionForm.id)[0];
         connection.type = this.connectionForm.type;
         this.refresh();
         this.connectionDialogVisible = false;
       },
       handleClickCancelSaveConnection() {
         this.connectionDialogVisible = false;
-        let connection = this.connections.filter(conn => conn.id === this.connectionForm.id)[0];
-        this.connections.splice(this.connections.indexOf(connection), 1);
+        let connection = this.internalConnections.filter(conn => conn.id === this.connectionForm.id)[0];
+        this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
         this.refresh();
       },
     },
     mounted() {
       let that = this;
-      that.refresh();
+      that.nodes.forEach(node => {
+        that.internalNodes.push(node);
+      });
+      that.connections.forEach(connection => {
+        that.internalConnections.push(connection);
+      });
+      that.$nextTick(function() {
+        that.refresh();
+      });
       document.onkeydown = function(event) {
         switch (event.keyCode) {
           case 37:
@@ -414,7 +412,7 @@
             break;
           case 46:
             if (that.currentNode) {
-              that.nodes.splice(that.nodes.indexOf(that.currentNode), 1);
+              that.internalNodes.splice(that.internalNodes.indexOf(that.currentNode), 1);
             }
             break;
           default:
@@ -441,7 +439,7 @@
               between(line.sourceX - 2, line.destinationX + 2, this.cursorToChartOffset.x) &&
               between(line.sourceY - 2, line.destinationY + 2, this.cursorToChartOffset.y)
           ) {
-            let connections = this.connections.filter(item => item.id === line.id);
+            let connections = this.internalConnections.filter(item => item.id === line.id);
             return connections.length > 0 ? connections[0] : null;
           }
         }

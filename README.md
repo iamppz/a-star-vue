@@ -9,6 +9,6 @@ yarn run serve
 
 ### Playground
 
-- **Workflow Designer:** /#/app/workflow/flowchart
+- **Workflow Designer:** /#/app/component/flowchart
 - **Dingtalk-like Workflow Designer** /#/app/process/flowDesign
 - **AStar:** /#/aStar

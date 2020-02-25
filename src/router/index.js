@@ -12,7 +12,7 @@ import Flowchart from "../components/flow/Canvas";
 import EChartsTest from "../views/EChartsTest";
 import Dictionary from "../views/Dictionary";
 import WorkflowConfig from "../views/workflow/Config";
-import FlowChart from "../views/workflow/FlowChart";
+import FlowChart from "../components/FlowChart";
 
 Vue.use(VueRouter);
 
@@ -31,7 +31,7 @@ const routes = [
             {path: 'dictionary', component: Dictionary},
             {path: 'workflow/index', component: WorkflowIndex},
             {path: 'workflow/config', component: WorkflowConfig},
-            {path: 'workflow/flowchart', component: FlowChart}
+            {path: 'component/flowchart', component: FlowChart}
         ]
     }
 ];
