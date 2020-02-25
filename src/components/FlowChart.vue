@@ -2,7 +2,7 @@
     <div>
         <div id="toolbar">
             <el-button type="primary" @click="add(10, 10)">添加节点</el-button>
-<!--             {{ hoveredConnection }}-->
+            <!--             {{ hoveredConnection }}-->
         </div>
         <div id="chart"
              @mousemove="handleChartMouseMove"
@@ -14,7 +14,7 @@
             <canvas id="canvas" width="800" height="600"/>
             <template v-for="node in internalNodes">
                 <div :class="{ node: true, active: currentNode && currentNode.id === node.id }"
-                     :key="node.id"
+                     :key="'node-' + node.id"
                      :style="{ top: node.y + 'px', left: node.x + 'px' }"
                      :name="'node-' + node.id"
                      @mousedown="handleNodeMouseDown(node, $event)"
@@ -102,7 +102,7 @@
         default: () => [
           {id: 1, x: 140, y: 270, name: '开始', type: 'start'},
           {id: 2, x: 540, y: 270, name: '结束', type: 'end'},
-        ]
+        ],
       },
       connections: {
         type: Array,
@@ -113,8 +113,8 @@
             id: 1,
             type: 'pass',
           },
-        ]
-      }
+        ],
+      },
     },
     data() {
       return {
@@ -233,7 +233,8 @@
             title: '是否删除该连线?',
             onOk() {
               return new Promise((resolve) => {
-                that.internalConnections.splice(that.internalConnections.indexOf(that.hoveredConnection), 1);
+                that.internalConnections.splice(
+                    that.internalConnections.indexOf(that.hoveredConnection), 1);
                 that.refresh();
                 resolve();
               }).catch(() => {});
@@ -360,20 +361,24 @@
         return arrow2('canvas', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
       },
       handleClickSaveConnection() {
-        let connection = this.internalConnections.filter(conn => conn.id === this.connectionForm.id)[0];
+        let connection = this.internalConnections.filter(
+            conn => conn.id === this.connectionForm.id)[0];
         connection.type = this.connectionForm.type;
         this.refresh();
         this.connectionDialogVisible = false;
       },
       handleClickCancelSaveConnection() {
         this.connectionDialogVisible = false;
-        let connection = this.internalConnections.filter(conn => conn.id === this.connectionForm.id)[0];
+        let connection = this.internalConnections.filter(
+            conn => conn.id === this.connectionForm.id)[0];
         this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
         this.refresh();
       },
     },
     mounted() {
       let that = this;
+      that.internalNodes.splice(0, that.internalNodes.length);
+      that.internalConnections.splice(0, that.internalConnections.length);
       that.nodes.forEach(node => {
         that.internalNodes.push(node);
       });
