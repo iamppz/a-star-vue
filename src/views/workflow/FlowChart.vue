@@ -4,48 +4,38 @@
             <el-button type="primary" @click="add(10, 10)">添加节点</el-button>
             <!-- {{ hoveredConnection }} -->
         </div>
-        <div
-                id="chart"
-                @mousemove="handleChartMouseMove"
-                @mouseup="handleChartMouseUp"
-                @dblclick="handleChartDblClick($event)"
-                :style="{ cursor: cursor }"
+        <div id="chart"
+             @mousemove="handleChartMouseMove"
+             @mouseup="handleChartMouseUp"
+             @dblclick="handleChartDblClick($event)"
+             :style="{ cursor: cursor }"
         >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600"/>
             <template v-for="node in nodes">
-                <div
-                        :class="{ node: true, active: currentNode && currentNode.id === node.id }"
-                        :key="node.id"
-                        :style="{ top: node.y + 'px', left: node.x + 'px' }"
-                        :name="'node-' + node.id"
-                        @mousedown="handleNodeMouseDown(node, $event)"
-                        @dblclick.stop="handleNodeMouseDblClick(node, $event)"
-                        @mouseup="handleNodeMouseUp(node)"
+                <div :class="{ node: true, active: currentNode && currentNode.id === node.id }"
+                     :key="node.id"
+                     :style="{ top: node.y + 'px', left: node.x + 'px' }"
+                     :name="'node-' + node.id"
+                     @mousedown="handleNodeMouseDown(node, $event)"
+                     @dblclick.stop="handleNodeMouseDblClick(node, $event)"
+                     @mouseup="handleNodeMouseUp(node)"
                 >
                     <div class="node-header">{{ node.name }}</div>
                     <template v-for="position in ['top', 'bottom', 'left', 'right']">
-                        <div
-                                :key="'connection-' + position"
-                                :class="{
-                                'node-connector': true,
-                                'node-connector-top': position === 'top',
-                                'node-connector-bottom': position === 'bottom',
-                                'node-connector-left': position === 'left',
-                                'node-connector-right': position === 'right'
-                            }"
-                                @mouseup="handleNodeConnectorMouseUp(node, position, $event)"
-                                @mousedown.stop="handleNodeConnectorMouseDown(node, position, $event)"
-                                @mousemove.stop="handleNodeConnectorMouseMove(node, position, $event)"
+                        <div :key="'connection-' + position"
+                             :class="{ 'node-connector': true, 'node-connector-top': position === 'top', 'node-connector-bottom': position === 'bottom', 'node-connector-left': position === 'left', 'node-connector-right': position === 'right' }"
+                             @mouseup="handleNodeConnectorMouseUp(node, position, $event)"
+                             @mousedown.stop="handleNodeConnectorMouseDown(node, position, $event)"
+                             @mousemove.stop="handleNodeConnectorMouseMove(node, position, $event)"
                         ></div>
                     </template>
                 </div>
             </template>
         </div>
-        <drawer-wrapper
-                :visible="nodeDialogVisible"
-                @cancel="handleClickCancelSaveNode"
-                @ok="handleClickSaveNode"
+        <drawer-wrapper :visible="nodeDialogVisible"
+                        @cancel="handleClickCancelSaveNode"
+                        @ok="handleClickSaveNode"
         >
             <template slot="body">
                 <el-form ref="form" :model="nodeForm" label-width="80px">
@@ -53,20 +43,14 @@
                         <el-input v-model="nodeForm.name"/>
                     </el-form-item>
                     <el-form-item label="类型">
-                        <el-select
-                                v-model="nodeForm.type"
-                                placeholder="请选择"
-                                style="width: 100%;"
+                        <el-select v-model="nodeForm.type"
+                                   placeholder="请选择"
+                                   style="width: 100%;"
                         >
-                            <el-option
-                                    v-for="item in [
-                                    { name: '开始', id: 'start' },
-                                    { name: '结束', id: 'end' },
-                                    { name: '审批', id: 'operation' }
-                                ]"
-                                    :key="'node-type-' + item.id"
-                                    :label="item.name"
-                                    :value="item.id"
+                            <el-option :key="'node-type-' + item.id"
+                                       v-for="item in [ { name: '开始', id: 'start' }, { name: '结束', id: 'end' }, { name: '审批', id: 'operation' } ]"
+                                       :label="item.name"
+                                       :value="item.id"
                             >
                             </el-option>
                         </el-select>
@@ -74,28 +58,21 @@
                 </el-form>
             </template>
         </drawer-wrapper>
-        <el-dialog
-                title="编辑"
-                :visible.sync="connectionDialogVisible"
-                width="440px"
-                :before-close="handleClickCancelSaveConnection"
+        <el-dialog title="编辑"
+                   :visible.sync="connectionDialogVisible"
+                   width="440px"
+                   :before-close="handleClickCancelSaveConnection"
         >
             <el-form ref="form" :model="connectionForm" label-width="80px">
                 <el-form-item label="类型">
-                    <el-select
-                            v-model="connectionForm.type"
-                            placeholder="请选择"
-                            style="width: 100%;"
+                    <el-select v-model="connectionForm.type"
+                               placeholder="请选择"
+                               style="width: 100%;"
                     >
-                        <el-option
-                                v-for="item in [
-                                { name: '通过', id: 'pass' },
-                                { name: '条件', id: 'condition' },
-                                { name: '驳回', id: 'reject' }
-                            ]"
-                                :key="'connection-type-' + item.id"
-                                :label="item.name"
-                                :value="item.id"
+                        <el-option :key="'connection-type-' + item.id"
+                                   v-for="item in [ { name: '通过', id: 'pass' }, { name: '条件', id: 'condition' }, { name: '驳回', id: 'reject' } ]"
+                                   :label="item.name"
+                                   :value="item.id"
                         >
                         </el-option>
                     </el-select>
@@ -116,6 +93,26 @@
   import '../../assets/flowchart.css';
 
   export default {
+    props: {
+      // nodes: {
+      //   type: Array,
+      //   default: () => [
+      //     {id: 1, x: 140, y: 270, name: '开始', type: 'start'},
+      //     {id: 2, x: 540, y: 270, name: '结束', type: 'end'},
+      //   ]
+      // },
+      // connections: {
+      //   type: Array,
+      //   default: () => [
+      //     {
+      //       source: {id: 1, position: 'right'},
+      //       destination: {id: 2, position: 'left'},
+      //       id: 1,
+      //       type: 'pass',
+      //     },
+      //   ]
+      // }
+    },
     data() {
       return {
         nodes: [
@@ -364,17 +361,7 @@
         lineTo('canvas', x1, y1, x2, y2, 1, '#a3a3a3', dash);
       },
       arrowTo(x1, y1, x2, y2, startPosition, endPosition, color) {
-        return arrow2(
-            'canvas',
-            x1,
-            y1,
-            x2,
-            y2,
-            startPosition,
-            endPosition,
-            1,
-            color || '#a3a3a3',
-        );
+        return arrow2('canvas', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
       },
       handleClickSaveConnection() {
         let connection = this.connections.filter(conn => conn.id === this.connectionForm.id)[0];
@@ -448,7 +435,7 @@
               between(line.sourceX - 2, line.destinationX + 2, this.cursorToChartOffset.x) &&
               between(line.sourceY - 2, line.destinationY + 2, this.cursorToChartOffset.y)
           ) {
-            let connections = this.connections.filter(item => item.id === line.id);
+            let connections = this.connections.filter(item => item.id === item.id);
             return connections.length > 0 ? connections[0] : null;
           }
         }
