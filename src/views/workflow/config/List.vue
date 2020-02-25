@@ -12,7 +12,7 @@
     </el-table>
 </template>
 <script>
-    import processService from "../../service/processService";
+    import processService from "../../../service/processService";
 	import moment from "moment";
 
     export default {
