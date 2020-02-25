@@ -2,7 +2,7 @@
     <div>
         <div id="toolbar">
             <el-button type="primary" @click="add(10, 10)">添加节点</el-button>
-            <!-- {{ hoveredConnection }} -->
+<!--             {{ hoveredConnection }}-->
         </div>
         <div id="chart"
              @mousemove="handleChartMouseMove"
@@ -441,7 +441,7 @@
               between(line.sourceX - 2, line.destinationX + 2, this.cursorToChartOffset.x) &&
               between(line.sourceY - 2, line.destinationY + 2, this.cursorToChartOffset.y)
           ) {
-            let connections = this.connections.filter(item => item.id === item.id);
+            let connections = this.connections.filter(item => item.id === line.id);
             return connections.length > 0 ? connections[0] : null;
           }
         }
