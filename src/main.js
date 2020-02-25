@@ -1,6 +1,7 @@
 import Vue from 'vue/dist/vue.js';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import 'ant-design-vue/dist/antd.css';
 import './assets/styles.css';
 import './assets/element.css';
 import router from "./router";

@@ -86,6 +86,8 @@
     </div>
 </template>
 <script>
+  import {Modal} from 'ant-design-vue';
+
   import {lineTo, arrow2, clearCanvas, fillRect} from '../../utils/canvas';
   import {getOffsetLeft, getOffsetTop} from '../../utils/dom';
   import {between, distanceOfPointToLine} from '../../utils/math';
@@ -150,7 +152,7 @@
         lines: [],
       };
     },
-    components: {DrawerWrapper},
+    components: {DrawerWrapper, Modal},
     methods: {
       add(x, y) {
         this.nodes.push({id: +new Date(), x: x, y: y, name: '新建节点', type: 'operation'});
@@ -236,13 +238,17 @@
         }
 
         if (this.hoveredConnection != null) {
-          this.$confirm('是否删除该连线?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
-          }).then(() => {
-            this.connections.splice(this.connections.indexOf(this.hoveredConnection), 1);
-            this.refresh();
+          let that = this;
+          Modal.confirm({
+            title: '是否删除该连线?',
+            onOk() {
+              return new Promise((resolve) => {
+                that.connections.splice(that.connections.indexOf(that.hoveredConnection), 1);
+                that.refresh();
+                resolve();
+              }).catch(() => {});
+            },
+            onCancel() {},
           });
         }
       },
