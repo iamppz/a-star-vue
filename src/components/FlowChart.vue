@@ -4,9 +4,9 @@
             <el-button-group>
                 <el-button size="mini" icon="el-icon-plus" @click="add(10, 10)">添加</el-button>
                 <el-button size="mini" icon="el-icon-minus" @click="remove()">删除</el-button>
+                <el-button size="mini" icon="el-icon-edit-outline" @click="edit()">编辑</el-button>
                 <el-button size="mini" icon="el-icon-check" @click="save()">保存</el-button>
             </el-button-group>
-            <!--             {{ hoveredConnection }}-->
         </div>
         <div id="chart"
              @mousemove="handleChartMouseMove"
@@ -40,7 +40,7 @@
         <el-dialog title="编辑"
                    :visible.sync="nodeDialogVisible"
                    width="440px"
-                   :before-close="handleClickCancelSaveConnection"
+                   :before-close="handleClickCancelSaveNode"
         >
             <el-form ref="form" :model="nodeForm" label-width="80px">
                 <el-form-item label="名称">
@@ -102,7 +102,6 @@
     </div>
 </template>
 <script>
-  import {Modal} from 'ant-design-vue';
   import {lineTo, arrow2, clearCanvas, fillRect} from '../utils/canvas';
   import {getOffsetLeft, getOffsetTop} from '../utils/dom';
   import {between, distanceOfPointToLine} from '../utils/math';
@@ -184,9 +183,7 @@
           this.movingInfo.offsetX = null;
           this.movingInfo.offsetY = null;
           let that = this;
-          that.$nextTick(function() {
-            that.refresh();
-          });
+          that.refresh();
         }
       },
       handleChartMouseMove(event) {
@@ -344,38 +341,41 @@
         this.connectionDialogVisible = true;
       },
       refresh() {
-        clearCanvas('canvas');
-        this.lines = [];
-        this.internalConnections.forEach(conn => {
-          let sourcePosition = this.getNodeConnectorOffset(
-              conn.source.id,
-              conn.source.position,
-          );
-          let destinationPosition = this.getNodeConnectorOffset(
-              conn.destination.id,
-              conn.destination.position,
-          );
-          let lines = this.arrowTo(
-              sourcePosition.x,
-              sourcePosition.y,
-              destinationPosition.x,
-              destinationPosition.y,
-              conn.source.position,
-              conn.destination.position,
-              {
-                pass: '#52c41a',
-                reject: 'red',
-              }[conn.type],
-          );
-          for (const line of lines) {
-            this.lines.push({
-              sourceX: line.sourceX,
-              sourceY: line.sourceY,
-              destinationX: line.destinationX,
-              destinationY: line.destinationY,
-              id: conn.id,
-            });
-          }
+        let that = this;
+        that.$nextTick(function() {
+          clearCanvas('canvas');
+          that.lines = [];
+          that.internalConnections.forEach(conn => {
+            let sourcePosition = that.getNodeConnectorOffset(
+                conn.source.id,
+                conn.source.position,
+            );
+            let destinationPosition = that.getNodeConnectorOffset(
+                conn.destination.id,
+                conn.destination.position,
+            );
+            let lines = that.arrowTo(
+                sourcePosition.x,
+                sourcePosition.y,
+                destinationPosition.x,
+                destinationPosition.y,
+                conn.source.position,
+                conn.destination.position,
+                {
+                  pass: '#52c41a',
+                  reject: 'red',
+                }[conn.type],
+            );
+            for (const line of lines) {
+              that.lines.push({
+                sourceX: line.sourceX,
+                sourceY: line.sourceY,
+                destinationX: line.destinationX,
+                destinationY: line.destinationY,
+                id: conn.id,
+              });
+            }
+          });
         });
       },
       getNodeConnectorOffset(nodeId, connectorPosition) {
@@ -428,14 +428,20 @@
       },
       remove() {
         if (this.currentNode) {
-          this.internalNodes.splice(this.internalNodes.indexOf(this.currentNode), 1);
           let connections = this.internalConnections.filter(
-              item => item.source.id === this.currentNode.id);
+              item => item.source.id === this.currentNode.id ||
+                  item.destination.id === this.currentNode.id,
+          );
           for (let connection of connections) {
             this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
           }
+          this.internalNodes.splice(this.internalNodes.indexOf(this.currentNode), 1);
           this.currentNode = null;
+          this.refresh();
         }
+      },
+      edit() {
+        this.handleNodeMouseDblClick(this.currentNode);
       },
     },
     mounted() {
@@ -448,9 +454,7 @@
       that.connections.forEach(connection => {
         that.internalConnections.push(connection);
       });
-      that.$nextTick(function() {
-        that.refresh();
-      });
+      that.refresh();
       document.onkeydown = function(event) {
         switch (event.keyCode) {
           case 37:
@@ -484,9 +488,7 @@
           default:
             break;
         }
-        that.$nextTick(function() {
-          that.refresh();
-        });
+        that.refresh();
       };
     },
     computed: {
