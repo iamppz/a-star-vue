@@ -88,10 +88,7 @@ export default {
     },
     methods: {
         async save() {
-            let resp = await processService.saveNodes(this.startNode);
-            if (resp.data.success) {
-                Message.success(resp.data.message);
-            }
+
         }
     }
 };

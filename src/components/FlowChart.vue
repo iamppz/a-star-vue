@@ -1,7 +1,11 @@
 <template>
     <div>
         <div id="toolbar">
-            <el-button type="primary" @click="add(10, 10)">添加节点</el-button>
+            <el-button-group>
+                <el-button size="mini" icon="el-icon-plus" @click="add(10, 10)">添加</el-button>
+                <el-button size="mini" icon="el-icon-minus" @click="remove()">删除</el-button>
+                <el-button size="mini" icon="el-icon-check" @click="save()">保存</el-button>
+            </el-button-group>
             <!--             {{ hoveredConnection }}-->
         </div>
         <div id="chart"
@@ -67,22 +71,31 @@
                    :before-close="handleClickCancelSaveConnection"
         >
             <el-form ref="form" :model="connectionForm" label-width="80px">
+                <el-form-item label="名称">
+                    <el-input v-model="connectionForm.name"/>
+                </el-form-item>
                 <el-form-item label="类型">
                     <el-select v-model="connectionForm.type"
                                placeholder="请选择"
                                style="width: 100%;"
                     >
                         <el-option :key="'connection-type-' + item.id"
-                                   v-for="item in [ { name: '通过', id: 'pass' }, { name: '条件', id: 'condition' }, { name: '驳回', id: 'reject' } ]"
+                                   v-for="item in [ { name: '通过', id: 'pass' }, { name: '驳回', id: 'reject' } ]"
                                    :label="item.name"
                                    :value="item.id"
                         >
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="表达式">
+                    <el-input v-model="connectionForm.expression"/>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="handleClickCancelSaveConnection">取消</el-button>
+                <el-button v-if="connectionForm.operation === 'add'"
+                           @click="handleClickCancelSaveConnection">取消</el-button>
+                <el-button v-if="connectionForm.operation === 'edit'"
+                           @click="handleClickRemoveConnection">删除</el-button>
                 <el-button type="primary" @click="handleClickSaveConnection">确定</el-button>
             </span>
         </el-dialog>
@@ -136,6 +149,8 @@
           sourcePosition: null,
           destinationId: null,
           destinationPosition: null,
+          name: null,
+          expression: null,
         },
         /**
          * lines of all internalConnections
@@ -228,20 +243,25 @@
         }
 
         if (this.hoveredConnection != null) {
-          let that = this;
-          Modal.confirm({
-            title: '是否删除该连线?',
-            onOk() {
-              return new Promise((resolve) => {
-                that.internalConnections.splice(
-                    that.internalConnections.indexOf(that.hoveredConnection), 1);
-                that.refresh();
-                resolve();
-              }).catch(() => {});
-            },
-            onCancel() {},
-          });
+          this.editConnection(
+              this.hoveredConnection.source.id,
+              this.hoveredConnection.source.position,
+              this.hoveredConnection.destination,
+              this.hoveredConnection.destination.position,
+              this.hoveredConnection.id,
+              this.hoveredConnection.type,
+              this.hoveredConnection.name,
+          );
         }
+      },
+      removeConnection(id) {
+        let connections = this.internalConnections.filter(item => item.id === id);
+        if (connections.length !== 1) {
+          return;
+        }
+
+        this.internalConnections.splice(this.internalConnections.indexOf(connections[0]), 1);
+        this.refresh();
       },
       handleChartDblClick(event) {
         let element = document.getElementById('chart');
@@ -289,15 +309,39 @@
             });
             this.refresh();
 
-            this.connectionForm.sourceId = this.connectingInfo.source.id;
-            this.connectionForm.sourcePosition = this.connectingInfo.sourcePosition;
-            this.connectionForm.destinationId = destination.id;
-            this.connectionForm.destinationPosition = position;
-            this.connectionForm.id = tempId;
-            this.connectionForm.type = 'pass';
-            this.connectionDialogVisible = true;
+            this.addConnection(
+                this.connectingInfo.source.id,
+                this.connectingInfo.sourcePosition,
+                destination.id,
+                position,
+                tempId,
+                'pass',
+                '通过',
+            );
           }
         }
+      },
+      addConnection(sourceId, sourcePosition, destinationId, destinationPosition, id, type, name) {
+        this.connectionForm.operation = 'add';
+        this.connectionForm.sourceId = sourceId;
+        this.connectionForm.sourcePosition = sourcePosition;
+        this.connectionForm.destinationId = destinationId;
+        this.connectionForm.destinationPosition = destinationPosition;
+        this.connectionForm.id = id;
+        this.connectionForm.type = type;
+        this.connectionForm.name = name;
+        this.connectionDialogVisible = true;
+      },
+      editConnection(sourceId, sourcePosition, destinationId, destinationPosition, id, type, name) {
+        this.connectionForm.operation = 'edit';
+        this.connectionForm.sourceId = sourceId;
+        this.connectionForm.sourcePosition = sourcePosition;
+        this.connectionForm.destinationId = destinationId;
+        this.connectionForm.destinationPosition = destinationPosition;
+        this.connectionForm.id = id;
+        this.connectionForm.type = type;
+        this.connectionForm.name = name;
+        this.connectionDialogVisible = true;
       },
       refresh() {
         clearCanvas('canvas');
@@ -321,7 +365,6 @@
               {
                 pass: '#52c41a',
                 reject: 'red',
-                condition: 'orange',
               }[conn.type],
           );
           for (const line of lines) {
@@ -360,10 +403,16 @@
       arrowTo(x1, y1, x2, y2, startPosition, endPosition, color) {
         return arrow2('canvas', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
       },
+      handleClickRemoveConnection() {
+        this.removeConnection(this.connectionForm.id);
+        this.connectionDialogVisible = false;
+      },
       handleClickSaveConnection() {
         let connection = this.internalConnections.filter(
             conn => conn.id === this.connectionForm.id)[0];
         connection.type = this.connectionForm.type;
+        connection.name = this.connectionForm.name;
+        connection.expression = this.connectionForm.expression;
         this.refresh();
         this.connectionDialogVisible = false;
       },
@@ -373,6 +422,20 @@
             conn => conn.id === this.connectionForm.id)[0];
         this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
         this.refresh();
+      },
+      save() {
+        this.$emit('save', this.internalNodes, this.internalConnections);
+      },
+      remove() {
+        if (this.currentNode) {
+          this.internalNodes.splice(this.internalNodes.indexOf(this.currentNode), 1);
+          let connections = this.internalConnections.filter(
+              item => item.source.id === this.currentNode.id);
+          for (let connection of connections) {
+            this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
+          }
+          this.currentNode = null;
+        }
       },
     },
     mounted() {
@@ -416,9 +479,7 @@
             }
             break;
           case 46:
-            if (that.currentNode) {
-              that.internalNodes.splice(that.internalNodes.indexOf(that.currentNode), 1);
-            }
+            that.remove();
             break;
           default:
             break;
