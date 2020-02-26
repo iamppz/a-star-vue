@@ -25,7 +25,11 @@
                      @dblclick.stop="handleNodeMouseDblClick(node, $event)"
                      @mouseup="handleNodeMouseUp(node)"
                 >
-                    <div class="node-header">{{ node.name }}</div>
+                    <div class="node-header">{{node.name}}</div>
+                    <div class="node-body">
+                        {{ node.type === 'start' ? '提交' : (node.type === 'end' ? '完成' :
+                        (node.approverIds || '无审批人')) }}
+                    </div>
                     <template v-for="position in ['top', 'bottom', 'left', 'right']">
                         <div :key="'connection-' + position"
                              :class="{ 'node-connector': true, 'node-connector-top': position === 'top', 'node-connector-bottom': position === 'bottom', 'node-connector-left': position === 'left', 'node-connector-right': position === 'right' }"
@@ -165,7 +169,7 @@
         this.currentNode = node;
         this.movingInfo.target = node;
         this.movingInfo.offsetX = event.offsetX;
-        this.movingInfo.offsetY = event.offsetY;
+        this.movingInfo.offsetY = event.offsetY + event.target.offsetTop;
       },
       handleNodeMouseDblClick(node) {
         this.nodeForm.id = node.id;
@@ -173,7 +177,7 @@
         this.nodeForm.type = node.type;
         this.nodeDialogVisible = true;
       },
-      handleNodeMouseUp() {
+      async handleNodeMouseUp() {
         if (this.movingInfo.target) {
           this.movingInfo.target.x =
               Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
@@ -183,41 +187,45 @@
           this.movingInfo.offsetX = null;
           this.movingInfo.offsetY = null;
           let that = this;
-          that.refresh();
+          await that.refresh();
         }
       },
-      handleChartMouseMove(event) {
+      async handleChartMouseMove(event) {
         let element = document.getElementById('chart');
         this.cursorToChartOffset.x = event.pageX - getOffsetLeft(element);
         this.cursorToChartOffset.y = event.pageY - getOffsetTop(element);
         if (this.movingInfo.target) {
           this.movingInfo.target.x = this.cursorToChartOffset.x - this.movingInfo.offsetX;
           this.movingInfo.target.y = this.cursorToChartOffset.y - this.movingInfo.offsetY;
-          this.refresh();
+          await this.refresh();
           let expectX = Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
           let expectY = Math.round(Math.round(this.movingInfo.target.y) / 10) * 10;
           fillRect('canvas', expectX, expectY, 120, 60, '#d2e3fc');
           let guidelineDash = [5, 3];
-          this.internalNodes.forEach(item => {
-            if (item.x === expectX) {
-              // vertical guideline
-              if (item.y < expectY) {
-                this.lineTo(item.x, item.y + 60, expectX, expectY, guidelineDash);
-              } else {
-                this.lineTo(expectX, expectY + 60, item.x, item.y, guidelineDash);
+          let that = this;
+          that.internalNodes.forEach(item => {
+            if (item.id !== that.movingInfo.target.id) {
+              if (item.x === expectX) {
+                // vertical guideline
+                if (item.y < expectY) {
+                  that.lineTo(item.x, item.y + 60, expectX, expectY, guidelineDash);
+                } else {
+                  that.lineTo(expectX, expectY + 60, item.x, item.y, guidelineDash);
+                }
+              }
+              if (item.y === expectY) {
+                // horizontal guideline
+                if (item.x < expectX) {
+                  that.lineTo(item.x + 120, item.y, expectX, expectY, guidelineDash);
+                } else {
+                  that.lineTo(expectX + 120, expectY, item.x, item.y, guidelineDash);
+                }
               }
             }
-            if (item.y === expectY) {
-              // horizontal guideline
-              if (item.x < expectX) {
-                this.lineTo(item.x + 120, item.y, expectX, expectY, guidelineDash);
-              } else {
-                this.lineTo(expectX + 120, expectY, item.x, item.y, guidelineDash);
-              }
-            }
+
           });
         } else if (this.connectingInfo.source) {
-          this.refresh();
+          await this.refresh();
           let offset = this.getNodeConnectorOffset(
               this.connectingInfo.source.id,
               this.connectingInfo.sourcePosition,
@@ -231,11 +239,11 @@
           );
         }
       },
-      handleChartMouseUp() {
+      async handleChartMouseUp() {
         if (this.connectingInfo.source) {
           this.connectingInfo.source = null;
           this.connectingInfo.sourcePosition = null;
-          this.refresh();
+          await this.refresh();
           return;
         }
 
@@ -251,14 +259,14 @@
           );
         }
       },
-      removeConnection(id) {
+      async removeConnection(id) {
         let connections = this.internalConnections.filter(item => item.id === id);
         if (connections.length !== 1) {
           return;
         }
 
         this.internalConnections.splice(this.internalConnections.indexOf(connections[0]), 1);
-        this.refresh();
+        await this.refresh();
       },
       handleChartDblClick(event) {
         let element = document.getElementById('chart');
@@ -273,9 +281,9 @@
         this.connectingInfo.source = sourceNode;
         this.connectingInfo.sourcePosition = position;
       },
-      handleNodeConnectorMouseMove(node, position) {
+      async handleNodeConnectorMouseMove(node, position) {
         if (this.connectingInfo.source) {
-          this.refresh();
+          await this.refresh();
           let sourceOffset = this.getNodeConnectorOffset(
               this.connectingInfo.source.id,
               this.connectingInfo.sourcePosition,
@@ -291,7 +299,7 @@
           );
         }
       },
-      handleNodeConnectorMouseUp(destination, position) {
+      async handleNodeConnectorMouseUp(destination, position) {
         if (this.connectingInfo.source) {
           if (this.connectingInfo.source.id !== destination.id) {
             // Node can't connect to itself
@@ -304,7 +312,7 @@
               destination: {id: destination.id, position: position},
               id: tempId,
             });
-            this.refresh();
+            await this.refresh();
 
             this.addConnection(
                 this.connectingInfo.source.id,
@@ -342,39 +350,42 @@
       },
       refresh() {
         let that = this;
-        that.$nextTick(function() {
-          clearCanvas('canvas');
-          that.lines = [];
-          that.internalConnections.forEach(conn => {
-            let sourcePosition = that.getNodeConnectorOffset(
-                conn.source.id,
-                conn.source.position,
-            );
-            let destinationPosition = that.getNodeConnectorOffset(
-                conn.destination.id,
-                conn.destination.position,
-            );
-            let lines = that.arrowTo(
-                sourcePosition.x,
-                sourcePosition.y,
-                destinationPosition.x,
-                destinationPosition.y,
-                conn.source.position,
-                conn.destination.position,
-                {
-                  pass: '#52c41a',
-                  reject: 'red',
-                }[conn.type],
-            );
-            for (const line of lines) {
-              that.lines.push({
-                sourceX: line.sourceX,
-                sourceY: line.sourceY,
-                destinationX: line.destinationX,
-                destinationY: line.destinationY,
-                id: conn.id,
-              });
-            }
+        return new Promise(function(resolve, reject) {
+          that.$nextTick(function() {
+            clearCanvas('canvas');
+            that.lines = [];
+            that.internalConnections.forEach(conn => {
+              let sourcePosition = that.getNodeConnectorOffset(
+                  conn.source.id,
+                  conn.source.position,
+              );
+              let destinationPosition = that.getNodeConnectorOffset(
+                  conn.destination.id,
+                  conn.destination.position,
+              );
+              let lines = that.arrowTo(
+                  sourcePosition.x,
+                  sourcePosition.y,
+                  destinationPosition.x,
+                  destinationPosition.y,
+                  conn.source.position,
+                  conn.destination.position,
+                  {
+                    pass: '#52c41a',
+                    reject: 'red',
+                  }[conn.type],
+              );
+              for (const line of lines) {
+                that.lines.push({
+                  sourceX: line.sourceX,
+                  sourceY: line.sourceY,
+                  destinationX: line.destinationX,
+                  destinationY: line.destinationY,
+                  id: conn.id,
+                });
+              }
+            });
+            resolve();
           });
         });
       },
@@ -407,26 +418,26 @@
         this.removeConnection(this.connectionForm.id);
         this.connectionDialogVisible = false;
       },
-      handleClickSaveConnection() {
+      async handleClickSaveConnection() {
         let connection = this.internalConnections.filter(
             conn => conn.id === this.connectionForm.id)[0];
         connection.type = this.connectionForm.type;
         connection.name = this.connectionForm.name;
         connection.expression = this.connectionForm.expression;
-        this.refresh();
+        await this.refresh();
         this.connectionDialogVisible = false;
       },
-      handleClickCancelSaveConnection() {
+      async handleClickCancelSaveConnection() {
         this.connectionDialogVisible = false;
         let connection = this.internalConnections.filter(
             conn => conn.id === this.connectionForm.id)[0];
         this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
-        this.refresh();
+        await this.refresh();
       },
       save() {
         this.$emit('save', this.internalNodes, this.internalConnections);
       },
-      remove() {
+      async remove() {
         if (this.currentNode) {
           let connections = this.internalConnections.filter(
               item => item.source.id === this.currentNode.id ||
@@ -437,7 +448,7 @@
           }
           this.internalNodes.splice(this.internalNodes.indexOf(this.currentNode), 1);
           this.currentNode = null;
-          this.refresh();
+          await this.refresh();
         }
       },
       edit() {

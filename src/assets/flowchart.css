@@ -3,7 +3,7 @@
 }
 
 #canvas {
-    border: 1px solid #a3a3a3;
+    border: 1px solid #dadce0;
     position: absolute;
 }
 
@@ -34,15 +34,24 @@
 }
 
 .node.active {
-    border-color: #d50000;
+    border-color: #999999;
 }
 
 .node-header {
+    font-weight: bold;
     background-color: #f1f3f4;
     color: #3c4043;
     height: 20px;
     line-height: 20px;
     padding: 0 6px;
+}
+
+.node-body {
+    height: 38px;
+    line-height: 38px;
+    padding: 0 6px;
+    text-align: center;
+    overflow: hidden;
 }
 
 .node-connector {
@@ -81,7 +90,8 @@
 }
 
 #position {
+    font-size: 12px;
     position: absolute;
-    right: 0;
-    top: 0;
+    right: 6px;
+    top: 6px;
 }

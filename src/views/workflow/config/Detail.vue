@@ -7,6 +7,7 @@
 <script>
   import FlowChart from '../../../components/FlowChart';
   import processService from '../../../service/processService';
+  import {Message} from 'element-ui';
 
   export default {
     components: {FlowChart},
@@ -27,6 +28,7 @@
             y: item.y || 0,
             name: item.name,
             type: item.state,
+            approverIds: item.approverIds,
           };
         });
         let that = this;
@@ -49,9 +51,18 @@
       }
     },
     methods: {
-      handleChartSave(nodes, connections) {
-        nodes.forEach(node => {
-          node.transitions = connections.map(conn => {
+      async handleChartSave(nodes, connections) {
+        let data = nodes.map(node => {
+          let result = {
+            id: node.id,
+            x: node.x || 0,
+            y: node.y || 0,
+            name: node.name,
+            state: node.type,
+            approverIds: node.approverIds,
+            processDefinitionId: 1
+          };
+          result.transitions = connections.filter(conn => conn.source.id === node.id).map(conn => {
             return {
               source: conn.source.id,
               destination: conn.destination.id,
@@ -62,7 +73,14 @@
               expression: conn.expression,
             };
           });
+          return result;
         });
+        let resp = await processService.saveNodes(data);
+        if (resp.data.success) {
+          Message.success('保存成功');
+        } else {
+          Message.error('保存失败');
+        }
       },
     },
   };
