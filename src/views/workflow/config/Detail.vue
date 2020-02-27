@@ -1,7 +1,36 @@
 <template>
     <div>
         <flow-chart v-if="loaded" :nodes="nodes" :connections="connections"
+                    @editnode="handleEditNode"
                     @save="handleChartSave"></flow-chart>
+        <el-dialog title="编辑"
+                   :visible.sync="nodeDialogVisible"
+                   width="440px"
+                   :before-close="handleClickCancelSaveNode"
+        >
+            <el-form ref="form" :model="nodeForm" label-width="80px">
+                <el-form-item label="名称">
+                    <el-input v-model="nodeForm.name"/>
+                </el-form-item>
+                <el-form-item label="类型">
+                    <el-select v-model="nodeForm.type"
+                               placeholder="请选择"
+                               style="width: 100%;"
+                    >
+                        <el-option :key="'node-type-' + item.id"
+                                   v-for="item in [ { name: '开始', id: 'start' }, { name: '结束', id: 'end' }, { name: '审批', id: 'operation' } ]"
+                                   :label="item.name"
+                                   :value="item.id"
+                        >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="handleClickCancelSaveNode">取消</el-button>
+                <el-button type="primary" @click="handleClickSaveNode">确定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -16,6 +45,11 @@
         nodes: [],
         connections: [],
         loaded: false,
+        nodeDialogVisible: false,
+        nodeForm: {name: null, id: null, type: null},
+        editingInfo: {
+          target: null,
+        },
       };
     },
     async mounted() {
@@ -60,7 +94,7 @@
             name: node.name,
             state: node.type,
             approverIds: node.approverIds,
-            processDefinitionId: 1
+            processDefinitionId: 1,
           };
           result.transitions = connections.filter(conn => conn.source.id === node.id).map(conn => {
             return {
@@ -81,6 +115,22 @@
         } else {
           Message.error('保存失败');
         }
+      },
+      handleEditNode(node) {
+        this.nodeForm.id = node.id;
+        this.nodeForm.name = node.name;
+        this.nodeForm.type = node.type;
+        this.nodeDialogVisible = true;
+        this.editingInfo.target = node;
+      },
+      handleClickSaveNode() {
+        let that = this;
+        this.editingInfo.target.name = that.nodeForm.name;
+        this.editingInfo.target.type = that.nodeForm.type;
+        this.nodeDialogVisible = false;
+      },
+      handleClickCancelSaveNode() {
+        this.nodeDialogVisible = false;
       },
     },
   };

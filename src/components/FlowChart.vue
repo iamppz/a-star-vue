@@ -42,34 +42,6 @@
             </template>
         </div>
         <el-dialog title="编辑"
-                   :visible.sync="nodeDialogVisible"
-                   width="440px"
-                   :before-close="handleClickCancelSaveNode"
-        >
-            <el-form ref="form" :model="nodeForm" label-width="80px">
-                <el-form-item label="名称">
-                    <el-input v-model="nodeForm.name"/>
-                </el-form-item>
-                <el-form-item label="类型">
-                    <el-select v-model="nodeForm.type"
-                               placeholder="请选择"
-                               style="width: 100%;"
-                    >
-                        <el-option :key="'node-type-' + item.id"
-                                   v-for="item in [ { name: '开始', id: 'start' }, { name: '结束', id: 'end' }, { name: '审批', id: 'operation' } ]"
-                                   :label="item.name"
-                                   :value="item.id"
-                        >
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="handleClickCancelSaveNode">取消</el-button>
-                <el-button type="primary" @click="handleClickSaveNode">确定</el-button>
-            </span>
-        </el-dialog>
-        <el-dialog title="编辑"
                    :visible.sync="connectionDialogVisible"
                    width="440px"
                    :before-close="handleClickCancelSaveConnection"
@@ -143,8 +115,6 @@
          * Mouse position(relative to chart div)
          */
         cursorToChartOffset: {x: 0, y: 0},
-        nodeDialogVisible: false,
-        nodeForm: {name: null, id: null, type: null},
         connectionDialogVisible: false,
         connectionForm: {
           type: null,
@@ -172,10 +142,7 @@
         this.movingInfo.offsetY = event.offsetY + event.target.offsetTop;
       },
       handleNodeMouseDblClick(node) {
-        this.nodeForm.id = node.id;
-        this.nodeForm.name = node.name;
-        this.nodeForm.type = node.type;
-        this.nodeDialogVisible = true;
+        this.$emit('editnode', node);
       },
       async handleNodeMouseUp() {
         if (this.movingInfo.target) {
@@ -350,7 +317,7 @@
       },
       refresh() {
         let that = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise(function(resolve) {
           that.$nextTick(function() {
             clearCanvas('canvas');
             that.lines = [];
@@ -397,16 +364,6 @@
           x: getOffsetLeft(connector) - getOffsetLeft(chartElement) + 3,
           y: getOffsetTop(connector) - getOffsetTop(chartElement) + 3,
         };
-      },
-      handleClickSaveNode() {
-        let that = this;
-        let node = this.internalNodes.filter(item => item.id === that.nodeForm.id)[0];
-        node.name = that.nodeForm.name;
-        node.type = that.nodeForm.type;
-        this.nodeDialogVisible = false;
-      },
-      handleClickCancelSaveNode() {
-        this.nodeDialogVisible = false;
       },
       lineTo(x1, y1, x2, y2, dash) {
         lineTo('canvas', x1, y1, x2, y2, 1, '#a3a3a3', dash);
