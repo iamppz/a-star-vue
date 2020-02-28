@@ -6,7 +6,7 @@ class UserService {
     }
 
   async getAllEnabledByDepartmentId(departmentId) {
-    return instance.get(`/api/user/getAllEnabledByDepartmentId?departmentId=${departmentId}`);
+    return instance.get(`/api/user/getAllEnabledByDepartmentId?departmentId=${departmentId || ''}`);
   }
 
     async getCurrent() {

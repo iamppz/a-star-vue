@@ -7,14 +7,14 @@
             <el-col :span="17">
                 <div style="height: 300px; padding: 0 20px; overflow-y: auto;">
                     <div style="display: inline-block; margin: 6px; width: 100px; cursor: pointer"
-                         v-for="user in users" :key="'option' + user.id"
+                         v-for="user in departmentUsers" :key="'option' + user.id"
                          @click="handleClickUser(user)">
                         <avatar size="small" style="cursor: pointer;">
                             {{user.name.substr(0, 1)}}
                         </avatar>
                         <span style="margin-left: 4px; line-height: 24px; display: inline-block; width: 72px; position: absolute; white-space: nowrap; overflow: hidden;">
-                                {{user.name}}
-                            </span>
+                            {{user.name}}
+                        </span>
                     </div>
                 </div>
             </el-col>
@@ -24,11 +24,11 @@
                 <el-dropdown placement="bottom-start" trigger="click" @command="handleCommand"
                              v-for="user in selectedUsers"
                              style="margin: 6px;" :key="'selected-' + user.name">
-                        <span class="el-dropdown-link">
-                            <avatar size="small" style="cursor: pointer">
-                                {{user.name.substr(0, 1)}}
-                            </avatar>
-                        </span>
+                    <span class="el-dropdown-link">
+                        <avatar size="small" style="cursor: pointer">
+                            {{user.name.substr(0, 1)}}
+                        </avatar>
+                    </span>
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item :command="'remove-' + user.id">移除
                         </el-dropdown-item>
@@ -38,7 +38,7 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
             <el-button @click="handleClickCancel">取消</el-button>
-            <el-button type="primary">确定</el-button>
+            <el-button type="primary" @click="handleClickOk">确定</el-button>
         </span>
     </el-dialog>
 </template>
@@ -53,11 +53,16 @@
         type: Boolean,
         default: false,
       },
+      selected: {
+        type: Array,
+        default: () => [],
+      },
     },
     data: function() {
       return {
-        users: [],
+        departmentUsers: [],
         selectedUsers: [],
+        allUsers: [],
       };
     },
     components: {
@@ -79,11 +84,30 @@
       async handleDepartmentTreeClick(department) {
         let resp = await userService.getAllEnabledByDepartmentId(department.id);
         if (resp.data.success) {
-          this.users = resp.data.data;
+          this.departmentUsers = resp.data.data;
         }
       },
       handleClickCancel() {
         this.$emit('update:visible', false);
+      },
+      handleClickOk() {
+        this.$emit('select', this.selectedUsers);
+      },
+    },
+    async mounted() {
+      let resp = await userService.getAllEnabledByDepartmentId(null);
+      if (resp.data.success) {
+        this.allUsers = resp.data.data;
+      }
+    },
+    watch: {
+      selected: {
+        immediate: true,
+        handler(val) {
+          this.selectedUsers = this.allUsers.filter(item => {
+            return val.indexOf(item.id) > -1;
+          });
+        },
       },
     },
   };
