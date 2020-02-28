@@ -28,7 +28,7 @@
                     <div class="node-header">{{node.name}}</div>
                     <div class="node-body">
                         {{ node.type === 'start' ? '提交' : (node.type === 'end' ? '完成' :
-                        (node.approverIds || '无审批人')) }}
+                        (node.approver || '无审批人')) }}
                     </div>
                     <template v-for="position in ['top', 'bottom', 'left', 'right']">
                         <div :key="'connection-' + position"

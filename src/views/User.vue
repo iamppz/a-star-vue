@@ -148,7 +148,7 @@
             async handleClickDepartment(department) {
                 let options = {target: this.$refs.table.$el};
                 let loading = Loading.service(options);
-                let resp = await userService.getByDepartment(department.id, this.currentPage);
+                let resp = await userService.getByDepartmentPageable(department.id, this.currentPage);
                 loading.close();
                 if (resp.data.success) {
                     this.users = resp.data.data.content;

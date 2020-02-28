@@ -1,9 +1,13 @@
 import instance from "../utils/instance";
 
 class UserService {
-    async getByDepartment(departmentId, pageIndex) {
+    async getByDepartmentPageable(departmentId, pageIndex) {
         return instance.get(`/api/user/department?departmentId=${departmentId}&pageIndex=${pageIndex}`);
     }
+
+  async getAllEnabledByDepartmentId(departmentId) {
+    return instance.get(`/api/user/getAllEnabledByDepartmentId?departmentId=${departmentId}`);
+  }
 
     async getCurrent() {
         return instance.get(`/api/user/current`);

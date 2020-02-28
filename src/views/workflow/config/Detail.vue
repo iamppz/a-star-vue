@@ -25,31 +25,51 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="审批人">
+                    <div>
+                        <el-dropdown placement="bottom-start" trigger="click">
+                            <span class="el-dropdown-link">
+                                <avatar style="cursor: pointer">USER</avatar>
+                            </span>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item>移除</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                        <el-button size="small" style="margin-left: 8px;" type="text"
+                                   @click="userPickerVisible = true">
+                            添加
+                        </el-button>
+                    </div>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="handleClickCancelSaveNode">取消</el-button>
                 <el-button type="primary" @click="handleClickSaveNode">确定</el-button>
             </span>
         </el-dialog>
+        <user-picker :visible.sync="userPickerVisible"></user-picker>
     </div>
 </template>
 <script>
   import FlowChart from '../../../components/FlowChart';
   import processService from '../../../service/processService';
   import {Message} from 'element-ui';
+  import {Avatar} from 'ant-design-vue';
+  import UserPicker from '../../../components/UserPicker';
 
   export default {
-    components: {FlowChart},
+    components: {UserPicker, FlowChart, Avatar},
     data: function() {
       return {
         nodes: [],
         connections: [],
         loaded: false,
         nodeDialogVisible: false,
-        nodeForm: {name: null, id: null, type: null},
+        nodeForm: {name: null, id: null, type: null, approverIds: null},
         editingInfo: {
           target: null,
         },
+        userPickerVisible: false,
       };
     },
     async mounted() {
@@ -120,6 +140,7 @@
         this.nodeForm.id = node.id;
         this.nodeForm.name = node.name;
         this.nodeForm.type = node.type;
+        this.nodeForm.approverIds = node.approverIds;
         this.nodeDialogVisible = true;
         this.editingInfo.target = node;
       },
@@ -127,6 +148,7 @@
         let that = this;
         this.editingInfo.target.name = that.nodeForm.name;
         this.editingInfo.target.type = that.nodeForm.type;
+        this.editingInfo.target.approver = that.nodeForm.approver;
         this.nodeDialogVisible = false;
       },
       handleClickCancelSaveNode() {
