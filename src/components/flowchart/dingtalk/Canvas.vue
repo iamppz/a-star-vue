@@ -22,7 +22,7 @@
 <script>
 import { Message } from 'element-ui';
 
-import processService from '../../service/processService';
+import processService from '../../../service/processService';
 import Start from './Start';
 
 export default {
@@ -93,4 +93,4 @@ export default {
     }
 };
 </script>
-<style scoped src="../../assets/flow-design.css"></style>
+<style scoped src="../../../assets/flow-design.css"></style>

@@ -1,6 +1,5 @@
 <template>
     <div>
-        {{editingInfo.target}}
         <flow-chart v-if="loaded" :nodes="nodes" :connections="connections"
                     @editnode="handleEditNode"
                     @save="handleChartSave"></flow-chart>
@@ -9,10 +8,10 @@
     </div>
 </template>
 <script>
-  import FlowChart from '../../../components/FlowChart';
+  import FlowChart from '../../../components/flowchart/joyce/general/FlowChart';
   import processService from '../../../service/processService';
   import {Message} from 'element-ui';
-  import FlowChartNodeDialog from '../../../components/FlowChartNodeDialog';
+  import FlowChartNodeDialog from '../../../components/flowchart/joyce/FlowChartNodeDialog';
 
   export default {
     components: {FlowChartNodeDialog, FlowChart},

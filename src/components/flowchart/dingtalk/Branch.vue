@@ -27,7 +27,7 @@
     import Condition from './Condition';
     import Operation from "./Operation";
     import End from "./End";
-    import {getIntersection, pathing} from "../../utils/process";
+    import {getIntersection, pathing} from "../../../utils/process";
     import _ from 'lodash';
 
     export default {
@@ -96,4 +96,4 @@
         }
     }
 </script>
-<style scoped src="../../assets/flow-design.css"></style>
+<style scoped src="../../../assets/flow-design.css"></style>

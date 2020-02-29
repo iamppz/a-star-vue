@@ -22,14 +22,16 @@
                     <div>
                         <template v-for="user in nodeForm.approvers">
                             <el-dropdown placement="bottom-start" trigger="click"
-                                         :key="'user' + user.id">
+                                         :key="'user' + user.id" @command="handleCommand">
                                 <span class="el-dropdown-link">
                                     <avatar size="small" style="cursor: pointer">
                                         {{user.name.substr(0, 1)}}
                                     </avatar>
                                 </span>
                                 <el-dropdown-menu slot="dropdown">
-                                    <el-dropdown-item>移除</el-dropdown-item>
+                                    <el-dropdown-item :command="'remove-' + user.id">
+                                        移除
+                                    </el-dropdown-item>
                                 </el-dropdown-menu>
                             </el-dropdown>
                         </template>
@@ -51,7 +53,7 @@
     </div>
 </template>
 <script>
-  import UserPicker from './UserPicker';
+  import UserPicker from '../../UserPicker';
   import {Avatar} from 'ant-design-vue';
 
   export default {
@@ -91,6 +93,12 @@
         });
         this.userPickerVisible = false;
       },
+      handleCommand(cmd) {
+        let id = parseInt(cmd.split('-')[1]);
+        let user = this.nodeForm.approvers.filter(item => item.id === id)[0];
+        let indexOf = this.nodeForm.approvers.indexOf(user);
+        this.nodeForm.approvers.splice(indexOf, 1);
+      },
     },
     watch: {
       node: {
@@ -99,14 +107,17 @@
           this.nodeForm.id = val.id;
           this.nodeForm.name = val.name;
           this.nodeForm.type = val.type;
-          this.nodeForm.approvers = val.approvers;
+          this.nodeForm.approvers.splice(0, this.nodeForm.approvers.length);
+          val.approvers.forEach(item => {
+            this.nodeForm.approvers.push(Object.assign({}, item));
+          });
         },
       },
     },
     computed: {
       approverIds() {
         return this.nodeForm.approvers.map(item => item.id);
-      }
-    }
+      },
+    },
   };
 </script>

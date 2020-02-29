@@ -27,8 +27,18 @@
                 >
                     <div class="node-header">{{node.name}}</div>
                     <div class="node-body">
-                        {{ node.type === 'start' ? '提交' : (node.type === 'end' ? '完成' :
-                        (node.approver || '无审批人')) }}
+                        {{
+                            node.type === 'start' ? '提交' : (
+                                node.type === 'end' ? '完成' : (
+                                    node.approvers.length === 0 ?
+                                    '无审批人' : (
+                                        node.approvers.length > 1 ?
+                                        node.approvers[0].name + '等' :
+                                        node.approvers[0].name
+                                    )
+                                )
+                            )
+                        }}
                     </div>
                     <template v-for="position in ['top', 'bottom', 'left', 'right']">
                         <div :key="'connection-' + position"
@@ -78,10 +88,10 @@
     </div>
 </template>
 <script>
-  import {lineTo, arrow2, clearCanvas, fillRect} from '../utils/canvas';
-  import {getOffsetLeft, getOffsetTop} from '../utils/dom';
-  import {between, distanceOfPointToLine} from '../utils/math';
-  import '../assets/flowchart.css';
+  import {lineTo, arrow2, clearCanvas, fillRect} from '../../../../utils/canvas';
+  import {getOffsetLeft, getOffsetTop} from '../../../../utils/dom';
+  import {between, distanceOfPointToLine} from '../../../../utils/math';
+  import '../../../../assets/flowchart.css';
 
   export default {
     props: {

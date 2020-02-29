@@ -76,4 +76,4 @@
         }
     }
 </script>
-<style scoped src="../../assets/flow-design.css"></style>
+<style scoped src="../../../assets/flow-design.css"></style>

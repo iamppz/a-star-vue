@@ -8,11 +8,11 @@ import App from '../views/App';
 import AStar from '../views/process/AStar';
 import WorkflowIndex from '../views/workflow/Index';
 
-import Flowchart from '../components/flow/Canvas';
+import Flowchart from '../components/flowchart/dingtalk/Canvas';
 import EChartsTest from '../views/EChartsTest';
 import Dictionary from '../views/Dictionary';
 import WorkflowConfigList from '../views/workflow/config/List';
-import FlowChart from '../components/FlowChart';
+import FlowChart from '../components/flowchart/joyce/general/FlowChart';
 import Detail from '../views/workflow/config/Detail';
 
 Vue.use(VueRouter);
