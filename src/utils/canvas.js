@@ -699,4 +699,22 @@ function fillRect(canId, x, y, width, height, color) {
   ctx.fillRect(x, y, width, height);
 }
 
-export {arrowTo, lineTo, clearCanvas, getDirection, arrow2, rect, fillRect};
+function fillText(canId, x, y, text, maxWidth, color, font, textAlign) {
+  let canvas = document.getElementById(canId);
+  let ctx = canvas.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.font = font;
+  ctx.textAlign = textAlign;
+  ctx.fillText(text, x, y, maxWidth);
+}
+
+export {
+  arrowTo,
+  lineTo,
+  clearCanvas,
+  getDirection,
+  arrow2,
+  rect,
+  fillRect,
+  fillText,
+};

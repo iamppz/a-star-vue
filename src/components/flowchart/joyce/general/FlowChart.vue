@@ -12,34 +12,17 @@
              @mousemove="handleChartMouseMove"
              @mouseup="handleChartMouseUp"
              @dblclick="handleChartDblClick($event)"
+             @mousedown="handleNodeMouseDown"
              :style="{ cursor: cursor }"
         >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600"/>
             <template v-for="node in internalNodes">
-                <div :class="{ node: true, active: currentNode && currentNode.id === node.id }"
+                <div :class="{ node: true }"
                      :key="'node-' + node.id"
                      :style="{ top: node.y + 'px', left: node.x + 'px' }"
                      :name="'node-' + node.id"
-                     @mousedown="handleNodeMouseDown(node, $event)"
-                     @dblclick.stop="handleNodeMouseDblClick(node, $event)"
-                     @mouseup="handleNodeMouseUp(node)"
                 >
-                    <div class="node-header">{{node.name}}</div>
-                    <div class="node-body">
-                        {{
-                            node.type === 'start' ? '提交' : (
-                                node.type === 'end' ? '完成' : (
-                                    node.approvers.length === 0 ?
-                                    '无审批人' : (
-                                        node.approvers.length > 1 ?
-                                        node.approvers[0].name + '等' :
-                                        node.approvers[0].name
-                                    )
-                                )
-                            )
-                        }}
-                    </div>
                     <template v-for="position in ['top', 'bottom', 'left', 'right']">
                         <div :key="'connection-' + position"
                              :class="{ 'node-connector': true, 'node-connector-top': position === 'top', 'node-connector-bottom': position === 'bottom', 'node-connector-left': position === 'left', 'node-connector-right': position === 'right' }"
@@ -51,9 +34,7 @@
                 </div>
             </template>
         </div>
-        <el-dialog title="编辑"
-                   :visible.sync="connectionDialogVisible"
-                   width="440px"
+        <el-dialog title="编辑" :visible.sync="connectionDialogVisible" width="440px"
                    :before-close="handleClickCancelSaveConnection"
         >
             <el-form ref="form" :model="connectionForm" label-width="80px">
@@ -61,8 +42,7 @@
                     <el-input v-model="connectionForm.name"/>
                 </el-form-item>
                 <el-form-item label="类型">
-                    <el-select v-model="connectionForm.type"
-                               placeholder="请选择"
+                    <el-select v-model="connectionForm.type" placeholder="请选择"
                                style="width: 100%;"
                     >
                         <el-option :key="'connection-type-' + item.id"
@@ -88,7 +68,7 @@
     </div>
 </template>
 <script>
-  import {lineTo, arrow2, clearCanvas, fillRect} from '../../../../utils/canvas';
+  import {lineTo, arrow2, clearCanvas, fillRect, rect, fillText} from '../../../../utils/canvas';
   import {getOffsetLeft, getOffsetTop} from '../../../../utils/dom';
   import {between, distanceOfPointToLine} from '../../../../utils/math';
   import '../../../../assets/flowchart.css';
@@ -145,27 +125,34 @@
       add(x, y) {
         this.internalNodes.push({id: +new Date(), x: x, y: y, name: '新建节点', type: 'operation'});
       },
-      handleNodeMouseDown(node, event) {
+      handleNodeMouseDown() {
+        let nodes = this.nodes.filter(
+            item => item.x <= this.cursorToChartOffset.x &&
+                (item.x + 120) >= this.cursorToChartOffset.x &&
+                item.y <= this.cursorToChartOffset.y &&
+                (item.y + 60) >= this.cursorToChartOffset.y);
+        if (nodes.length <= 0) {
+          return;
+        }
+
+        let node = nodes[0];
         this.currentNode = node;
         this.movingInfo.target = node;
-        this.movingInfo.offsetX = event.offsetX;
-        this.movingInfo.offsetY = event.offsetY + event.target.offsetTop;
+        this.movingInfo.offsetX = this.cursorToChartOffset.x - node.x;
+        this.movingInfo.offsetY = this.cursorToChartOffset.y - node.y;
       },
-      handleNodeMouseDblClick(node) {
-        this.$emit('editnode', node);
-      },
-      async handleNodeMouseUp() {
-        if (this.movingInfo.target) {
-          this.movingInfo.target.x =
-              Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
-          this.movingInfo.target.y =
-              Math.round(Math.round(this.movingInfo.target.y) / 10) * 10;
-          this.movingInfo.target = null;
-          this.movingInfo.offsetX = null;
-          this.movingInfo.offsetY = null;
-          let that = this;
-          await that.refresh();
+      handleNodeMouseDblClick() {
+        let nodes = this.nodes.filter(
+            item => item.x <= this.cursorToChartOffset.x &&
+                (item.x + 120) >= this.cursorToChartOffset.x &&
+                item.y <= this.cursorToChartOffset.y &&
+                (item.y + 60) >= this.cursorToChartOffset.y);
+        if (nodes.length <= 0) {
+          return;
         }
+
+        let node = nodes[0];
+        this.$emit('editnode', node);
       },
       async handleChartMouseMove(event) {
         let element = document.getElementById('chart');
@@ -177,7 +164,6 @@
           await this.refresh();
           let expectX = Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
           let expectY = Math.round(Math.round(this.movingInfo.target.y) / 10) * 10;
-          fillRect('canvas', expectX, expectY, 120, 60, '#d2e3fc');
           let guidelineDash = [5, 3];
           let that = this;
           that.internalNodes.forEach(item => {
@@ -217,6 +203,19 @@
         }
       },
       async handleChartMouseUp() {
+        if (this.movingInfo.target) {
+          this.movingInfo.target.x =
+              Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
+          this.movingInfo.target.y =
+              Math.round(Math.round(this.movingInfo.target.y) / 10) * 10;
+          this.movingInfo.target = null;
+          this.movingInfo.offsetX = null;
+          this.movingInfo.offsetY = null;
+          let that = this;
+          await that.refresh();
+          return;
+        }
+
         if (this.connectingInfo.source) {
           this.connectingInfo.source = null;
           this.connectingInfo.sourcePosition = null;
@@ -246,10 +245,20 @@
         await this.refresh();
       },
       handleChartDblClick(event) {
-        let element = document.getElementById('chart');
-        let x = event.pageX - getOffsetLeft(element) - 60;
-        let y = event.pageY - getOffsetTop(element) - 30;
-        this.add(x, y);
+        let nodes = this.nodes.filter(
+            item => item.x <= this.cursorToChartOffset.x &&
+                (item.x + 120) >= this.cursorToChartOffset.x &&
+                item.y <= this.cursorToChartOffset.y &&
+                (item.y + 60) >= this.cursorToChartOffset.y);
+        if (nodes.length <= 0) {
+          let element = document.getElementById('chart');
+          let x = event.pageX - getOffsetLeft(element) - 60;
+          let y = event.pageY - getOffsetTop(element) - 30;
+          this.add(x, y);
+        } else {
+          let node = nodes[0];
+          this.$emit('editnode', node);
+        }
       },
       handleNodeConnectorMouseDown(sourceNode, position) {
         if (sourceNode.type === 'end') {
@@ -330,6 +339,33 @@
         return new Promise(function(resolve) {
           that.$nextTick(function() {
             clearCanvas('canvas');
+            that.internalNodes.forEach(node => {
+              if (that.movingInfo.target) {
+                let expectX = Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
+                let expectY = Math.round(Math.round(this.movingInfo.target.y) / 10) * 10;
+                fillRect('canvas', expectX, expectY, 120, 60, '#d2e3fc');
+              }
+
+              if (node === that.currentNode) {
+                that.rect(node.x, node.y, '#999999');
+              } else {
+                that.rect(node.x, node.y, '#dadce0');
+              }
+              fillRect('canvas', node.x, node.y, 120, 60, 'white');
+              fillRect('canvas', node.x, node.y, 120, 20, '#f1f3f4');
+              let font = '13px "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif';
+              fillText('canvas', node.x + 4, node.y + 15, node.name, 112, 'black',
+                  font, 'start');
+              let text = node.type === 'start' ? '提交' : (node.type === 'end' ? '完成' : (
+                      node.approvers.length === 0 ? '无审批人' : (
+                          node.approvers.length > 1 ? `${node.approvers[0].name}等` :
+                              node.approvers[0].name
+                      )
+                  )
+              );
+              fillText('canvas', node.x + 60, node.y + 45, text, 112, 'black',
+                  font, 'center');
+            });
             that.lines = [];
             that.internalConnections.forEach(conn => {
               let sourcePosition = that.getNodeConnectorOffset(
@@ -380,6 +416,9 @@
       },
       arrowTo(x1, y1, x2, y2, startPosition, endPosition, color) {
         return arrow2('canvas', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
+      },
+      rect(x, y, color) {
+        rect('canvas', x, y, 120, 60, 1, color);
       },
       handleClickRemoveConnection() {
         this.removeConnection(this.connectionForm.id);
