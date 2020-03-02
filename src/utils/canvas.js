@@ -692,6 +692,24 @@ function rect(canId, x, y, width, height, lineWidth, strokeStyle, dash) {
   lineTo(canId, x, y + height, x, y, lineWidth, strokeStyle, dash);
 }
 
+function arc(canId, x, y, radius, color) {
+  let c = document.getElementById(canId);
+  let ctx = c.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+  ctx.stroke();
+}
+
+function fillArc(canId, x, y, radius, color) {
+  let c = document.getElementById(canId);
+  let ctx = c.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+  ctx.fill();
+}
+
 function fillRect(canId, x, y, width, height, color) {
   let canvas = document.getElementById(canId);
   let ctx = canvas.getContext('2d');
@@ -717,4 +735,6 @@ export {
   rect,
   fillRect,
   fillText,
+  arc,
+  fillArc,
 };

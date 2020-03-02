@@ -12,27 +12,11 @@
              @mousemove="handleChartMouseMove"
              @mouseup="handleChartMouseUp"
              @dblclick="handleChartDblClick($event)"
-             @mousedown="handleNodeMouseDown"
+             @mousedown="handleChartMouseDown"
              :style="{ cursor: cursor }"
         >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600"/>
-            <template v-for="node in internalNodes">
-                <div :class="{ node: true }"
-                     :key="'node-' + node.id"
-                     :style="{ top: node.y + 'px', left: node.x + 'px' }"
-                     :name="'node-' + node.id"
-                >
-                    <template v-for="position in ['top', 'bottom', 'left', 'right']">
-                        <div :key="'connection-' + position"
-                             :class="{ 'node-connector': true, 'node-connector-top': position === 'top', 'node-connector-bottom': position === 'bottom', 'node-connector-left': position === 'left', 'node-connector-right': position === 'right' }"
-                             @mouseup="handleNodeConnectorMouseUp(node, position, $event)"
-                             @mousedown.stop="handleNodeConnectorMouseDown(node, position, $event)"
-                             @mousemove.stop="handleNodeConnectorMouseMove(node, position, $event)"
-                        ></div>
-                    </template>
-                </div>
-            </template>
         </div>
         <el-dialog title="编辑" :visible.sync="connectionDialogVisible" width="440px"
                    :before-close="handleClickCancelSaveConnection"
@@ -68,7 +52,16 @@
     </div>
 </template>
 <script>
-  import {lineTo, arrow2, clearCanvas, fillRect, rect, fillText} from '../../../../utils/canvas';
+  import {
+    lineTo,
+    arrow2,
+    clearCanvas,
+    fillRect,
+    rect,
+    fillText,
+    arc,
+    fillArc,
+  } from '../../../../utils/canvas';
   import {getOffsetLeft, getOffsetTop} from '../../../../utils/dom';
   import {between, distanceOfPointToLine} from '../../../../utils/math';
   import '../../../../assets/flowchart.css';
@@ -125,34 +118,30 @@
       add(x, y) {
         this.internalNodes.push({id: +new Date(), x: x, y: y, name: '新建节点', type: 'operation'});
       },
-      handleNodeMouseDown() {
-        let nodes = this.nodes.filter(
-            item => item.x <= this.cursorToChartOffset.x &&
-                (item.x + 120) >= this.cursorToChartOffset.x &&
-                item.y <= this.cursorToChartOffset.y &&
-                (item.y + 60) >= this.cursorToChartOffset.y);
-        if (nodes.length <= 0) {
+      handleChartMouseDown() {
+        if (this.hoveredConnector) {
+          if (this.hoveredConnector.node.type === 'end') {
+            return;
+          }
+          this.connectingInfo.source = this.hoveredConnector.node;
+          this.connectingInfo.sourcePosition = this.hoveredConnector.position;
           return;
         }
 
-        let node = nodes[0];
-        this.currentNode = node;
-        this.movingInfo.target = node;
-        this.movingInfo.offsetX = this.cursorToChartOffset.x - node.x;
-        this.movingInfo.offsetY = this.cursorToChartOffset.y - node.y;
+        if (!this.hoveredNode) {
+          return;
+        }
+        this.currentNode = this.hoveredNode;
+        this.movingInfo.target = this.hoveredNode;
+        this.movingInfo.offsetX = this.cursorToChartOffset.x - this.hoveredNode.x;
+        this.movingInfo.offsetY = this.cursorToChartOffset.y - this.hoveredNode.y;
       },
       handleNodeMouseDblClick() {
-        let nodes = this.nodes.filter(
-            item => item.x <= this.cursorToChartOffset.x &&
-                (item.x + 120) >= this.cursorToChartOffset.x &&
-                item.y <= this.cursorToChartOffset.y &&
-                (item.y + 60) >= this.cursorToChartOffset.y);
-        if (nodes.length <= 0) {
+        if (!this.hoveredNode) {
           return;
         }
 
-        let node = nodes[0];
-        this.$emit('editnode', node);
+        this.$emit('editnode', this.hoveredNode);
       },
       async handleChartMouseMove(event) {
         let element = document.getElementById('chart');
@@ -185,21 +174,35 @@
                 }
               }
             }
-
           });
         } else if (this.connectingInfo.source) {
           await this.refresh();
-          let offset = this.getNodeConnectorOffset(
+          let sourceOffset = this.getNodeConnectorOffset(
               this.connectingInfo.source.id,
               this.connectingInfo.sourcePosition,
           );
-          this.arrowTo(
-              offset.x,
-              offset.y,
-              this.cursorToChartOffset.x,
-              this.cursorToChartOffset.y,
-              this.connectingInfo.sourcePosition,
-          );
+          if (this.hoveredConnector) {
+            let destinationOffset = this.getNodeConnectorOffset(this.hoveredConnector.node.id,
+                this.hoveredConnector.position);
+            this.arrowTo(
+                sourceOffset.x,
+                sourceOffset.y,
+                destinationOffset.x,
+                destinationOffset.y,
+                this.connectingInfo.sourcePosition,
+                this.hoveredConnector.position,
+            );
+          } else {
+            this.arrowTo(
+                sourceOffset.x,
+                sourceOffset.y,
+                this.cursorToChartOffset.x,
+                this.cursorToChartOffset.y,
+                this.connectingInfo.sourcePosition,
+            );
+          }
+        } else {
+          this.refresh();
         }
       },
       async handleChartMouseUp() {
@@ -217,10 +220,37 @@
         }
 
         if (this.connectingInfo.source) {
-          this.connectingInfo.source = null;
-          this.connectingInfo.sourcePosition = null;
-          await this.refresh();
-          return;
+          if (this.hoveredConnector) {
+            if (this.connectingInfo.source.id !== this.hoveredConnector.node.id) {
+              // Node can't connect to itself
+              let tempId = +new Date();
+              this.internalConnections.push({
+                source: {
+                  id: this.connectingInfo.source.id,
+                  position: this.connectingInfo.sourcePosition,
+                },
+                destination: {
+                  id: this.hoveredConnector.node.id,
+                  position: this.hoveredConnector.position,
+                },
+                id: tempId,
+              });
+              await this.refresh();
+
+              this.addConnection(
+                  this.connectingInfo.source.id,
+                  this.connectingInfo.sourcePosition,
+                  this.hoveredConnector.node.id,
+                  this.hoveredConnector.position,
+                  tempId,
+                  'pass',
+                  '通过',
+              );
+
+              this.connectingInfo.source = null;
+              this.connectingInfo.sourcePosition = null;
+            }
+          }
         }
 
         if (this.hoveredConnection != null) {
@@ -245,72 +275,21 @@
         await this.refresh();
       },
       handleChartDblClick(event) {
-        let nodes = this.nodes.filter(
-            item => item.x <= this.cursorToChartOffset.x &&
-                (item.x + 120) >= this.cursorToChartOffset.x &&
-                item.y <= this.cursorToChartOffset.y &&
-                (item.y + 60) >= this.cursorToChartOffset.y);
-        if (nodes.length <= 0) {
+        if (!this.hoveredNode) {
           let element = document.getElementById('chart');
           let x = event.pageX - getOffsetLeft(element) - 60;
           let y = event.pageY - getOffsetTop(element) - 30;
           this.add(x, y);
         } else {
-          let node = nodes[0];
-          this.$emit('editnode', node);
+          this.$emit('editnode', this.hoveredNode);
         }
       },
-      handleNodeConnectorMouseDown(sourceNode, position) {
-        if (sourceNode.type === 'end') {
-          return;
-        }
-        this.connectingInfo.source = sourceNode;
-        this.connectingInfo.sourcePosition = position;
-      },
-      async handleNodeConnectorMouseMove(node, position) {
-        if (this.connectingInfo.source) {
-          await this.refresh();
-          let sourceOffset = this.getNodeConnectorOffset(
-              this.connectingInfo.source.id,
-              this.connectingInfo.sourcePosition,
-          );
-          let destinationOffset = this.getNodeConnectorOffset(node.id, position);
-          this.arrowTo(
-              sourceOffset.x,
-              sourceOffset.y,
-              destinationOffset.x,
-              destinationOffset.y,
-              this.connectingInfo.sourcePosition,
-              position,
-          );
-        }
-      },
-      async handleNodeConnectorMouseUp(destination, position) {
-        if (this.connectingInfo.source) {
-          if (this.connectingInfo.source.id !== destination.id) {
-            // Node can't connect to itself
-            let tempId = +new Date();
-            this.internalConnections.push({
-              source: {
-                id: this.connectingInfo.source.id,
-                position: this.connectingInfo.sourcePosition,
-              },
-              destination: {id: destination.id, position: position},
-              id: tempId,
-            });
-            await this.refresh();
-
-            this.addConnection(
-                this.connectingInfo.source.id,
-                this.connectingInfo.sourcePosition,
-                destination.id,
-                position,
-                tempId,
-                'pass',
-                '通过',
-            );
-          }
-        }
+      getConnectorPosition(node) {
+        let top = {x: node.x + 60, y: node.y};
+        let left = {x: node.x, y: node.y + 30};
+        let bottom = {x: node.x + 60, y: node.y + 60};
+        let right = {x: node.x + 120, y: node.y + 30};
+        return {left, right, top, bottom};
       },
       addConnection(sourceId, sourcePosition, destinationId, destinationPosition, id, type, name) {
         this.connectionForm.operation = 'add';
@@ -339,6 +318,10 @@
         return new Promise(function(resolve) {
           that.$nextTick(function() {
             clearCanvas('canvas');
+
+            let connectorVisible = that.hoveredConnector || that.connectingInfo.source ||
+                that.hoveredNode;
+            // render nodes
             that.internalNodes.forEach(node => {
               if (that.movingInfo.target) {
                 let expectX = Math.round(Math.round(this.movingInfo.target.x) / 10) * 10;
@@ -347,25 +330,13 @@
               }
 
               if (node === that.currentNode) {
-                that.rect(node.x, node.y, '#999999');
+                that.renderNode(node, '#666666', connectorVisible);
               } else {
-                that.rect(node.x, node.y, '#dadce0');
+                that.renderNode(node, '#bbbbbb', connectorVisible);
               }
-              fillRect('canvas', node.x, node.y, 120, 60, 'white');
-              fillRect('canvas', node.x, node.y, 120, 20, '#f1f3f4');
-              let font = '13px "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif';
-              fillText('canvas', node.x + 4, node.y + 15, node.name, 112, 'black',
-                  font, 'start');
-              let text = node.type === 'start' ? '提交' : (node.type === 'end' ? '完成' : (
-                      node.approvers.length === 0 ? '无审批人' : (
-                          node.approvers.length > 1 ? `${node.approvers[0].name}等` :
-                              node.approvers[0].name
-                      )
-                  )
-              );
-              fillText('canvas', node.x + 60, node.y + 45, text, 112, 'black',
-                  font, 'center');
             });
+
+            // render lines
             that.lines = [];
             that.internalConnections.forEach(conn => {
               let sourcePosition = that.getNodeConnectorOffset(
@@ -403,13 +374,8 @@
         });
       },
       getNodeConnectorOffset(nodeId, connectorPosition) {
-        let nodeElement = document.getElementsByName('node-' + nodeId)[0];
-        let connector = nodeElement.querySelector('.node-connector-' + connectorPosition);
-        let chartElement = document.getElementById('chart');
-        return {
-          x: getOffsetLeft(connector) - getOffsetLeft(chartElement) + 3,
-          y: getOffsetTop(connector) - getOffsetTop(chartElement) + 3,
-        };
+        let node = this.nodes.filter(item => item.id === nodeId)[0];
+        return this.getConnectorPosition(node)[connectorPosition];
       },
       lineTo(x1, y1, x2, y2, dash) {
         lineTo('canvas', x1, y1, x2, y2, 1, '#a3a3a3', dash);
@@ -417,8 +383,31 @@
       arrowTo(x1, y1, x2, y2, startPosition, endPosition, color) {
         return arrow2('canvas', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
       },
-      rect(x, y, color) {
-        rect('canvas', x, y, 120, 60, 1, color);
+      renderNode(node, borderColor, connectorVisible) {
+        rect('canvas', node.x, node.y, 120, 60, 1, borderColor);
+        fillRect('canvas', node.x, node.y, 120, 60, 'white');
+        fillRect('canvas', node.x, node.y, 120, 20, '#f1f3f4');
+        if (connectorVisible) {
+          let connectorPosition = this.getConnectorPosition(node);
+          for (let position in connectorPosition) {
+            let positionElement = connectorPosition[position];
+            fillArc('canvas', positionElement.x, positionElement.y, 3, 'white');
+            arc('canvas', positionElement.x, positionElement.y, 3, '#bbbbbb');
+          }
+        }
+
+        let font = '13px "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif';
+        fillText('canvas', node.x + 4, node.y + 15, node.name, 112, 'black',
+            font, 'start');
+        let text = node.type === 'start' ? '提交' : (node.type === 'end' ? '完成' : (
+                node.approvers.length === 0 ? '无审批人' : (
+                    node.approvers.length > 1 ? `${node.approvers[0].name}等` :
+                        node.approvers[0].name
+                )
+            )
+        );
+        fillText('canvas', node.x + 60, node.y + 45, text, 112, 'black',
+            font, 'center');
       },
       handleClickRemoveConnection() {
         this.removeConnection(this.connectionForm.id);
@@ -530,11 +519,44 @@
         }
         return null;
       },
+      hoveredNode() {
+        let nodes = this.nodes.filter(
+            item => item.x <= this.cursorToChartOffset.x &&
+                (item.x + 120) >= this.cursorToChartOffset.x &&
+                item.y <= this.cursorToChartOffset.y &&
+                (item.y + 60) >= this.cursorToChartOffset.y);
+        if (nodes.length <= 0) {
+          return null;
+        }
+
+        return nodes[0];
+      },
+      hoveredConnector() {
+        if (!this.hoveredNode) {
+          return;
+        }
+
+        let connectorPosition = this.getConnectorPosition(this.hoveredNode);
+        for (let prop in connectorPosition) {
+          let entry = connectorPosition[prop];
+          if (Math.hypot(entry.x - this.cursorToChartOffset.x,
+              entry.y - this.cursorToChartOffset.y) < 10) {
+            return {position: prop, node: this.hoveredNode};
+          }
+        }
+        return null;
+      },
       cursor() {
-        if (this.connectingInfo.source) {
+        if (this.connectingInfo.source || this.hoveredConnector) {
           return 'crosshair';
         }
-        return this.hoveredConnection != null ? 'pointer' : null;
+        if (this.hoveredConnection != null) {
+          return 'pointer';
+        }
+        if (this.hoveredNode) {
+          return 'move';
+        }
+        return null;
       },
     },
   };
