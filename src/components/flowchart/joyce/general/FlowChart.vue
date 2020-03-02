@@ -144,9 +144,8 @@
         this.$emit('editnode', this.hoveredNode);
       },
       async handleChartMouseMove(event) {
-        let element = document.getElementById('chart');
-        this.cursorToChartOffset.x = event.pageX - getOffsetLeft(element);
-        this.cursorToChartOffset.y = event.pageY - getOffsetTop(element);
+        this.cursorToChartOffset.x = event.offsetX;
+        this.cursorToChartOffset.y = event.offsetY;
         if (this.movingInfo.target) {
           this.movingInfo.target.x = this.cursorToChartOffset.x - this.movingInfo.offsetX;
           this.movingInfo.target.y = this.cursorToChartOffset.y - this.movingInfo.offsetY;
@@ -246,11 +245,10 @@
                   'pass',
                   '通过',
               );
-
-              this.connectingInfo.source = null;
-              this.connectingInfo.sourcePosition = null;
             }
           }
+          this.connectingInfo.source = null;
+          this.connectingInfo.sourcePosition = null;
         }
 
         if (this.hoveredConnection != null) {
@@ -276,10 +274,8 @@
       },
       handleChartDblClick(event) {
         if (!this.hoveredNode) {
-          let element = document.getElementById('chart');
-          let x = event.pageX - getOffsetLeft(element) - 60;
-          let y = event.pageY - getOffsetTop(element) - 30;
-          this.add(x, y);
+          this.add(event.offsetX, event.offsetY);
+          this.refresh();
         } else {
           this.$emit('editnode', this.hoveredNode);
         }
@@ -374,7 +370,7 @@
         });
       },
       getNodeConnectorOffset(nodeId, connectorPosition) {
-        let node = this.nodes.filter(item => item.id === nodeId)[0];
+        let node = this.internalNodes.filter(item => item.id === nodeId)[0];
         return this.getConnectorPosition(node)[connectorPosition];
       },
       lineTo(x1, y1, x2, y2, dash) {
@@ -400,7 +396,7 @@
         fillText('canvas', node.x + 4, node.y + 15, node.name, 112, 'black',
             font, 'start');
         let text = node.type === 'start' ? '提交' : (node.type === 'end' ? '完成' : (
-                node.approvers.length === 0 ? '无审批人' : (
+                (!node.approvers || node.approvers.length === 0) ? '无审批人' : (
                     node.approvers.length > 1 ? `${node.approvers[0].name}等` :
                         node.approvers[0].name
                 )
@@ -520,7 +516,7 @@
         return null;
       },
       hoveredNode() {
-        let nodes = this.nodes.filter(
+        let nodes = this.internalNodes.filter(
             item => item.x <= this.cursorToChartOffset.x &&
                 (item.x + 120) >= this.cursorToChartOffset.x &&
                 item.y <= this.cursorToChartOffset.y &&
