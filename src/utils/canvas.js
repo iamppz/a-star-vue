@@ -147,30 +147,38 @@ function arrow2(
   }
   switch (direction) {
     case 'lu': {
-      if (startPosition === 'right' && endPosition === 'left') {
-        addHorizontalCenterLine();
-      } else if (startPosition === 'right' && endPosition === 'right') {
-        addSecondXPenultY();
-      } else if (startPosition === 'right' && endPosition === 'top') {
-        addSecondXPenultY();
-      } else if (startPosition === 'right' && endPosition === 'bottom') {
-        addHorizontalCenterLine();
-      } else if (startPosition === 'bottom' && endPosition === 'left') {
-        addPenultXSecondY();
-      } else if (startPosition === 'bottom' && endPosition === 'bottom') {
-        addPenultXSecondY();
-      } else if (startPosition === 'bottom' && endPosition === 'right') {
-        addPenultXSecondY();
-      } else if (startPosition === 'bottom' && endPosition === 'top') {
-        addVerticalCenterLine();
-      } else if (startPosition === 'top' && endPosition === 'right') {
-        addSecondXPenultY();
-      } else if (startPosition === 'top' && endPosition === 'left') {
-        addHorizontalCenterLine();
-      } else if (startPosition === 'top' && endPosition === 'top') {
-        addSecondXPenultY();
-      } else if (startPosition === 'top' && endPosition === 'bottom') {
-        addHorizontalCenterLine();
+      if (startPosition === 'right') {
+        switch (endPosition) {
+          case 'top':
+          case 'right':
+            addSecondXPenultY();
+            break;
+          default: {
+            addHorizontalCenterLine();
+            break;
+          }
+        }
+      } else if (startPosition === 'bottom') {
+        switch (endPosition) {
+          case 'top':
+            addVerticalCenterLine();
+            break;
+          default: {
+            addPenultXSecondY();
+            break;
+          }
+        }
+      } else if (startPosition === 'top') {
+        switch (endPosition) {
+          case 'top':
+          case 'right':
+            addSecondXPenultY();
+            break;
+          default: {
+            addHorizontalCenterLine();
+            break;
+          }
+        }
       } else {
         // startPosition is left
         switch (endPosition) {
