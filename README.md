@@ -1,4 +1,4 @@
-# joyce-frontend
+# Joyce
 
 ### Usage
 
