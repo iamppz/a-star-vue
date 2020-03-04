@@ -1,10 +1,24 @@
 <template>
     <div>
-        <flow-chart v-if="loaded" :nodes="nodes" :connections="connections"
-                    @editnode="handleEditNode"
-                    @save="handleChartSave"></flow-chart>
-        <flow-chart-node-dialog :visible.sync="nodeDialogVisible" :node.sync="editingInfo.target">
-        </flow-chart-node-dialog>
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/app/home' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>系统设置</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/app/workflow/config/list' }">
+                流程设置
+            </el-breadcrumb-item>
+            <el-breadcrumb-item>详情</el-breadcrumb-item>
+        </el-breadcrumb>
+        <el-tabs v-model="tab" id="tab">
+            <el-tab-pane label="流程设置" name="chart">
+                <flow-chart v-if="loaded" :nodes="nodes" :connections="connections"
+                            @editnode="handleEditNode"
+                            @save="handleChartSave"></flow-chart>
+                <flow-chart-node-dialog :visible.sync="nodeDialogVisible"
+                                        :node.sync="editingInfo.target">
+                </flow-chart-node-dialog>
+            </el-tab-pane>
+            <el-tab-pane label="表单设计" name="form">配置管理</el-tab-pane>
+        </el-tabs>
     </div>
 </template>
 <script>
@@ -24,10 +38,11 @@
           target: null,
         },
         nodeDialogVisible: false,
+        tab: 'chart',
       };
     },
     async mounted() {
-      const response = await processService.getNodes(1);
+      const response = await processService.getNodes(this.$route.query.id);
       if (response.data.success) {
         this.nodes = response.data.data.map(item => {
           return {
@@ -68,7 +83,7 @@
             name: node.name,
             state: node.type,
             approvers: node.approvers,
-            processDefinitionId: 1,
+            processDefinitionId: this.$route.query.id,
           };
           result.transitions = connections.filter(conn => conn.source.id === node.id).map(conn => {
             return {
@@ -97,3 +112,8 @@
     },
   };
 </script>
+<style>
+    #tab {
+        margin-top: 20px;
+    }
+</style>
