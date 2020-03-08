@@ -47,17 +47,16 @@
                 <el-button type="primary" @click="handleClickSaveNode">确定</el-button>
             </span>
         </el-dialog>
-        <user-picker :visible.sync="userPickerVisible" @select="handleUserPickerSelect"
-                     :selected="approverIds">
-        </user-picker>
+        <!--        <user-picker :visible.sync="userPickerVisible" @select="handleUserPickerSelect"-->
+        <!--                     :selected="approverIds">-->
+        <!--        </user-picker>-->
     </div>
 </template>
 <script>
-  import UserPicker from '../../UserPicker';
   import {Avatar} from 'ant-design-vue';
 
   export default {
-    components: {UserPicker, Avatar},
+    components: {Avatar},
     props: {
       visible: {
         type: Boolean,
@@ -118,6 +117,8 @@
       approverIds() {
         return this.nodeForm.approvers.map(item => item.id);
       },
+    },
+    mounted() {
     },
   };
 </script>

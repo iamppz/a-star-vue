@@ -43,9 +43,9 @@
     </el-dialog>
 </template>
 <script>
-  import DepartmentTree from './DepartmentTree';
+  import DepartmentTree from '../DepartmentTree';
   import {Avatar} from 'ant-design-vue';
-  import userService from '../service/userService';
+  import userService from '../../service/userService';
 
   export default {
     props: {
@@ -92,6 +92,9 @@
       },
       handleClickOk() {
         this.$emit('select', this.selectedUsers);
+      },
+      show() {
+        this.visible = true;
       },
     },
     async mounted() {

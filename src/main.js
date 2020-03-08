@@ -5,9 +5,11 @@ import 'ant-design-vue/dist/antd.css';
 import './assets/styles.css';
 import './assets/element.css';
 import router from "./router";
+import UserPicker from './components/UserPicker/index';
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
+Vue.use(UserPicker);
 
 new Vue({
     el: '#app',
