@@ -555,5 +555,14 @@
         return null;
       },
     },
+    watch: {
+      internalNodes: {
+        immediate: true,
+        deep: true,
+        handler() {
+          this.refresh();
+        },
+      },
+    }
   };
 </script>

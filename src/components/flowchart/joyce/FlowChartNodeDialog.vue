@@ -74,7 +74,7 @@
         this.$emit('update:node', Object.assign(this.node, {
           name: this.nodeForm.name,
           type: this.nodeForm.type,
-          approvers: this.nodeForm.approvers,
+          approvers: this.nodeForm.approvers.map(item => Object.assign({}, item)),
         }));
         this.$emit('update:visible', false);
       },
