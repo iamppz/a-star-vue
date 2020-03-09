@@ -36,7 +36,7 @@
                             </el-dropdown>
                         </template>
                         <el-button size="small" style="margin-left: 8px;" type="text"
-                                   @click="userPickerVisible = true">
+                                   @click="handleClickAddApprover">
                             添加
                         </el-button>
                     </div>
@@ -47,9 +47,6 @@
                 <el-button type="primary" @click="handleClickSaveNode">确定</el-button>
             </span>
         </el-dialog>
-        <!--        <user-picker :visible.sync="userPickerVisible" @select="handleUserPickerSelect"-->
-        <!--                     :selected="approverIds">-->
-        <!--        </user-picker>-->
     </div>
 </template>
 <script>
@@ -69,7 +66,6 @@
     },
     data: function() {
       return {
-        userPickerVisible: false,
         nodeForm: {name: null, id: null, type: null, approvers: []},
       };
     },
@@ -85,18 +81,20 @@
       handleClickCancelSaveNode() {
         this.$emit('update:visible', false);
       },
-      handleUserPickerSelect(users) {
-        this.nodeForm.approvers.splice(0, this.nodeForm.approvers.length);
-        users.forEach(u => {
-          this.nodeForm.approvers.push(u);
-        });
-        this.userPickerVisible = false;
-      },
       handleCommand(cmd) {
         let id = parseInt(cmd.split('-')[1]);
         let user = this.nodeForm.approvers.filter(item => item.id === id)[0];
         let indexOf = this.nodeForm.approvers.indexOf(user);
         this.nodeForm.approvers.splice(indexOf, 1);
+      },
+      handleClickAddApprover() {
+        let that = this;
+        that.$userPicker.show(that.approverIds, function(selectedUsers) {
+          that.nodeForm.approvers.splice(0, that.nodeForm.approvers.length);
+          selectedUsers.forEach(u => {
+            that.nodeForm.approvers.push(u);
+          });
+        });
       },
     },
     watch: {

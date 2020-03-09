@@ -53,9 +53,9 @@
         type: Boolean,
         default: false,
       },
-      selected: {
-        type: Array,
-        default: () => [],
+      callback: {
+        type: Function,
+        default: null,
       },
     },
     data: function() {
@@ -70,7 +70,7 @@
     },
     methods: {
       handleClickUser(user) {
-        if (this.selectedUsers.indexOf(user) > -1) {
+        if (this.selectedUsers.findIndex(item => item.id === user.id) > -1) {
           return;
         }
         this.selectedUsers.push(user);
@@ -88,29 +88,22 @@
         }
       },
       handleClickCancel() {
-        this.$emit('update:visible', false);
+        this.visible = false;
       },
       handleClickOk() {
-        this.$emit('select', this.selectedUsers);
+        this.visible = false;
+        this.callback(this.selectedUsers);
       },
-      show() {
+      async show(selected, callback) {
         this.visible = true;
-      },
-    },
-    async mounted() {
-      let resp = await userService.getAllEnabledByDepartmentId(null);
-      if (resp.data.success) {
-        this.allUsers = resp.data.data;
-      }
-    },
-    watch: {
-      selected: {
-        immediate: true,
-        handler(val) {
-          this.selectedUsers = this.allUsers.filter(item => {
-            return val.indexOf(item.id) > -1;
-          });
-        },
+        let resp = await userService.getAllEnabledByDepartmentId(null);
+        if (resp.data.success) {
+          this.allUsers = resp.data.data;
+        }
+        this.selectedUsers = this.allUsers.filter(item => {
+          return selected.indexOf(item.id) > -1;
+        });
+        this.callback = callback;
       },
     },
   };
