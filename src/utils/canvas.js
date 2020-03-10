@@ -1,6 +1,20 @@
+import * as d3 from 'd3';
+
 function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, dash) {
   let sta = [x1, y1];
   let end = [x2, y2];
+  let lineGenerator = d3.line().x(function(d) {
+    return d[0];
+  }).y(function(d) {
+    return d[1];
+  });
+  let svg = d3.select('#svg');
+  let path = svg.append('path').
+      attr('stroke', strokeStyle).
+      attr('stroke-width', lineWidth).
+      attr('fill', 'none').
+      attr('d', lineGenerator([sta, end])).
+      style('cursor', 'pointer');
   let canvas = document.getElementById(canId);
   let ctx = canvas.getContext('2d');
   if (dash) {
@@ -21,6 +35,7 @@ function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, dash) {
     ctx.setLineDash([]);
   }
   ctx.save();
+  return path;
 }
 
 function clearCanvas(canId) {
@@ -602,6 +617,7 @@ function arrow2(
   points.push(end);
 
   let lines = [];
+  let paths = [];
   for (let i = 0; i < points.length; i++) {
     let source = points[i];
     let destination = points[i + 1];
@@ -612,7 +628,7 @@ function arrow2(
       destinationY: destination[1],
     });
     if (i === points.length - 2) {
-      arrowTo(
+      let path = arrowTo(
           canId,
           source[0],
           source[1],
@@ -621,9 +637,10 @@ function arrow2(
           lineWidth,
           strokeStyle,
       );
+      paths.push(path);
       break;
     } else {
-      lineTo(
+      let path = lineTo(
           canId,
           source[0],
           source[1],
@@ -632,13 +649,30 @@ function arrow2(
           lineWidth,
           strokeStyle,
       );
+      paths.push(path);
     }
   }
-  return lines;
+  return {lines, paths};
 }
 
 function arrowTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle) {
-  lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle);
+  let path = lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle);
+  let svg = d3.select('#svg');
+  let marker =
+      svg.append('marker').
+          attr('id', 'arrow').
+          attr('markerUnits', 'strokeWidth')//设置为strokeWidth箭头会随着线的粗细发生变化
+          .attr('viewBox', '0 0 12 12')//坐标系的区域
+          .attr('refX', 9)//箭头坐标
+          .attr('refY', 6).
+          attr('markerWidth', 12).
+          attr('markerHeight', 12).
+          attr('orient', 'auto')//绘制方向，可设定为：auto（自动确认方向）和 角度值
+          .append('path').
+          attr('d', 'M2,2 L10,6 L2,10 L6,6 L2,2')//箭头的路径
+          .attr('fill', strokeStyle);//箭头颜色
+  path.attr('marker-end', 'url(#arrow)');
+
   let sta = [x1, y1];
   let end = [x2, y2];
   let canvas = document.getElementById(canId);
@@ -659,6 +693,7 @@ function arrowTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle) {
   ctx.fill();
   ctx.restore();
   ctx.closePath();
+  return path;
 }
 
 function getDirection(x1, y1, x2, y2) {

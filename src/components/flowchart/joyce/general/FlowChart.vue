@@ -17,6 +17,7 @@
         >
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <canvas id="canvas" width="800" height="600"/>
+            <svg width="800" height="600" id="svg" style="margin-left: 800px;"></svg>
         </div>
         <el-dialog title="编辑" :visible.sync="connectionDialogVisible" width="440px"
                    :before-close="handleClickCancelSaveConnection"
@@ -62,9 +63,9 @@
     arc,
     fillArc,
   } from '../../../../utils/canvas';
-  import {getOffsetLeft, getOffsetTop} from '../../../../utils/dom';
   import {between, distanceOfPointToLine} from '../../../../utils/math';
   import '../../../../assets/flowchart.css';
+  import * as d3 from 'd3';
 
   export default {
     props: {
@@ -250,18 +251,6 @@
           this.connectingInfo.source = null;
           this.connectingInfo.sourcePosition = null;
         }
-
-        if (this.hoveredConnection != null) {
-          this.editConnection(
-              this.hoveredConnection.source.id,
-              this.hoveredConnection.source.position,
-              this.hoveredConnection.destination,
-              this.hoveredConnection.destination.position,
-              this.hoveredConnection.id,
-              this.hoveredConnection.type,
-              this.hoveredConnection.name,
-          );
-        }
       },
       async removeConnection(id) {
         let connections = this.internalConnections.filter(item => item.id === id);
@@ -314,6 +303,7 @@
         return new Promise(function(resolve) {
           that.$nextTick(function() {
             clearCanvas('canvas');
+            d3.selectAll('svg > *').remove();
 
             let connectorVisible = that.hoveredConnector || that.connectingInfo.source ||
                 that.hoveredNode;
@@ -343,7 +333,7 @@
                   conn.destination.id,
                   conn.destination.position,
               );
-              let lines = that.arrowTo(
+              let result = that.arrowTo(
                   sourcePosition.x,
                   sourcePosition.y,
                   destinationPosition.x,
@@ -355,13 +345,27 @@
                     reject: 'red',
                   }[conn.type],
               );
-              for (const line of lines) {
+              for (const line of result.lines) {
                 that.lines.push({
                   sourceX: line.sourceX,
                   sourceY: line.sourceY,
                   destinationX: line.destinationX,
                   destinationY: line.destinationY,
                   id: conn.id,
+                });
+              }
+
+              for (const path of result.paths) {
+                path.on('click', function() {
+                  that.editConnection(
+                      conn.source.id,
+                      conn.source.position,
+                      conn.destination,
+                      conn.destination.position,
+                      conn.id,
+                      conn.type,
+                      conn.name,
+                  );
                 });
               }
             });
@@ -380,6 +384,36 @@
         return arrow2('canvas', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
       },
       renderNode(node, borderColor, connectorVisible) {
+        let svg = d3.select('#svg');
+        let container = svg.append('rect').
+            attr('x', node.x).
+            attr('y', node.y).
+            attr('width', 120).
+            attr('height', 60).
+            attr('stroke', borderColor).
+            attr('stroke-width', '1px').
+            attr('fill', 'white');
+        let header = svg.append('rect').
+            attr('x', node.x).
+            attr('y', node.y).
+            attr('width', 120).
+            attr('height', 20).
+            attr('stroke', borderColor).
+            attr('stroke-width', '1px').
+            attr('fill', '#f1f3f4');
+        let title = svg.append('text').
+            attr('x', node.x + 4).
+            attr('y', node.y + 15).
+            text(function() {return node.name;}).each(function wrap() {
+              let self = d3.select(this),
+                  textLength = self.node().getComputedTextLength(),
+                  text = self.text();
+              while (textLength > (120 - 2 * 4) && text.length > 0) {
+                text = text.slice(0, -1);
+                self.text(text + '...');
+                textLength = self.node().getComputedTextLength();
+              }
+            });
         rect('canvas', node.x, node.y, 120, 60, 1, borderColor);
         fillRect('canvas', node.x, node.y, 120, 60, 'white');
         fillRect('canvas', node.x, node.y, 120, 20, '#f1f3f4');
@@ -387,6 +421,13 @@
           let connectorPosition = this.getConnectorPosition(node);
           for (let position in connectorPosition) {
             let positionElement = connectorPosition[position];
+            svg.append('circle').
+                attr('cx', positionElement.x).
+                attr('cy', positionElement.y).
+                attr('r', 3).
+                attr('stroke', '#bbbbbb').
+                attr('stroke-width', '1px').
+                attr('fill', 'white');
             fillArc('canvas', positionElement.x, positionElement.y, 3, 'white');
             arc('canvas', positionElement.x, positionElement.y, 3, '#bbbbbb');
           }
@@ -404,6 +445,20 @@
         );
         fillText('canvas', node.x + 60, node.y + 45, text, 112, 'black',
             font, 'center');
+        let content = svg.append('text').
+            attr('x', node.x + 60).
+            attr('y', node.y + 45).
+            attr('text-anchor', 'middle').
+            text(function() {return text;}).each(function wrap() {
+              let self = d3.select(this),
+                  textLength = self.node().getComputedTextLength(),
+                  text = self.text();
+              while (textLength > (120 - 2 * 4) && text.length > 0) {
+                text = text.slice(0, -1);
+                self.text(text + '...');
+                textLength = self.node().getComputedTextLength();
+              }
+            });
       },
       handleClickRemoveConnection() {
         this.removeConnection(this.connectionForm.id);
@@ -420,10 +475,12 @@
       },
       async handleClickCancelSaveConnection() {
         this.connectionDialogVisible = false;
-        let connection = this.internalConnections.filter(
-            conn => conn.id === this.connectionForm.id)[0];
-        this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
-        await this.refresh();
+        if (this.connectionForm.operation === 'add') {
+          let connection = this.internalConnections.filter(
+              conn => conn.id === this.connectionForm.id)[0];
+          this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
+          await this.refresh();
+        }
       },
       save() {
         this.$emit('save', this.internalNodes, this.internalConnections);
@@ -494,27 +551,6 @@
       };
     },
     computed: {
-      hoveredConnection() {
-        for (const line of this.lines) {
-          let distance = distanceOfPointToLine(
-              line.sourceX,
-              line.sourceY,
-              line.destinationX,
-              line.destinationY,
-              this.cursorToChartOffset.x,
-              this.cursorToChartOffset.y,
-          );
-          if (
-              distance < 5 &&
-              between(line.sourceX - 2, line.destinationX + 2, this.cursorToChartOffset.x) &&
-              between(line.sourceY - 2, line.destinationY + 2, this.cursorToChartOffset.y)
-          ) {
-            let connections = this.internalConnections.filter(item => item.id === line.id);
-            return connections.length > 0 ? connections[0] : null;
-          }
-        }
-        return null;
-      },
       hoveredNode() {
         let nodes = this.internalNodes.filter(
             item => item.x <= this.cursorToChartOffset.x &&
@@ -546,9 +582,6 @@
         if (this.connectingInfo.source || this.hoveredConnector) {
           return 'crosshair';
         }
-        if (this.hoveredConnection != null) {
-          return 'pointer';
-        }
         if (this.hoveredNode) {
           return 'move';
         }
@@ -563,6 +596,6 @@
           this.refresh();
         },
       },
-    }
+    },
   };
 </script>
