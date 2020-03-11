@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
+import {approximatelyEquals} from './math';
 
-function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, dash) {
+function lineTo(svgId, x1, y1, x2, y2, lineWidth, strokeStyle, dash) {
   let sta = [x1, y1];
   let end = [x2, y2];
   let lineGenerator = d3.line().x(function(d) {
@@ -8,7 +9,7 @@ function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, dash) {
   }).y(function(d) {
     return d[1];
   });
-  let svg = d3.select('#svg');
+  let svg = d3.select('#' + svgId);
   let path = svg.append('path').
       attr('stroke', strokeStyle).
       attr('stroke-width', lineWidth).
@@ -22,7 +23,7 @@ function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, dash) {
 }
 
 function arrow2(
-    canId, x1, y1, x2, y2, startPosition, endPosition, lineWidth, strokeStyle) {
+    svgId, x1, y1, x2, y2, startPosition, endPosition, lineWidth, strokeStyle) {
   let points = [];
   let start = [x1, y1];
   let end = [x2, y2];
@@ -606,7 +607,7 @@ function arrow2(
     });
     if (i === points.length - 2) {
       let path = arrowTo(
-          canId,
+          svgId,
           source[0],
           source[1],
           destination[0],
@@ -618,7 +619,7 @@ function arrow2(
       break;
     } else {
       let path = lineTo(
-          canId,
+          svgId,
           source[0],
           source[1],
           destination[0],
@@ -632,9 +633,9 @@ function arrow2(
   return {lines, paths};
 }
 
-function arrowTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle) {
-  let path = lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle);
-  let svg = d3.select('#svg');
+function arrowTo(svgId, x1, y1, x2, y2, lineWidth, strokeStyle) {
+  let path = lineTo(svgId, x1, y1, x2, y2, lineWidth, strokeStyle);
+  let svg = d3.select('#' + svgId);
   svg.append('marker').
       attr('id', 'arrow').
       attr('markerUnits', 'strokeWidth').
@@ -675,10 +676,6 @@ function getDirection(x1, y1, x2, y2) {
     return 'ld';
   }
   return 'rd';
-}
-
-function approximatelyEquals(n, m) {
-  return Math.abs(m - n) <= 3;
 }
 
 export {

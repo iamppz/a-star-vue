@@ -50,7 +50,7 @@
     </div>
 </template>
 <script>
-  import {lineTo, arrow2} from '../../../../utils/canvas';
+  import {lineTo, arrow2} from '../../../../utils/svg';
   import '../../../../assets/flowchart.css';
   import * as d3 from 'd3';
 
@@ -241,10 +241,10 @@
         return this.getConnectorPosition(node)[connectorPosition];
       },
       lineTo(x1, y1, x2, y2, dash) {
-        lineTo('canvas', x1, y1, x2, y2, 1, '#a3a3a3', dash);
+        lineTo('svg', x1, y1, x2, y2, 1, '#a3a3a3', dash);
       },
       arrowTo(x1, y1, x2, y2, startPosition, endPosition, color) {
-        return arrow2('canvas', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
+        return arrow2('svg', x1, y1, x2, y2, startPosition, endPosition, 1, color || '#a3a3a3');
       },
       renderNode(node, borderColor, connectorVisible) {
         let that = this;
