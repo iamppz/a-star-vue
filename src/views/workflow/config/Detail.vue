@@ -11,11 +11,16 @@
         <el-tabs v-model="tab" id="tab">
             <el-tab-pane label="流程设置" name="chart">
                 <flow-chart v-if="loaded" :nodes="nodes" :connections="connections"
-                            @editnode="handleEditNode"
-                            @save="handleChartSave"></flow-chart>
+                            @editnode="handleEditNode" @editconnection="handleEditConnection"
+                            @save="handleChartSave">
+                </flow-chart>
                 <flow-chart-node-dialog :visible.sync="nodeDialogVisible"
                                         :node.sync="editingInfo.target">
                 </flow-chart-node-dialog>
+                <flow-chart-connection-dialog :visible.sync="connectionDialogVisible"
+                                              :connection.sync="connectionEditingInfo.target"
+                                              :operation="connectionEditingInfo.operations">
+                </flow-chart-connection-dialog>
             </el-tab-pane>
             <el-tab-pane label="表单设计" name="form">配置管理</el-tab-pane>
         </el-tabs>
@@ -26,18 +31,20 @@
   import processService from '../../../service/processService';
   import {Message} from 'element-ui';
   import FlowChartNodeDialog from '../../../components/flowchart/joyce/FlowChartNodeDialog';
+  import FlowChartConnectionDialog
+    from '../../../components/flowchart/joyce/FlowChartConnectionDialog';
 
   export default {
-    components: {FlowChartNodeDialog, FlowChart},
+    components: {FlowChartConnectionDialog, FlowChartNodeDialog, FlowChart},
     data: function() {
       return {
         nodes: [],
         connections: [],
         loaded: false,
-        editingInfo: {
-          target: null,
-        },
+        editingInfo: {target: null},
+        connectionEditingInfo: {target: null},
         nodeDialogVisible: false,
+        connectionDialogVisible: false,
         tab: 'chart',
       };
     },
@@ -108,6 +115,10 @@
       handleEditNode(node) {
         this.editingInfo.target = node;
         this.nodeDialogVisible = true;
+      },
+      handleEditConnection(connection) {
+        this.connectionEditingInfo.target = connection;
+        this.connectionDialogVisible = true;
       },
     },
   };

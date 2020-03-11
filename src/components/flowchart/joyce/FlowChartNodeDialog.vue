@@ -101,6 +101,7 @@
       node: {
         immediate: true,
         handler(val) {
+          if (!val) { return; }
           this.nodeForm.id = val.id;
           this.nodeForm.name = val.name;
           this.nodeForm.type = val.type;

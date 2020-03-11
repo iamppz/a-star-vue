@@ -16,37 +16,7 @@
             <span id="position">{{ cursorToChartOffset.x + ', ' + cursorToChartOffset.y }}</span>
             <svg width="800" height="600" id="svg"></svg>
         </div>
-        <el-dialog title="编辑" :visible.sync="connectionDialogVisible" width="440px"
-                   :before-close="handleClickCancelSaveConnection"
-        >
-            <el-form ref="form" :model="connectionForm" label-width="80px">
-                <el-form-item label="名称">
-                    <el-input v-model="connectionForm.name"/>
-                </el-form-item>
-                <el-form-item label="类型">
-                    <el-select v-model="connectionForm.type" placeholder="请选择"
-                               style="width: 100%;"
-                    >
-                        <el-option :key="'connection-type-' + item.id"
-                                   v-for="item in [ { name: '通过', id: 'pass' }, { name: '驳回', id: 'reject' } ]"
-                                   :label="item.name"
-                                   :value="item.id"
-                        >
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="表达式">
-                    <el-input v-model="connectionForm.expression"/>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button v-if="connectionForm.operation === 'add'"
-                           @click="handleClickCancelSaveConnection">取消</el-button>
-                <el-button v-if="connectionForm.operation === 'edit'"
-                           @click="handleClickRemoveConnection">删除</el-button>
-                <el-button type="primary" @click="handleClickSaveConnection">确定</el-button>
-            </span>
-        </el-dialog>
+
     </div>
 </template>
 <script>
@@ -86,16 +56,6 @@
          * Mouse position(relative to chart div)
          */
         cursorToChartOffset: {x: 0, y: 0},
-        connectionDialogVisible: false,
-        connectionForm: {
-          type: null,
-          sourceId: null,
-          sourcePosition: null,
-          destinationId: null,
-          destinationPosition: null,
-          name: null,
-          expression: null,
-        },
         /**
          * lines of all internalConnections
          */
@@ -125,6 +85,8 @@
               this.cursorToChartOffset.y,
               this.connectingInfo.sourcePosition,
           );
+        } else {
+          await this.refresh();
         }
       },
       async removeConnection(id) {
@@ -147,27 +109,8 @@
         let right = {x: node.x + 120, y: node.y + 30};
         return {left, right, top, bottom};
       },
-      addConnection(sourceId, sourcePosition, destinationId, destinationPosition, id, type, name) {
-        this.connectionForm.operation = 'add';
-        this.connectionForm.sourceId = sourceId;
-        this.connectionForm.sourcePosition = sourcePosition;
-        this.connectionForm.destinationId = destinationId;
-        this.connectionForm.destinationPosition = destinationPosition;
-        this.connectionForm.id = id;
-        this.connectionForm.type = type;
-        this.connectionForm.name = name;
-        this.connectionDialogVisible = true;
-      },
-      editConnection(sourceId, sourcePosition, destinationId, destinationPosition, id, type, name) {
-        this.connectionForm.operation = 'edit';
-        this.connectionForm.sourceId = sourceId;
-        this.connectionForm.sourcePosition = sourcePosition;
-        this.connectionForm.destinationId = destinationId;
-        this.connectionForm.destinationPosition = destinationPosition;
-        this.connectionForm.id = id;
-        this.connectionForm.type = type;
-        this.connectionForm.name = name;
-        this.connectionDialogVisible = true;
+      editConnection(conn) {
+        this.$emit('editconnection', conn);
       },
       refresh() {
         let that = this;
@@ -220,15 +163,7 @@
 
               for (const path of result.paths) {
                 path.on('click', function() {
-                  that.editConnection(
-                      conn.source.id,
-                      conn.source.position,
-                      conn.destination,
-                      conn.destination.position,
-                      conn.id,
-                      conn.type,
-                      conn.name,
-                  );
+                  that.editConnection(conn);
                 });
               }
             });
@@ -261,15 +196,15 @@
             attr('x', node.x + 4).
             attr('y', node.y + 15).
             text(function() {return node.name;}).each(function wrap() {
-              let self = d3.select(this),
-                  textLength = self.node().getComputedTextLength(),
-                  text = self.text();
-              while (textLength > (120 - 2 * 4) && text.length > 0) {
-                text = text.slice(0, -1);
-                self.text(text + '...');
-                textLength = self.node().getComputedTextLength();
-              }
-            });
+          let self = d3.select(this),
+              textLength = self.node().getComputedTextLength(),
+              text = self.text();
+          while (textLength > (120 - 2 * 4) && text.length > 0) {
+            text = text.slice(0, -1);
+            self.text(text + '...');
+            textLength = self.node().getComputedTextLength();
+          }
+        });
         let text = node.type === 'start' ? '提交' : (node.type === 'end' ? '完成' : (
                 (!node.approvers || node.approvers.length === 0) ? '无审批人' : (
                     node.approvers.length > 1 ? `${node.approvers[0].name}等` :
@@ -290,15 +225,15 @@
             attr('y', node.y + 45).
             attr('text-anchor', 'middle').
             text(function() {return text;}).each(function wrap() {
-              let self = d3.select(this),
-                  textLength = self.node().getComputedTextLength(),
-                  text = self.text();
-              while (textLength > (120 - 2 * 4) && text.length > 0) {
-                text = text.slice(0, -1);
-                self.text(text + '...');
-                textLength = self.node().getComputedTextLength();
-              }
-            });
+          let self = d3.select(this),
+              textLength = self.node().getComputedTextLength(),
+              text = self.text();
+          while (textLength > (120 - 2 * 4) && text.length > 0) {
+            text = text.slice(0, -1);
+            self.text(text + '...');
+            textLength = self.node().getComputedTextLength();
+          }
+        });
         let drag = d3.drag().
             on('start', function() {
               that.currentNode = node;
@@ -340,8 +275,6 @@
             on('end', function() {
               node.x = Math.round(Math.round(node.x) / 10) * 10;
               node.y = Math.round(Math.round(node.y) / 10) * 10;
-              this.movingInfo.offsetX = null;
-              this.movingInfo.offsetY = null;
               that.refresh();
             });
         let container = svg.append('rect').
@@ -400,7 +333,7 @@
                 if (that.connectingInfo.source.id !== node.id) {
                   // Node can't connect to itself
                   let tempId = +new Date();
-                  that.internalConnections.push({
+                  let conn = {
                     source: {
                       id: that.connectingInfo.source.id,
                       position: that.connectingInfo.sourcePosition,
@@ -410,46 +343,19 @@
                       position: position,
                     },
                     id: tempId,
-                  });
+                    type: 'pass',
+                    name: '通过',
+                  };
+                  that.internalConnections.push(conn);
                   that.refresh();
 
-                  that.addConnection(
-                      that.connectingInfo.source.id,
-                      that.connectingInfo.sourcePosition,
-                      node.id,
-                      position,
-                      tempId,
-                      'pass',
-                      '通过',
-                  );
+                  that.editConnection(conn);
                 }
                 that.connectingInfo.source = null;
                 that.connectingInfo.sourcePosition = null;
               }
             });
           }
-        }
-      },
-      handleClickRemoveConnection() {
-        this.removeConnection(this.connectionForm.id);
-        this.connectionDialogVisible = false;
-      },
-      async handleClickSaveConnection() {
-        let connection = this.internalConnections.filter(
-            conn => conn.id === this.connectionForm.id)[0];
-        connection.type = this.connectionForm.type;
-        connection.name = this.connectionForm.name;
-        connection.expression = this.connectionForm.expression;
-        await this.refresh();
-        this.connectionDialogVisible = false;
-      },
-      async handleClickCancelSaveConnection() {
-        this.connectionDialogVisible = false;
-        if (this.connectionForm.operation === 'add') {
-          let connection = this.internalConnections.filter(
-              conn => conn.id === this.connectionForm.id)[0];
-          this.internalConnections.splice(this.internalConnections.indexOf(connection), 1);
-          await this.refresh();
         }
       },
       save() {

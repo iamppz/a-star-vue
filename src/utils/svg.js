@@ -265,9 +265,6 @@ function arrow2(
             addVerticalCenterLine();
             break;
           }
-          case 'bottom':
-            addVerticalRightLine();
-            break;
           default: {
             addPenultXSecondY();
             break;
