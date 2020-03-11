@@ -15,33 +15,10 @@ function lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle, dash) {
       attr('fill', 'none').
       attr('d', lineGenerator([sta, end])).
       style('cursor', 'pointer');
-  let canvas = document.getElementById(canId);
-  let ctx = canvas.getContext('2d');
   if (dash) {
-    ctx.setLineDash(dash);
+    path.style('stroke-dasharray', dash.join(','));
   }
-  ctx.beginPath();
-  ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = strokeStyle;
-  ctx.translate(0, 0, 0);
-  ctx.moveTo(sta[0], sta[1]);
-  ctx.translate(0, 0, 0);
-  ctx.moveTo(sta[0], sta[1]);
-  ctx.translate(0, 0, 0);
-  ctx.lineTo(end[0], end[1]);
-  ctx.fill();
-  ctx.stroke();
-  if (dash) {
-    ctx.setLineDash([]);
-  }
-  ctx.save();
   return path;
-}
-
-function clearCanvas(canId) {
-  let c = document.getElementById(canId);
-  let cxt = c.getContext('2d');
-  cxt.clearRect(0, 0, 800, 600);
 }
 
 function arrow2(
@@ -658,41 +635,19 @@ function arrow2(
 function arrowTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle) {
   let path = lineTo(canId, x1, y1, x2, y2, lineWidth, strokeStyle);
   let svg = d3.select('#svg');
-  let marker =
-      svg.append('marker').
-          attr('id', 'arrow').
-          attr('markerUnits', 'strokeWidth')//设置为strokeWidth箭头会随着线的粗细发生变化
-          .attr('viewBox', '0 0 12 12')//坐标系的区域
-          .attr('refX', 9)//箭头坐标
-          .attr('refY', 6).
-          attr('markerWidth', 12).
-          attr('markerHeight', 12).
-          attr('orient', 'auto')//绘制方向，可设定为：auto（自动确认方向）和 角度值
-          .append('path').
-          attr('d', 'M2,2 L10,6 L2,10 L6,6 L2,2')//箭头的路径
-          .attr('fill', strokeStyle);//箭头颜色
+  svg.append('marker').
+      attr('id', 'arrow').
+      attr('markerUnits', 'strokeWidth').
+      attr('viewBox', '0 0 12 12').
+      attr('refX', 9).
+      attr('refY', 6).
+      attr('markerWidth', 12).
+      attr('markerHeight', 12).
+      attr('orient', 'auto').
+      append('path').
+      attr('d', 'M2,2 L10,6 L2,10 L6,6 L2,2').
+      attr('fill', strokeStyle);
   path.attr('marker-end', 'url(#arrow)');
-
-  let sta = [x1, y1];
-  let end = [x2, y2];
-  let canvas = document.getElementById(canId);
-  let ctx = canvas.getContext('2d');
-  ctx.translate(end[0], end[1]);
-  let ang = (end[0] - sta[0]) / (end[1] - sta[1]);
-  ang = Math.atan(ang);
-  if (end[1] - sta[1] >= 0) {
-    ctx.rotate(-ang);
-  } else {
-    ctx.rotate(Math.PI - ang);
-  }
-  ctx.lineTo(-5, -10);
-  ctx.lineTo(0, -5);
-  ctx.lineTo(5, -10);
-  ctx.lineTo(0, 0);
-  ctx.fillStyle = strokeStyle;
-  ctx.fill();
-  ctx.restore();
-  ctx.closePath();
   return path;
 }
 
@@ -726,58 +681,9 @@ function approximatelyEquals(n, m) {
   return Math.abs(m - n) <= 3;
 }
 
-function rect(canId, x, y, width, height, lineWidth, strokeStyle, dash) {
-  lineTo(canId, x, y, x + width, y, lineWidth, strokeStyle, dash);
-  lineTo(canId, x + width, y, x + width, y + height, lineWidth, strokeStyle,
-      dash);
-  lineTo(canId, x + width, y + height, x, y + height, lineWidth, strokeStyle,
-      dash);
-  lineTo(canId, x, y + height, x, y, lineWidth, strokeStyle, dash);
-}
-
-function arc(canId, x, y, radius, color) {
-  let c = document.getElementById(canId);
-  let ctx = c.getContext('2d');
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-  ctx.stroke();
-}
-
-function fillArc(canId, x, y, radius, color) {
-  let c = document.getElementById(canId);
-  let ctx = c.getContext('2d');
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
-  ctx.fill();
-}
-
-function fillRect(canId, x, y, width, height, color) {
-  let canvas = document.getElementById(canId);
-  let ctx = canvas.getContext('2d');
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, width, height);
-}
-
-function fillText(canId, x, y, text, maxWidth, color, font, textAlign) {
-  let canvas = document.getElementById(canId);
-  let ctx = canvas.getContext('2d');
-  ctx.fillStyle = color;
-  ctx.font = font;
-  ctx.textAlign = textAlign;
-  ctx.fillText(text, x, y, maxWidth);
-}
-
 export {
   arrowTo,
   lineTo,
-  clearCanvas,
   getDirection,
   arrow2,
-  rect,
-  fillRect,
-  fillText,
-  arc,
-  fillArc,
 };
