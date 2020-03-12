@@ -23,6 +23,7 @@
   import {lineTo, arrow2} from '../../../../utils/svg';
   import '../../../../assets/flowchart.css';
   import * as d3 from 'd3';
+  import {Message} from 'element-ui';
 
   export default {
     props: {
@@ -56,10 +57,6 @@
          * Mouse position(relative to chart div)
          */
         cursorToChartOffset: {x: 0, y: 0},
-        /**
-         * lines of all internalConnections
-         */
-        lines: [],
       };
     },
     methods: {
@@ -67,7 +64,11 @@
         this.internalNodes.push({id: +new Date(), x: x, y: y, name: '新建节点', type: 'operation'});
       },
       edit() {
-
+        if (this.currentNode) {
+          this.$emit('editnode', this.currentNode);
+        } else {
+          Message.error('未选中任何节点');
+        }
       },
       async handleChartMouseMove(event) {
         this.cursorToChartOffset.x = event.offsetX;
@@ -129,7 +130,6 @@
             });
 
             // render lines
-            that.lines = [];
             that.internalConnections.forEach(conn => {
               let sourcePosition = that.getNodeConnectorOffset(
                   conn.source.id,
@@ -151,16 +151,6 @@
                     reject: 'red',
                   }[conn.type],
               );
-              for (const line of result.lines) {
-                that.lines.push({
-                  sourceX: line.sourceX,
-                  sourceY: line.sourceY,
-                  destinationX: line.destinationX,
-                  destinationY: line.destinationY,
-                  id: conn.id,
-                });
-              }
-
               for (const path of result.paths) {
                 path.on('click', function() {
                   that.editConnection(conn);
