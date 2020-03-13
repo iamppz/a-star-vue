@@ -9,6 +9,9 @@
             <el-breadcrumb-item>详情</el-breadcrumb-item>
         </el-breadcrumb>
         <el-tabs v-model="tab" id="tab">
+            <el-tab-pane label="表单设计" name="form">
+                <dynamic-form :form-id="1"></dynamic-form>
+            </el-tab-pane>
             <el-tab-pane label="流程设置" name="chart">
                 <flow-chart v-if="loaded" :nodes="nodes" :connections="connections"
                             @editnode="handleEditNode" @editconnection="handleEditConnection"
@@ -22,7 +25,6 @@
                                               :operation="connectionEditingInfo.operations">
                 </flow-chart-connection-dialog>
             </el-tab-pane>
-            <el-tab-pane label="表单设计" name="form">配置管理</el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -33,9 +35,10 @@
   import FlowChartNodeDialog from '../../../components/flowchart/joyce/FlowChartNodeDialog';
   import FlowChartConnectionDialog
     from '../../../components/flowchart/joyce/FlowChartConnectionDialog';
+  import DynamicForm from '../../../components/form/DynamicForm';
 
   export default {
-    components: {FlowChartConnectionDialog, FlowChartNodeDialog, FlowChart},
+    components: {DynamicForm, FlowChartConnectionDialog, FlowChartNodeDialog, FlowChart},
     data: function() {
       return {
         nodes: [],
@@ -45,7 +48,7 @@
         connectionEditingInfo: {target: null},
         nodeDialogVisible: false,
         connectionDialogVisible: false,
-        tab: 'chart',
+        tab: 'form',
       };
     },
     async mounted() {
