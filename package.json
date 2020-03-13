@@ -15,7 +15,7 @@
     "css-loader": "^2.1.0",
     "d3": "^5.15.0",
     "echarts": "^4.2.1",
-    "element-ui": "2.6.3",
+    "element-ui": "2.13.0",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
     "lodash": "^4.17.11",
