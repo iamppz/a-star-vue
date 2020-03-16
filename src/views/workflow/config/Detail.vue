@@ -10,7 +10,8 @@
         </el-breadcrumb>
         <el-tabs v-model="tab" id="tab">
             <el-tab-pane label="表单设计" name="form">
-                <dynamic-form :form-id="1" data-id="2"></dynamic-form>
+                <dynamic-form-designer :style="{ height: formDesignerHeight }">
+                </dynamic-form-designer>
             </el-tab-pane>
             <el-tab-pane label="流程设置" name="chart">
                 <flow-chart v-if="loaded" :nodes="nodes" :connections="connections"
@@ -36,9 +37,13 @@
   import FlowChartConnectionDialog
     from '../../../components/flowchart/joyce/FlowChartConnectionDialog';
   import DynamicForm from '../../../components/form/DynamicForm';
+  import DynamicFormDesigner from '../../../components/form/DynamicFormDesigner';
 
   export default {
-    components: {DynamicForm, FlowChartConnectionDialog, FlowChartNodeDialog, FlowChart},
+    components: {
+      DynamicFormDesigner,
+      DynamicForm, FlowChartConnectionDialog, FlowChartNodeDialog, FlowChart,
+    },
     data: function() {
       return {
         nodes: [],
@@ -122,6 +127,11 @@
       handleEditConnection(connection) {
         this.connectionEditingInfo.target = connection;
         this.connectionDialogVisible = true;
+      },
+    },
+    computed: {
+      formDesignerHeight() {
+        return (window.innerHeight - 190) + 'px';
       },
     },
   };
