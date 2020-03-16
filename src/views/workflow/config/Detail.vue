@@ -10,7 +10,7 @@
         </el-breadcrumb>
         <el-tabs v-model="tab" id="tab">
             <el-tab-pane label="表单设计" name="form">
-                <dynamic-form :form-id="1"></dynamic-form>
+                <dynamic-form :form-id="1" data-id="2"></dynamic-form>
             </el-tab-pane>
             <el-tab-pane label="流程设置" name="chart">
                 <flow-chart v-if="loaded" :nodes="nodes" :connections="connections"

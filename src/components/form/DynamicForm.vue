@@ -3,23 +3,27 @@
         <table class="dynamic-form" width="100%">
             <tr v-for="i in form.row" v-bind:key="i">
                 <template v-for="j in form.col">
-                    <td v-if="getCell(i, j) !== null" v-bind:key="j" :colspan="getCell(i, j).colspan"
-                        :rowspan="getCell(i, j).rowspan" :width="cellWidth * getCell(i, j).colspan + 'px'"
+                    <td v-if="getCell(i, j) !== null" v-bind:key="j"
+                        :colspan="getCell(i, j).colspan"
+                        :rowspan="getCell(i, j).rowspan"
+                        :width="cellWidth * getCell(i, j).colspan + 'px'"
                         :height="cellHeight * getCell(i, j).rowspan + 'px'">
                         <template v-if="getCell(i, j).type === 'label'">
                             <label>{{getCell(i, j).text}}</label>
                         </template>
                         <template v-else>
-                            <el-input v-if="getCell(i, j).type === 'input'" v-model="data[getCell(i, j).binding]"
+                            <el-input v-if="getCell(i, j).type === 'input'"
+                                      v-model="data[getCell(i, j).binding]"
                                       placeholder="请输入内容"/>
-                            <el-input v-else-if="getCell(i, j).type === 'textarea'" type="textarea" autosize
+                            <el-input v-else-if="getCell(i, j).type === 'textarea'" type="textarea"
+                                      autosize
                                       v-model="data[getCell(i, j).binding]" placeholder="请输入内容"/>
                             <template v-else-if="getCell(i, j).type === 'cascader'">
-                                <tree-select v-if="trees[getCell(i, j).dictionary]" v-model="data[getCell(i, j).binding]" 
-                                            :options="trees[getCell(i, j).dictionary]" style="width: 100%;" 
-                                            :normalizer="function(node) { return { label: node.name } }"/>
+                                <cascader-wrapper v-model="data[getCell(i, j).binding]"
+                                                  :options="trees[getCell(i, j).dictionary]">
+                                </cascader-wrapper>
                             </template>
-                            <label v-else>{{ 'unknown type: ' +  getCell(i, j).type}}</label>
+                            <label v-else>{{ 'unknown type: ' + getCell(i, j).type}}</label>
                         </template>
                     </td>
                 </template>
@@ -28,107 +32,106 @@
     </div>
 </template>
 <script>
-    import {Message, Cascader} from "element-ui";
-    import TreeSelect from "@riophae/vue-treeselect";
+  import {Message} from 'element-ui';
+  import dynamicFormService from '../../service/dynamicFormService';
+  import treeService from '../../service/treeService';
+  import CascaderWrapper from '../CascaderWrapper';
 
-    import dynamicFormService from "../../service/dynamicFormService";
-    import treeService from '../../service/treeService';
+  export default {
+    props: {
+      formId: {
+        type: Number,
+        default: null,
+      },
+      dataId: {
+        type: Number,
+        default: null,
+      },
+      defaultValues: {
+        type: Object,
+        default: null,
+      },
+    },
+    data() {
+      return {
+        form: {},
+        data: {},
+        trees: {},
+      };
+    },
+    async created() {
+      let resp = await dynamicFormService.get(this.formId);
+      if (resp.data.success) {
+        this.form = resp.data.data;
+      }
 
-    export default {
-        props: {
-            formId: {
-                type: Number,
-                default: null
-            },
-            dataId: {
-                type: Number,
-                default: null
-            },
-            defaultValues: {
-                type: Object,
-                default: null
-            }
-        },
-        data() {
-            return {
-                form: {},
-                data: {},
-                trees: {}
-            }
-        },
-        async created() {
-            let resp = await dynamicFormService.get(this.formId);
-            if (resp.data.success) {
-                this.form = resp.data.data;
-            }
-
-            for (var i = this.cells.length - 1; i >= 0; i--) {
-                let cell = this.cells[i];
-                if (cell.type === 'cascader') {
-                    let treeResp = await treeService.get(cell.dictionary);
-                    this.trees[cell.dictionary] = [treeResp.data.data];
-                }
-            }
-
-            if (this.dataId) {
-                resp = await dynamicFormService.getData(this.form.id, this.dataId);
-                if (resp.data.success) {
-                    this.data = resp.data.data;
-                }
-            } else if (this.defaultValues) {
-                this.data = this.defaultValues;
-            }
-        },
-        computed: {
-            widthPixel() {
-                return (this.form.width || 720) + 'px';
-            },
-            cellWidth() {
-                return this.form.width / this.form.col;
-            },
-            cellHeight() {
-                return 36;
-            },
-            cells() {
-                return JSON.parse(this.form.cells);
-            }
-        },
-        methods: {
-            getCell(row, col) {
-                let filtered = this.cells.filter(cell => cell.row === row && cell.col === col);
-                return filtered.length > 0 ? filtered[0] : null;
-            },
-            async update() {
-                let resp = await dynamicFormService.update(this.form.id, this.data);
-                if (resp.data.success) {
-                    Message.success(resp.data.message);
-                }
-            },
-            async add() {
-                let resp = await dynamicFormService.add(this.form.id, this.data);
-                if (!resp.data.success) {
-                    return null;
-                }
-
-                this.data.id = resp.data.data;
-                Message.success(resp.data.message);
-                return this.data.id;
-            },
-            validate() {
-            }
-        },
-        watch: {
-            data: {
-                handler: function (val) {
-                    console.log(val);
-                },
-                deep: true
-            }
-        },
-        components: {
-            Cascader, TreeSelect
+      for (var i = this.cells.length - 1; i >= 0; i--) {
+        let cell = this.cells[i];
+        if (cell.type === 'cascader') {
+          let treeResp = await treeService.get(cell.dictionary);
+          this.trees[cell.dictionary] = [treeResp.data.data];
         }
-    }
+      }
+
+      if (this.dataId) {
+        resp = await dynamicFormService.getData(this.form.id, this.dataId);
+        if (resp.data.success) {
+          this.data = resp.data.data;
+        }
+      } else if (this.defaultValues) {
+        this.data = this.defaultValues;
+      }
+    },
+    computed: {
+      widthPixel() {
+        return (this.form.width || 720) + 'px';
+      },
+      cellWidth() {
+        return this.form.width / this.form.col;
+      },
+      cellHeight() {
+        return 36;
+      },
+      cells() {
+        return JSON.parse(this.form.cells);
+      },
+    },
+    methods: {
+      getCell(row, col) {
+        let filtered = this.cells.filter(cell => cell.row === row && cell.col === col);
+        return filtered.length > 0 ? filtered[0] : null;
+      },
+      async update() {
+        let resp = await dynamicFormService.update(this.form.id, this.data);
+        if (resp.data.success) {
+          Message.success(resp.data.message);
+        }
+      },
+      async add() {
+        let resp = await dynamicFormService.add(this.form.id, this.data);
+        if (!resp.data.success) {
+          return null;
+        }
+
+        this.data.id = resp.data.data;
+        Message.success(resp.data.message);
+        return this.data.id;
+      },
+      validate() {
+      },
+    },
+    watch: {
+      data: {
+        handler: function(val) {
+          console.log(val);
+        },
+        deep: true,
+      },
+    },
+    components: {
+      CascaderWrapper,
+    },
+  };
 </script>
 <style scoped>
     .dynamic-form > tr > td {
