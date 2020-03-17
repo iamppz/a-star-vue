@@ -30,6 +30,12 @@
                     <div class="placeholder">
                         从左侧拖拽或点击来添加字段
                     </div>
+                    <!--                    <template v-for="(item, index) in list">-->
+                    <!--                        <el-row v-if="item.type === 'layout'" :key="'content-widget-' + index">-->
+                    <!--                            <el-col v-for="child in item.children" :span="child.span"></el-col>-->
+                    <!--                        </el-row>-->
+                    <!--                    </template>-->
+                    <layout></layout>
                 </div>
             </td>
             <td class="right">Right</td>
@@ -38,6 +44,8 @@
 </template>
 
 <script>
+  import Layout from './Layout';
+
   export default {
     name: 'DynamicFormDesigner',
     data() {
@@ -77,6 +85,9 @@
         this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
         this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
       },
+    },
+    components: {
+      Layout,
     },
   };
 </script>
