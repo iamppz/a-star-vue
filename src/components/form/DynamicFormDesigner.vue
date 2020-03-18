@@ -3,7 +3,6 @@
            @mouseleave="draggingInfo.target = null" @mousemove="handleMouseMove($event)">
         <tr>
             <td class="left">
-                {{draggingInfo}}
                 <div>基础字段</div>
                 <ul class="panel">
                     <li class="widget" @mousedown="handleWidgetMouseDown(item, $event)"
@@ -27,17 +26,18 @@
                 </div>
             </td>
             <td class="center">
-                <div class="content" @mousemove="handleContentMouseMove($event)">
-                    <div class="placeholder">
-                        从左侧拖拽或点击来添加字段
-                    </div>
-                    <!--                    <template v-for="(item, index) in list">-->
-                    <!--                        <el-row v-if="item.type === 'layout'" :key="'content-widget-' + index">-->
-                    <!--                            <el-col v-for="child in item.children" :span="child.span"></el-col>-->
-                    <!--                        </el-row>-->
-                    <!--                    </template>-->
-                    <layout></layout>
-                    <div class="indicator"></div>
+                <div class="content" @mousemove="handleContentMouseMove($event)"
+                     @mouseup="handleContentMouseUp">
+                    <!--                    <div class="placeholder" v-if="elements.length === 0">-->
+                    <!--                        从左侧拖拽或点击来添加字段-->
+                    <!--                    </div>-->
+                    <template v-for="(element, index) in elements">
+                        <template v-if="element.type === 'layout'">
+                            <layout :data="element" :key="'element-' + index"
+                                    @mouseup.stop="handleLayoutMouseUp"></layout>
+                        </template>
+                    </template>
+                    <div class="indicator" v-show="draggingInfo.target !== null"></div>
                 </div>
             </td>
             <td class="right">Right</td>
@@ -58,6 +58,7 @@
           offsetY: null,
           x: null,
           y: null,
+          elements: [],
         },
         basicWidgets: [
           {type: 'input', icon: 'iconinput', name: '输入框'},
@@ -73,6 +74,7 @@
           {type: 'tab', icon: 'iconinput', name: '标签页'},
           {type: 'separator', icon: 'iconinput', name: '分割线'},
         ],
+        elements: [],
       };
     },
     methods: {
@@ -97,14 +99,65 @@
             container = target.closest('.col') || target.closest('.content');
           }
           let fragment = document.createDocumentFragment();
-          fragment.appendChild(document.getElementsByClassName('indicator')[0]);
-          container.appendChild(fragment);
+          let indicator = document.getElementsByClassName('indicator')[0];
+          fragment.appendChild(indicator);
+          let refNode = null;
+          for (let i = 0; i < container.childNodes.length; i++) {
+            let childNode = container.childNodes[i];
+            let top = childNode.getBoundingClientRect().top;
+            if (event.clientY < top) {
+              refNode = childNode;
+              break;
+            }
+          }
+          if (refNode === null) {
+            container.appendChild(fragment);
+          } else {
+            container.insertBefore(fragment, refNode);
+          }
         }
       },
+      handleContentMouseUp(event) {
+        if (this.draggingInfo.target) {
+          let instance = this.createWidgetInstance(this.draggingInfo.target.type);
+          this.elements.splice(this.getIndicatorIndex(), 0, instance);
+          this.draggingInfo.target = null;
+
+          this.resetIndicator();
+        }
+      },
+      handleLayoutMouseUp(event) {
+        if (this.draggingInfo.target) {
+          let instance = this.createWidgetInstance(this.draggingInfo.target.type);
+          event.element.elements.splice(this.getIndicatorIndex(), 0, instance);
+          this.draggingInfo.target = null;
+
+          this.resetIndicator();
+        }
+      },
+      getIndicatorIndex() {
+        let indicator = document.getElementsByClassName('indicator')[0];
+        let i = 0;
+        while ((indicator = indicator.previousSibling) != null) {
+          i++;
+        }
+        return i;
+      },
+      resetIndicator() {
+        let fragment = document.createDocumentFragment();
+        fragment.appendChild(document.getElementsByClassName('indicator')[0]);
+        let content = document.getElementsByClassName('content')[0];
+        content.appendChild(fragment);
+      },
+      createWidgetInstance(widgetType) {
+        let element = {type: widgetType};
+        if (element.type === 'layout') {
+          element.children = [{span: 12, elements: []}, {span: 12, elements: []}];
+        }
+        return element;
+      },
     },
-    components: {
-      Layout,
-    },
+    components: {Layout},
   };
 </script>
 

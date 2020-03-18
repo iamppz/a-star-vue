@@ -2,10 +2,10 @@
     <table class="row">
         <tr>
             <td v-for="(child, i) in formattedData.children" :key="i"
-                class="col" :style="{width: child.width}">
+                class="col" :style="{width: child.width}" @mouseup="handleMouseUp(child, $event)">
                 <template v-if="child.elements">
                     <layout v-for="(grandchild, j) in child.elements" :data="grandchild"
-                            :key="i + '-' + j"></layout>
+                            :key="i + '-' + j" @mouseup="handleChildMouseUp"></layout>
                 </template>
             </td>
         </tr>
@@ -18,56 +18,7 @@
     props: {
       data: {
         type: Object,
-        default: () => ({
-          type: 'layout',
-          children: [
-            {
-              span: 12,
-              elements: [
-                {
-                  type: 'layout',
-                  children: [
-                    {
-                      span: 12,
-                      elements: [
-                        {
-                          type: 'layout',
-                          children: [
-                            {
-                              span: 12,
-                              elements: [],
-                            },
-                            {
-                              span: 12,
-                            },
-                          ],
-                        },
-                        {
-                          type: 'layout',
-                          children: [
-                            {
-                              span: 12,
-                              elements: [],
-                            },
-                            {
-                              span: 12,
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                    {
-                      span: 12,
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              span: 12,
-            },
-          ],
-        }),
+        default: null,
       },
     },
     computed: {
@@ -80,6 +31,15 @@
         return result;
       },
     },
+    methods: {
+      handleMouseUp(element, event) {
+        event.element = element;
+        this.$emit('mouseup', event);
+      },
+      handleChildMouseUp(event) {
+        this.$emit('mouseup', event);
+      },
+    },
   };
 </script>
 
@@ -87,6 +47,9 @@
     .row {
         border: 1px dashed #dadce0;
         width: 100%;
+    }
+
+    .row:not(:first-child) {
         margin-top: 6px;
     }
 
