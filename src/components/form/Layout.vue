@@ -1,17 +1,15 @@
 <template>
-    <div>
-        <table class="row">
-            <tr>
-                <td v-for="(child, i) in formattedData.children" :key="i"
-                    class="col" :style="{width: child.width}">
-                    <template v-if="child.elements">
-                        <layout v-for="(grandchild, j) in child.elements" :data="grandchild"
-                                :key="i + '-' + j"></layout>
-                    </template>
-                </td>
-            </tr>
-        </table>
-    </div>
+    <table class="row">
+        <tr>
+            <td v-for="(child, i) in formattedData.children" :key="i"
+                class="col" :style="{width: child.width}">
+                <template v-if="child.elements">
+                    <layout v-for="(grandchild, j) in child.elements" :data="grandchild"
+                            :key="i + '-' + j"></layout>
+                </template>
+            </td>
+        </tr>
+    </table>
 </template>
 
 <script>
@@ -32,6 +30,18 @@
                     {
                       span: 12,
                       elements: [
+                        {
+                          type: 'layout',
+                          children: [
+                            {
+                              span: 12,
+                              elements: [],
+                            },
+                            {
+                              span: 12,
+                            },
+                          ],
+                        },
                         {
                           type: 'layout',
                           children: [
@@ -77,6 +87,7 @@
     .row {
         border: 1px dashed #dadce0;
         width: 100%;
+        margin-top: 6px;
     }
 
     .col {

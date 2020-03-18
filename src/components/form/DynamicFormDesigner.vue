@@ -3,6 +3,7 @@
            @mouseleave="draggingInfo.target = null" @mousemove="handleMouseMove($event)">
         <tr>
             <td class="left">
+                {{draggingInfo}}
                 <div>基础字段</div>
                 <ul class="panel">
                     <li class="widget" @mousedown="handleWidgetMouseDown(item, $event)"
@@ -26,7 +27,7 @@
                 </div>
             </td>
             <td class="center">
-                <div class="content">
+                <div class="content" @mousemove="handleContentMouseMove($event)">
                     <div class="placeholder">
                         从左侧拖拽或点击来添加字段
                     </div>
@@ -36,6 +37,7 @@
                     <!--                        </el-row>-->
                     <!--                    </template>-->
                     <layout></layout>
+                    <div class="indicator"></div>
                 </div>
             </td>
             <td class="right">Right</td>
@@ -84,6 +86,20 @@
       handleMouseMove(event) {
         this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
         this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
+      },
+      handleContentMouseMove(event) {
+        if (this.draggingInfo.target) {
+          let container;
+          let target = event.target;
+          if (target.classList.contains('col') || target.classList.contains('content')) {
+            container = target;
+          } else {
+            container = target.closest('.col') || target.closest('.content');
+          }
+          let fragment = document.createDocumentFragment();
+          fragment.appendChild(document.getElementsByClassName('indicator')[0]);
+          container.appendChild(fragment);
+        }
       },
     },
     components: {
@@ -142,5 +158,10 @@
         position: absolute;
         top: calc(50% - 15px);
         left: calc(50% - 130px);
+    }
+
+    .indicator {
+        height: 5px;
+        background-color: lightpink;
     }
 </style>
