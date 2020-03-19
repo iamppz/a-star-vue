@@ -1,6 +1,6 @@
 <template>
-    <table class="layout" @mouseup="draggingInfo.target = null"
-           @mouseleave="draggingInfo.target = null" @mousemove="handleMouseMove($event)">
+    <table class="layout" @mouseup="widgetDraggingInfo.target = null"
+           @mouseleave="widgetDraggingInfo.target = null" @mousemove="handleMouseMove($event)">
         <tr>
             <td class="left">
                 <div>基础字段</div>
@@ -19,10 +19,8 @@
                         {{item.name}}
                     </li>
                 </ul>
-                <div class="widget" v-if="draggingInfo.target !== null"
-                     :style="{top: draggingInfo.y + 'px', left: draggingInfo.x + 'px', position: 'fixed'}">
-                    <span :class="['iconfont', draggingInfo.target.icon]"></span>
-                    {{draggingInfo.target.name}}
+                <div v-if="widgetDraggingInfo.target !== null" v-html="widgetDraggingInfo.html"
+                     :style="{top: widgetDraggingInfo.y + 'px', left: widgetDraggingInfo.x + 'px', position: 'fixed'}">
                 </div>
             </td>
             <td class="center">
@@ -34,10 +32,11 @@
                     <template v-for="(element, index) in elements">
                         <template v-if="element.type === 'layout'">
                             <layout :data="element" :key="'element-' + index"
-                                    @mouseup.stop="handleLayoutMouseUp"></layout>
+                                    @mouseup.stop="handleLayoutMouseUp"
+                                    @mousedown.stop="handleInstanceMouseDown"></layout>
                         </template>
                     </template>
-                    <div class="indicator" v-show="draggingInfo.target !== null"></div>
+                    <div class="indicator" v-show="widgetDraggingInfo.target !== null"></div>
                 </div>
             </td>
             <td class="right">Right</td>
@@ -52,13 +51,20 @@
     name: 'DynamicFormDesigner',
     data() {
       return {
-        draggingInfo: {
+        widgetDraggingInfo: {
           target: null,
           offsetX: null,
           offsetY: null,
           x: null,
           y: null,
-          elements: [],
+          html: null,
+        },
+        instanceDraggingInfo: {
+          target: null,
+          offsetX: null,
+          offsetY: null,
+          x: null,
+          y: null,
         },
         basicWidgets: [
           {type: 'input', icon: 'iconinput', name: '输入框'},
@@ -79,18 +85,28 @@
     },
     methods: {
       handleWidgetMouseDown(widget, event) {
-        this.draggingInfo.target = widget;
-        this.draggingInfo.offsetX = event.offsetX;
-        this.draggingInfo.offsetY = event.offsetY;
-        this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
-        this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
+        this.widgetDraggingInfo.target = widget;
+        this.widgetDraggingInfo.offsetX = event.offsetX;
+        this.widgetDraggingInfo.offsetY = event.offsetY;
+        this.widgetDraggingInfo.x = event.clientX - this.widgetDraggingInfo.offsetX;
+        this.widgetDraggingInfo.y = event.clientY - this.widgetDraggingInfo.offsetY;
+        this.widgetDraggingInfo.html = event.target.outerHTML;
       },
       handleMouseMove(event) {
-        this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
-        this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
+        if (this.widgetDraggingInfo.target) {
+          this.widgetDraggingInfo.x = event.clientX - this.widgetDraggingInfo.offsetX;
+          this.widgetDraggingInfo.y = event.clientY - this.widgetDraggingInfo.offsetY;
+        } else if (this.instanceDraggingInfo.target) {
+          this.instanceDraggingInfo.x = event.clientX - this.instanceDraggingInfo.offsetX;
+          this.instanceDraggingInfo.y = event.clientY - this.instanceDraggingInfo.offsetY;
+          this.instanceDraggingInfo.element.style.position = 'fixed';
+          this.instanceDraggingInfo.element.style.width = 'inherit';
+          this.instanceDraggingInfo.element.style.top = this.instanceDraggingInfo.y + 'px';
+          this.instanceDraggingInfo.element.style.left = this.instanceDraggingInfo.x + 'px';
+        }
       },
       handleContentMouseMove(event) {
-        if (this.draggingInfo.target) {
+        if (this.widgetDraggingInfo.target || this.instanceDraggingInfo.target) {
           let container;
           let target = event.target;
           if (target.classList.contains('col') || target.classList.contains('content')) {
@@ -118,22 +134,28 @@
         }
       },
       handleContentMouseUp(event) {
-        if (this.draggingInfo.target) {
-          let instance = this.createWidgetInstance(this.draggingInfo.target.type);
+        if (this.widgetDraggingInfo.target) {
+          let instance = this.createWidgetInstance(this.widgetDraggingInfo.target.type);
           this.elements.splice(this.getIndicatorIndex(), 0, instance);
-          this.draggingInfo.target = null;
-
+          this.widgetDraggingInfo.target = null;
           this.resetIndicator();
         }
       },
       handleLayoutMouseUp(event) {
-        if (this.draggingInfo.target) {
-          let instance = this.createWidgetInstance(this.draggingInfo.target.type);
+        if (this.widgetDraggingInfo.target) {
+          let instance = this.createWidgetInstance(this.widgetDraggingInfo.target.type);
           event.element.elements.splice(this.getIndicatorIndex(), 0, instance);
-          this.draggingInfo.target = null;
-
+          this.widgetDraggingInfo.target = null;
           this.resetIndicator();
         }
+      },
+      handleInstanceMouseDown(event) {
+        this.instanceDraggingInfo.target = event.element;
+        this.instanceDraggingInfo.offsetX = event.offsetX;
+        this.instanceDraggingInfo.offsetY = event.offsetY;
+        this.instanceDraggingInfo.x = event.clientX - this.instanceDraggingInfo.offsetX;
+        this.instanceDraggingInfo.y = event.clientY - this.instanceDraggingInfo.offsetY;
+        this.instanceDraggingInfo.element = event.target.closest('table');
       },
       getIndicatorIndex() {
         let indicator = document.getElementsByClassName('indicator')[0];

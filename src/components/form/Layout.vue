@@ -1,11 +1,13 @@
 <template>
-    <table class="row">
+    <table class="row" @mousedown="handleMouseDown(data, $event)">
         <tr>
             <td v-for="(child, i) in formattedData.children" :key="i"
-                class="col" :style="{width: child.width}" @mouseup="handleMouseUp(child, $event)">
+                class="col" :style="{width: child.width}"
+                @mouseup="handleMouseUp(child, $event)">
                 <template v-if="child.elements">
                     <layout v-for="(grandchild, j) in child.elements" :data="grandchild"
-                            :key="i + '-' + j" @mouseup="handleChildMouseUp"></layout>
+                            :key="i + '-' + j" @mouseup.stop="handleChildMouseUp"
+                            @mousedown.stop="handleChildMouseDown"></layout>
                 </template>
             </td>
         </tr>
@@ -38,6 +40,13 @@
       },
       handleChildMouseUp(event) {
         this.$emit('mouseup', event);
+      },
+      handleMouseDown(element, event) {
+        event.element = element;
+        this.$emit('mousedown', event);
+      },
+      handleChildMouseDown(event) {
+        this.$emit('mousedown', event);
       },
     },
   };
