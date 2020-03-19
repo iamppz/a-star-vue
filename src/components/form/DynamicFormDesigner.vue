@@ -1,6 +1,5 @@
 <template>
-    <table class="layout" @mouseup="widgetDraggingInfo.target = null"
-           @mouseleave="widgetDraggingInfo.target = null" @mousemove="handleMouseMove($event)">
+    <table class="layout" @mousemove="handleMouseMove($event)">
         <tr>
             <td class="left">
                 <div>基础字段</div>
@@ -19,13 +18,13 @@
                         {{item.name}}
                     </li>
                 </ul>
-                <div v-if="widgetDraggingInfo.target !== null" v-html="widgetDraggingInfo.html"
-                     :style="{top: widgetDraggingInfo.y + 'px', left: widgetDraggingInfo.x + 'px', position: 'fixed'}">
+                <div v-if="draggingInfo.target !== null" id="draggable"
+                     :style="{top: draggingInfo.y + 'px', left: draggingInfo.x + 'px'}">
                 </div>
             </td>
             <td class="center">
                 <div class="content" @mousemove="handleContentMouseMove($event)"
-                     @mouseup="handleContentMouseUp">
+                     @mouseleave="handleContentMouseUp" @mouseup="handleContentMouseUp">
                     <!--                    <div class="placeholder" v-if="elements.length === 0">-->
                     <!--                        从左侧拖拽或点击来添加字段-->
                     <!--                    </div>-->
@@ -36,7 +35,6 @@
                                     @mousedown.stop="handleInstanceMouseDown"></layout>
                         </template>
                     </template>
-                    <div class="indicator" v-show="widgetDraggingInfo.target !== null"></div>
                 </div>
             </td>
             <td class="right">Right</td>
@@ -51,20 +49,13 @@
     name: 'DynamicFormDesigner',
     data() {
       return {
-        widgetDraggingInfo: {
+        draggingInfo: {
           target: null,
           offsetX: null,
           offsetY: null,
           x: null,
           y: null,
           html: null,
-        },
-        instanceDraggingInfo: {
-          target: null,
-          offsetX: null,
-          offsetY: null,
-          x: null,
-          y: null,
         },
         basicWidgets: [
           {type: 'input', icon: 'iconinput', name: '输入框'},
@@ -85,28 +76,25 @@
     },
     methods: {
       handleWidgetMouseDown(widget, event) {
-        this.widgetDraggingInfo.target = widget;
-        this.widgetDraggingInfo.offsetX = event.offsetX;
-        this.widgetDraggingInfo.offsetY = event.offsetY;
-        this.widgetDraggingInfo.x = event.clientX - this.widgetDraggingInfo.offsetX;
-        this.widgetDraggingInfo.y = event.clientY - this.widgetDraggingInfo.offsetY;
-        this.widgetDraggingInfo.html = event.target.outerHTML;
+        this.draggingInfo.mode = 'copy';
+        this.draggingInfo.target = widget;
+        this.draggingInfo.offsetX = event.offsetX;
+        this.draggingInfo.offsetY = event.offsetY;
+        this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
+        this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
+        this.$nextTick(() => {
+          let draggable = document.getElementById('draggable');
+          draggable.appendChild(event.target.cloneNode(true));
+        });
       },
       handleMouseMove(event) {
-        if (this.widgetDraggingInfo.target) {
-          this.widgetDraggingInfo.x = event.clientX - this.widgetDraggingInfo.offsetX;
-          this.widgetDraggingInfo.y = event.clientY - this.widgetDraggingInfo.offsetY;
-        } else if (this.instanceDraggingInfo.target) {
-          this.instanceDraggingInfo.x = event.clientX - this.instanceDraggingInfo.offsetX;
-          this.instanceDraggingInfo.y = event.clientY - this.instanceDraggingInfo.offsetY;
-          this.instanceDraggingInfo.element.style.position = 'fixed';
-          this.instanceDraggingInfo.element.style.width = 'inherit';
-          this.instanceDraggingInfo.element.style.top = this.instanceDraggingInfo.y + 'px';
-          this.instanceDraggingInfo.element.style.left = this.instanceDraggingInfo.x + 'px';
+        if (this.draggingInfo.target) {
+          this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
+          this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
         }
       },
       handleContentMouseMove(event) {
-        if (this.widgetDraggingInfo.target || this.instanceDraggingInfo.target) {
+        if (this.draggingInfo.target) {
           let container;
           let target = event.target;
           if (target.classList.contains('col') || target.classList.contains('content')) {
@@ -114,9 +102,11 @@
           } else {
             container = target.closest('.col') || target.closest('.content');
           }
-          let fragment = document.createDocumentFragment();
-          let indicator = document.getElementsByClassName('indicator')[0];
-          fragment.appendChild(indicator);
+          let available = document.getElementsByClassName('indicator').length > 0;
+          let indicator = available
+              ? document.getElementsByClassName('indicator')[0]
+              : document.createElement('div');
+          indicator.classList.add('indicator');
           let refNode = null;
           for (let i = 0; i < container.childNodes.length; i++) {
             let childNode = container.childNodes[i];
@@ -127,35 +117,60 @@
             }
           }
           if (refNode === null) {
-            container.appendChild(fragment);
+            container.appendChild(indicator);
           } else {
-            container.insertBefore(fragment, refNode);
+            container.insertBefore(indicator, refNode);
           }
         }
       },
       handleContentMouseUp(event) {
-        if (this.widgetDraggingInfo.target) {
-          let instance = this.createWidgetInstance(this.widgetDraggingInfo.target.type);
+        if (this.draggingInfo.target) {
+          let instance = this.draggingInfo.mode === 'move'
+              ? this.draggingInfo.target
+              : this.createWidgetInstance(this.draggingInfo.target.type);
           this.elements.splice(this.getIndicatorIndex(), 0, instance);
-          this.widgetDraggingInfo.target = null;
-          this.resetIndicator();
+          this.draggingInfo.target = null;
+          this.$nextTick(() => {
+            this.resetIndicator();
+          });
         }
       },
       handleLayoutMouseUp(event) {
-        if (this.widgetDraggingInfo.target) {
-          let instance = this.createWidgetInstance(this.widgetDraggingInfo.target.type);
+        if (this.draggingInfo.target) {
+          let instance = this.draggingInfo.mode === 'move'
+              ? this.draggingInfo.target
+              : this.createWidgetInstance(this.draggingInfo.target.type);
           event.element.elements.splice(this.getIndicatorIndex(), 0, instance);
-          this.widgetDraggingInfo.target = null;
-          this.resetIndicator();
+          this.draggingInfo.target = null;
+          this.$nextTick(() => {
+            this.resetIndicator();
+          });
         }
       },
       handleInstanceMouseDown(event) {
-        this.instanceDraggingInfo.target = event.element;
-        this.instanceDraggingInfo.offsetX = event.offsetX;
-        this.instanceDraggingInfo.offsetY = event.offsetY;
-        this.instanceDraggingInfo.x = event.clientX - this.instanceDraggingInfo.offsetX;
-        this.instanceDraggingInfo.y = event.clientY - this.instanceDraggingInfo.offsetY;
-        this.instanceDraggingInfo.element = event.target.closest('table');
+        this.draggingInfo.target = event.element;
+        this.draggingInfo.offsetX = event.offsetX;
+        this.draggingInfo.offsetY = event.offsetY;
+        this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
+        this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
+        this.draggingInfo.mode = 'move';
+        this.$nextTick(() => {
+          let draggable = document.getElementById('draggable');
+          let target = event.target;
+          let layout = target.closest('table');
+          let clonedLayout = layout.cloneNode(true);
+          clonedLayout.style.width = layout.clientWidth + 'px';
+          while (draggable.firstChild) {
+            draggable.removeChild(draggable.lastChild);
+          }
+          draggable.appendChild(clonedLayout);
+          if (event.parentElement) {
+            event.parentElement.elements.splice(event.parentElement.elements.indexOf(event.element),
+                1);
+          } else {
+            this.elements.splice(this.elements.indexOf(event.element), 1);
+          }
+        });
       },
       getIndicatorIndex() {
         let indicator = document.getElementsByClassName('indicator')[0];
@@ -166,15 +181,15 @@
         return i;
       },
       resetIndicator() {
-        let fragment = document.createDocumentFragment();
-        fragment.appendChild(document.getElementsByClassName('indicator')[0]);
-        let content = document.getElementsByClassName('content')[0];
-        content.appendChild(fragment);
+        let elementsByClassName = document.getElementsByClassName('indicator');
+        if (elementsByClassName.length > 0) {
+          elementsByClassName[0].remove();
+        }
       },
       createWidgetInstance(widgetType) {
         let element = {type: widgetType};
         if (element.type === 'layout') {
-          element.children = [{span: 12, elements: []}, {span: 12, elements: []}];
+          element.children = [{span: 50, elements: []}, {span: 50, elements: []}];
         }
         return element;
       },
@@ -182,7 +197,12 @@
     components: {Layout},
   };
 </script>
-
+<style>
+    .indicator {
+        height: 5px;
+        background-color: lightpink;
+    }
+</style>
 <style scoped>
     .layout {
         width: 100%;
@@ -235,8 +255,12 @@
         left: calc(50% - 130px);
     }
 
-    .indicator {
-        height: 5px;
-        background-color: lightpink;
+    .dragging {
+        display: block;
+        pointer-events: none;
+    }
+
+    #draggable {
+        position: fixed;
     }
 </style>
