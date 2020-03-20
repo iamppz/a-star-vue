@@ -23,11 +23,11 @@
                 </div>
             </td>
             <td class="center">
+                <div class="placeholder" v-if="elements.length === 0">
+                    从左侧拖拽或点击来添加字段
+                </div>
                 <div class="content" @mousemove="handleContentMouseMove($event)"
                      @mouseleave="handleContentMouseUp" @mouseup="handleContentMouseUp">
-                    <!--                    <div class="placeholder" v-if="elements.length === 0">-->
-                    <!--                        从左侧拖拽或点击来添加字段-->
-                    <!--                    </div>-->
                     <template v-for="(element, index) in elements">
                         <template v-if="element.type === 'layout'">
                             <layout :data="element" :key="'element-' + index"
@@ -246,18 +246,16 @@
         border: 1px dashed #dadce0;
         height: 100%;
         position: relative;
+        padding: 6px;
     }
 
     .placeholder {
+        position: absolute;
+        z-index: -1;
         font-size: 20px;
         position: absolute;
         top: calc(50% - 15px);
         left: calc(50% - 130px);
-    }
-
-    .dragging {
-        display: block;
-        pointer-events: none;
     }
 
     #draggable {
