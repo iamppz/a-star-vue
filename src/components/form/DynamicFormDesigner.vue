@@ -73,6 +73,10 @@
           {type: 'separator', icon: 'iconinput', name: '分割线'},
         ],
         elements: [],
+        currentInstance: {
+          target: null,
+          parent: null,
+        },
       };
     },
     methods: {
@@ -149,6 +153,11 @@
         }
       },
       handleInstanceMouseDown(event) {
+        this.currentInstance.target = event.element;
+        if (event.parentElement) {
+          this.currentInstance.parent = event.parentElement;
+        }
+
         this.draggingInfo.target = event.element;
         this.draggingInfo.offsetX = event.offsetX;
         this.draggingInfo.offsetY = event.offsetY;
@@ -185,6 +194,29 @@
       },
     },
     components: {Grid},
+    mounted() {
+      let that = this;
+      document.onkeydown = function(event) {
+        switch (event.keyCode) {
+          case 27:
+            if (that.currentInstance.target) {
+              that.currentInstance.target = null;
+              that.currentInstance.parent = null;
+            }
+            break;
+          case 46:
+            if (that.currentInstance.target) {
+              let elements = that.currentInstance.parent
+                  ? that.currentInstance.parent.elements
+                  : that.elements;
+              elements.splice(elements.indexOf(event.element), 1);
+            }
+            break;
+          default:
+            break;
+        }
+      };
+    },
   };
 </script>
 <style>
