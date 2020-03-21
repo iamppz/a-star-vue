@@ -26,13 +26,13 @@
                 <div class="placeholder" v-if="elements.length === 0">
                     从左侧拖拽或点击来添加字段
                 </div>
-                <div class="content" @mousemove="handleContentMouseMove($event)"
-                     @mouseleave="handleContentMouseUp" @mouseup="handleContentMouseUp">
+                <div class="form" @mousemove="handleContentMouseMove($event)"
+                     @mouseleave="handleFormMouseUp" @mouseup="handleFormMouseUp">
                     <template v-for="(element, index) in elements">
-                        <template v-if="element.type === 'layout'">
-                            <layout :data="element" :key="'element-' + index"
-                                    @mouseup.stop="handleLayoutMouseUp"
-                                    @mousedown.stop="handleInstanceMouseDown"></layout>
+                        <template v-if="element.type === 'grid'">
+                            <grid :data="element" :key="'element-' + index"
+                                  @mouseup.stop="handleGridMouseUp"
+                                  @mousedown.stop="handleInstanceMouseDown"></grid>
                         </template>
                     </template>
                 </div>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-  import Layout from './Layout';
+  import Grid from './Grid';
 
   export default {
     name: 'DynamicFormDesigner',
@@ -66,7 +66,7 @@
           {type: 'radio', icon: 'iconradio', name: '单选'},
         ],
         advancedWidgets: [
-          {type: 'layout', icon: 'iconinput', name: '布局'},
+          {type: 'grid', icon: 'iconinput', name: '布局'},
           {type: 'list', icon: 'iconinput', name: '列表'},
           {type: 'tab', icon: 'iconinput', name: '标签页'},
           {type: 'separator', icon: 'iconinput', name: '分割线'},
@@ -97,16 +97,19 @@
         if (this.draggingInfo.target) {
           let container;
           let target = event.target;
-          if (target.classList.contains('col') || target.classList.contains('content')) {
+          if (target.classList.contains('col') || target.classList.contains('form')) {
             container = target;
           } else {
-            container = target.closest('.col') || target.closest('.content');
+            container = target.closest('.col') || target.closest('.form');
           }
-          let available = document.getElementsByClassName('indicator').length > 0;
-          let indicator = available
-              ? document.getElementsByClassName('indicator')[0]
-              : document.createElement('div');
-          indicator.classList.add('indicator');
+          let indicators = document.getElementsByClassName('indicator');
+          let indicator;
+          if (indicators.length > 0) {
+            indicator = indicators[0];
+          } else {
+            indicator = document.createElement('div');
+            indicator.classList.add('indicator');
+          }
           let refNode = null;
           for (let i = 0; i < container.childNodes.length; i++) {
             let childNode = container.childNodes[i];
@@ -123,27 +126,21 @@
           }
         }
       },
-      handleContentMouseUp(event) {
-        if (this.draggingInfo.target) {
-          let instance = this.draggingInfo.mode === 'move'
-              ? this.draggingInfo.target
-              : this.createWidgetInstance(this.draggingInfo.target.type);
-          this.elements.splice(this.getIndicatorIndex(), 0, instance);
-          this.draggingInfo.target = null;
-          this.$nextTick(() => {
-            this.resetIndicator();
-          });
-        }
+      handleFormMouseUp() {
+        this.handleMouseUp(this.elements);
       },
-      handleLayoutMouseUp(event) {
+      handleGridMouseUp(event) {
+        this.handleMouseUp(event.element.elements);
+      },
+      handleMouseUp(elements) {
         if (this.draggingInfo.target) {
           let instance = this.draggingInfo.mode === 'move'
               ? this.draggingInfo.target
               : this.createWidgetInstance(this.draggingInfo.target.type);
-          event.element.elements.splice(this.getIndicatorIndex(), 0, instance);
+          elements.splice(this.getIndicatorIndex(), 0, instance);
           this.draggingInfo.target = null;
           this.$nextTick(() => {
-            this.resetIndicator();
+            this.removeIndicator();
           });
         }
       },
@@ -157,19 +154,15 @@
         this.$nextTick(() => {
           let draggable = document.getElementById('draggable');
           let target = event.target;
-          let layout = target.closest('table');
-          let clonedLayout = layout.cloneNode(true);
-          clonedLayout.style.width = layout.clientWidth + 'px';
+          let grid = target.closest('table');
+          let clonedGrid = grid.cloneNode(true);
+          clonedGrid.style.width = grid.clientWidth + 'px';
           while (draggable.firstChild) {
             draggable.removeChild(draggable.lastChild);
           }
-          draggable.appendChild(clonedLayout);
-          if (event.parentElement) {
-            event.parentElement.elements.splice(event.parentElement.elements.indexOf(event.element),
-                1);
-          } else {
-            this.elements.splice(this.elements.indexOf(event.element), 1);
-          }
+          draggable.appendChild(clonedGrid);
+          let elements = event.parentElement ? event.parentElement.elements : this.elements;
+          elements.splice(elements.indexOf(event.element), 1);
         });
       },
       getIndicatorIndex() {
@@ -180,21 +173,21 @@
         }
         return i;
       },
-      resetIndicator() {
-        let elementsByClassName = document.getElementsByClassName('indicator');
-        if (elementsByClassName.length > 0) {
-          elementsByClassName[0].remove();
+      removeIndicator() {
+        let indicators = document.getElementsByClassName('indicator');
+        for (let element of indicators) {
+          element.remove();
         }
       },
       createWidgetInstance(widgetType) {
         let element = {type: widgetType};
-        if (element.type === 'layout') {
+        if (element.type === 'grid') {
           element.children = [{span: 50, elements: []}, {span: 50, elements: []}];
         }
         return element;
       },
     },
-    components: {Layout},
+    components: {Grid},
   };
 </script>
 <style>
@@ -242,7 +235,7 @@
         user-select: none;
     }
 
-    .content {
+    .form {
         border: 1px dashed #dadce0;
         height: 100%;
         position: relative;
@@ -253,7 +246,6 @@
         position: absolute;
         z-index: -1;
         font-size: 20px;
-        position: absolute;
         top: calc(50% - 15px);
         left: calc(50% - 130px);
     }

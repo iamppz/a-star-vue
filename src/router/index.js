@@ -14,6 +14,7 @@ import Dictionary from '../views/Dictionary';
 import WorkflowConfigList from '../views/workflow/config/List';
 import FlowChart from '../components/flowchart/joyce/general/FlowChart';
 import Detail from '../views/workflow/config/Detail';
+import DynamicFormDesigner from '../components/form/DynamicFormDesigner';
 
 Vue.use(VueRouter);
 
@@ -34,6 +35,7 @@ const routes = [
       {path: 'workflow/config/list', component: WorkflowConfigList},
       {path: 'workflow/config/detail', component: Detail},
       {path: 'component/flowchart', component: FlowChart},
+      {path: 'component/dynamicform/designer', component: DynamicFormDesigner},
     ],
   },
 ];

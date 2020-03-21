@@ -5,9 +5,9 @@
                 class="col" :style="{width: child.span + '%'}"
                 @mouseup="handleMouseUp(child, $event)">
                 <template v-if="child.elements">
-                    <layout v-for="(grandchild, j) in child.elements" :data="grandchild"
-                            :key="i + '-' + j" @mouseup.stop="handleChildMouseUp"
-                            @mousedown.stop="handleChildMouseDown(...arguments, child)"></layout>
+                    <grid v-for="(grandchild, j) in child.elements" :data="grandchild"
+                          :key="i + '-' + j" @mouseup.stop="handleChildMouseUp"
+                          @mousedown.stop="handleChildMouseDown(...arguments, child)"></grid>
                 </template>
             </td>
         </tr>
@@ -16,7 +16,7 @@
 
 <script>
   export default {
-    name: 'Layout',
+    name: 'Grid',
     props: {
       data: {
         type: Object,
