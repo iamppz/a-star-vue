@@ -26,7 +26,7 @@
                 <div class="placeholder" v-if="elements.length === 0">
                     从左侧拖拽或点击来添加字段
                 </div>
-                <div class="form" @mousemove="handleContentMouseMove($event)"
+                <div class="form" @mousemove="handleFormMouseMove($event)"
                      @mouseleave="handleFormMouseUp" @mouseup="handleFormMouseUp">
                     <template v-for="(element, index) in elements">
                         <template v-if="element.type === 'grid'">
@@ -44,6 +44,7 @@
 
 <script>
   import Grid from './Grid';
+  import {getIndex, removeAllChildNodes} from '../../utils/dom';
 
   export default {
     name: 'DynamicFormDesigner',
@@ -86,6 +87,7 @@
           let draggable = document.getElementById('draggable');
           draggable.appendChild(event.target.cloneNode(true));
         });
+        this.handleFormMouseMove(event);
       },
       handleMouseMove(event) {
         if (this.draggingInfo.target) {
@@ -93,7 +95,7 @@
           this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
         }
       },
-      handleContentMouseMove(event) {
+      handleFormMouseMove(event) {
         if (this.draggingInfo.target) {
           let container;
           let target = event.target;
@@ -101,6 +103,9 @@
             container = target;
           } else {
             container = target.closest('.col') || target.closest('.form');
+          }
+          if (container === null) {
+            container = document.getElementsByClassName('form')[0];
           }
           let indicators = document.getElementsByClassName('indicator');
           let indicator;
@@ -111,8 +116,7 @@
             indicator.classList.add('indicator');
           }
           let refNode = null;
-          for (let i = 0; i < container.childNodes.length; i++) {
-            let childNode = container.childNodes[i];
+          for (let childNode of container.childNodes) {
             let top = childNode.getBoundingClientRect().top;
             if (event.clientY < top) {
               refNode = childNode;
@@ -152,26 +156,19 @@
         this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
         this.draggingInfo.mode = 'move';
         this.$nextTick(() => {
-          let draggable = document.getElementById('draggable');
-          let target = event.target;
-          let grid = target.closest('table');
+          let grid = event.target.closest('table');
           let clonedGrid = grid.cloneNode(true);
           clonedGrid.style.width = grid.clientWidth + 'px';
-          while (draggable.firstChild) {
-            draggable.removeChild(draggable.lastChild);
-          }
+          let draggable = document.getElementById('draggable');
+          removeAllChildNodes(draggable);
           draggable.appendChild(clonedGrid);
           let elements = event.parentElement ? event.parentElement.elements : this.elements;
           elements.splice(elements.indexOf(event.element), 1);
         });
+        this.handleFormMouseMove(event);
       },
       getIndicatorIndex() {
-        let indicator = document.getElementsByClassName('indicator')[0];
-        let i = 0;
-        while ((indicator = indicator.previousSibling) != null) {
-          i++;
-        }
-        return i;
+        return getIndex(document.getElementsByClassName('indicator')[0]);
       },
       removeIndicator() {
         let indicators = document.getElementsByClassName('indicator');

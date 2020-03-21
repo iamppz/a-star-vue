@@ -20,6 +20,20 @@ function getOffsetTop(elem) {
     return offsetTop;
 }
 
+function removeAllChildNodes(element) {
+  while (element.firstChild) {
+    element.removeChild(element.lastChild);
+  }
+}
+
+function getIndex(element) {
+  let i = 0;
+  while ((element = element.previousSibling) != null) {
+    i++;
+  }
+  return i;
+}
+
 export {
-    getOffsetLeft, getOffsetTop
+    getOffsetLeft, getOffsetTop, removeAllChildNodes, getIndex
 }
