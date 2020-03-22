@@ -1,13 +1,15 @@
 <template>
     <table class="row" @mousedown="handleMouseDown(data, $event)">
         <tr>
-            <td v-for="(child, i) in data.children" :key="i"
-                class="col" :style="{width: child.span + '%'}"
-                @mouseup="handleMouseUp(child, $event)">
-                <template v-if="child.elements">
-                    <grid v-for="(grandchild, j) in child.elements" :data="grandchild"
-                          :key="i + '-' + j" @mouseup.stop="handleChildMouseUp"
-                          @mousedown.stop="handleChildMouseDown(...arguments, child)"></grid>
+            <td v-for="(col, i) in data.children" :key="i"
+                class="col" :style="{width: col.span + '%'}"
+                @mouseup="handleMouseUp(col, $event)">
+                <template v-if="col.elements">
+                    <div v-for="(element, j) in col.elements" :key="i + '-' + j"
+                         :class="{active: element === active, instance: true}">
+                        <grid :data="element" @mouseup.stop="handleChildMouseUp"
+                              @mousedown.stop="handleChildMouseDown(...arguments, col)"></grid>
+                    </div>
                 </template>
             </td>
         </tr>
@@ -22,9 +24,12 @@
         type: Object,
         default: null,
       },
+      active: {
+        type: Object,
+        default: null,
+      },
     },
-    computed: {
-    },
+    computed: {},
     methods: {
       handleMouseUp(element, event) {
         event.element = element;
@@ -61,5 +66,9 @@
         border: 1px dashed #dadce0;
         height: 50px;
         padding: 6px;
+    }
+
+    .instance.active {
+        border: 1px solid #1890ff;
     }
 </style>

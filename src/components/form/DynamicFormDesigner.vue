@@ -22,6 +22,7 @@
                      :style="{top: draggingInfo.y + 'px', left: draggingInfo.x + 'px'}">
                 </div>
             </td>
+
             <td class="center">
                 <div class="placeholder" v-if="elements.length === 0">
                     从左侧拖拽或点击来添加字段
@@ -29,14 +30,16 @@
                 <div class="form" @mousemove="handleFormMouseMove($event)"
                      @mouseleave="handleFormMouseUp" @mouseup="handleFormMouseUp">
                     <template v-for="(element, index) in elements">
-                        <template v-if="element.type === 'grid'">
-                            <grid :data="element" :key="'element-' + index"
-                                  @mouseup.stop="handleGridMouseUp"
+                        <div v-if="element.type === 'grid'" :key="'element-' + index"
+                             :class="{active: element === currentInstance.target, instance: true}">
+                            <grid :data="element" @mouseup.stop="handleGridMouseUp"
+                                  :active="currentInstance.target"
                                   @mousedown.stop="handleInstanceMouseDown"></grid>
-                        </template>
+                        </div>
                     </template>
                 </div>
             </td>
+
             <td class="right">Right</td>
         </tr>
     </table>
@@ -269,6 +272,10 @@
         height: 100%;
         position: relative;
         padding: 6px;
+    }
+
+    .instance.active {
+        border: 1px solid #1890ff;
     }
 
     .placeholder {
