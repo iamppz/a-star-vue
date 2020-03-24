@@ -1,15 +1,16 @@
 <template>
     <table class="row">
         <tr>
-            <td v-for="(form, i) in data.children" :key="i"
-                class="col" :style="{width: form.span + '%'}"
-                @mouseup="handleMouseUp($event, form)">
-                <template v-if="form.elements">
-                    <div v-for="(element, j) in form.elements" :key="i + '-' + j"
+            <td v-for="(swimlane, i) in data.swimlanes" :key="i"
+                class="col" :style="{width: swimlane.span + '%'}"
+                @mouseup="handleSwimlaneMouseUp($event, swimlane)">
+                <template v-if="swimlane.elements">
+                    <div v-for="(element, j) in swimlane.elements" :key="i + '-' + j"
                          :class="{active: element === active, instance: true}">
                         <i class="dragger el-icon-rank"
-                           @mousedown.stop="handleChildMouseDown($event, element, form)"></i>
-                        <grid :data="element"></grid>
+                           @mousedown.stop="handleElementMouseDown($event, element, swimlane)"></i>
+                        <grid :data="element" @mousedown.stop="handleChildElementMouseDown"
+                              @mouseup="handleChildSwimlaneMouseUp"></grid>
                     </div>
                 </template>
             </td>
@@ -34,13 +35,19 @@
     },
     computed: {},
     methods: {
-      handleChildMouseDown(event, element, parent) {
+      handleElementMouseDown(event, element, parent) {
         event.element = element;
-        event.parentElement = parent;
+        event.swimlane = parent;
         this.$emit('mousedown', event);
       },
-      handleMouseUp(event, element) {
+      handleSwimlaneMouseUp(event, element) {
         event.element = element;
+        this.$emit('mouseup', event);
+      },
+      handleChildElementMouseDown(event) {
+        this.$emit('mousedown', event);
+      },
+      handleChildSwimlaneMouseUp(event) {
         this.$emit('mouseup', event);
       },
     },

@@ -18,7 +18,6 @@
                         {{item.name}}
                     </li>
                 </ul>
-                {{draggingInfo.target}}
                 <div v-if="draggingInfo.target !== null" id="draggable"
                      :style="{top: draggingInfo.y + 'px', left: draggingInfo.x + 'px'}">
                 </div>
@@ -28,7 +27,7 @@
                 <div class="placeholder" v-if="elements.length === 0">
                     从左侧拖拽或点击来添加字段
                 </div>
-                <div class="form" @mousemove="handleFormMouseMove($event)"
+                <div class="swimlane" @mousemove="handleFormMouseMove($event)"
                      @mouseup="handleMouseUp(elements)">
                     <template v-for="(element, index) in elements">
                         <div v-if="element.type === 'grid'" :key="'element-' + index"
@@ -50,7 +49,7 @@
 
 <script>
   import Grid from './Grid';
-  import {getIndex, removeAllChildNodes} from '../../utils/dom';
+  import {clone, getIndex, removeAllChildNodes} from '../../utils/dom';
   import '../../assets/dynamicform.css';
 
   export default {
@@ -110,13 +109,13 @@
         if (this.draggingInfo.target) {
           let container;
           let target = event.target;
-          if (target.classList.contains('col') || target.classList.contains('form')) {
+          if (target.classList.contains('col') || target.classList.contains('swimlane')) {
             container = target;
           } else {
-            container = target.closest('.col') || target.closest('.form');
+            container = target.closest('.col') || target.closest('.swimlane');
           }
           if (container === null) {
-            container = document.getElementsByClassName('form')[0];
+            container = document.getElementsByClassName('swimlane')[0];
           }
           let indicator = this.initIndicator();
           let refNode = null;
@@ -143,7 +142,7 @@
           indicator = document.createElement('div');
           indicator.classList.add('indicator');
         }
-        document.getElementsByClassName('form')[0].appendChild(indicator);
+        document.getElementsByClassName('swimlane')[0].appendChild(indicator);
         return indicator;
       },
       handleMouseUp(elements) {
@@ -164,8 +163,8 @@
       },
       handleInstanceMouseDown(event) {
         this.currentInstance.target = event.element;
-        if (event.parentElement) {
-          this.currentInstance.parent = event.parentElement;
+        if (event.swimlane) {
+          this.currentInstance.parent = event.swimlane;
         } else {
           this.currentInstance.parent = null;
         }
@@ -177,15 +176,10 @@
         this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
         this.draggingInfo.mode = 'move';
         this.$nextTick(() => {
-          let grid = event.target.closest('div');
-          let clonedGrid = grid.cloneNode(true);
-          clonedGrid.style.width = grid.clientWidth + 'px';
-          clonedGrid.classList.add('instance');
-          clonedGrid.classList.add('active');
           let draggable = document.getElementById('draggable');
           removeAllChildNodes(draggable);
-          draggable.appendChild(clonedGrid);
-          let elements = event.parentElement ? event.parentElement.elements : this.elements;
+          draggable.appendChild(clone(event.target.closest('div')));
+          let elements = event.swimlane ? event.swimlane.elements : this.elements;
           elements.splice(elements.indexOf(event.element), 1);
         });
         this.initIndicator();
@@ -202,7 +196,7 @@
       createWidgetInstance(widgetType) {
         let element = {type: widgetType};
         if (element.type === 'grid') {
-          element.children = [{span: 50, elements: []}, {span: 50, elements: []}];
+          element.swimlanes = [{span: 50, elements: []}, {span: 50, elements: []}];
         }
         return element;
       },
@@ -278,7 +272,7 @@
         user-select: none;
     }
 
-    .form {
+    .swimlane {
         border: 1px dashed #dadce0;
         height: 100%;
         position: relative;

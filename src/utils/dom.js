@@ -26,6 +26,14 @@ function removeAllChildNodes(element) {
   }
 }
 
+function clone(element) {
+  let clonedGrid = element.cloneNode(true);
+  clonedGrid.style.width = element.clientWidth + 'px';
+  clonedGrid.classList.add('instance');
+  clonedGrid.classList.add('active');
+  return clonedGrid;
+}
+
 function getIndex(element) {
   let i = 0;
   while ((element = element.previousSibling) != null) {
@@ -35,5 +43,5 @@ function getIndex(element) {
 }
 
 export {
-  getOffsetLeft, getOffsetTop, removeAllChildNodes, getIndex,
+  getOffsetLeft, getOffsetTop, removeAllChildNodes, getIndex, clone,
 };

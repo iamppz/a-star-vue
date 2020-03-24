@@ -2,21 +2,25 @@
     border: 1px solid #1890ff;
 }
 
-.instance.active .dragger {
+.instance.active > .dragger {
     background-color: #1890ff;
     color: white;
 }
 
 .instance .dragger {
-    background-color: gray;
+    background-color: #dadce0;
     color: white;
 }
 
 .dragger {
     cursor: move;
     position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .instance {
+    border: 1px solid #dadce0;
     position: relative;
+    padding: 6px;
 }
