@@ -1,18 +1,20 @@
 <template>
-    <table class="row">
+    <table class="swimlanes">
         <tr>
             <td v-for="(swimlane, i) in data.swimlanes" :key="i"
-                class="col" :style="{width: swimlane.span + '%'}"
+                class="swimlane" :style="{width: swimlane.span + '%'}"
                 @mouseup="handleSwimlaneMouseUp($event, swimlane)">
                 <template v-if="swimlane.elements">
-                    <div v-for="(element, j) in swimlane.elements" :key="i + '-' + j"
-                         :class="{instance: true}" @mousedown="handleElementMouseDown($event)">
-                        <i class="dragger el-icon-rank"
-                           @mousedown.stop="handleDraggerMouseDown($event, element, swimlane)"></i>
-                        <span class="id">{{element.id}}</span>
-                        <grid :data="element" @mousedown.stop="handleChildElementMouseDown"
-                              @mouseup="handleChildSwimlaneMouseUp"></grid>
-                    </div>
+                    <template v-for="(element, j) in swimlane.elements">
+                        <div :key="i + '-' + j"
+                             :class="{instance: true}" @mousedown="handleElementMouseDown($event)">
+                            <i class="dragger el-icon-rank"
+                               @mousedown.stop="handleDraggerMouseDown($event, element, swimlane)"></i>
+                            <span class="id">{{element.id}}</span>
+                            <grid :data="element" @mousedown.stop="handleChildDraggerMouseDown"
+                                  @mouseup="handleChildSwimlaneMouseUp"></grid>
+                        </div>
+                    </template>
                 </template>
             </td>
         </tr>
@@ -41,7 +43,7 @@
         event.element = element;
         this.$emit('mouseup', event);
       },
-      handleChildElementMouseDown(event) {
+      handleChildDraggerMouseDown(event) {
         this.$emit('mousedown', event);
       },
       handleChildSwimlaneMouseUp(event) {
@@ -59,14 +61,15 @@
 </script>
 
 <style scoped>
-    .row {
+    .swimlanes {
         border: 1px dashed #a3a3a3;
         width: 100%;
     }
 
-    .col {
+    .swimlane {
         border: 1px dashed #a3a3a3;
         height: 50px;
         padding: 6px;
+        vertical-align: top;
     }
 </style>

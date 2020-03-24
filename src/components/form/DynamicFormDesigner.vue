@@ -25,24 +25,12 @@
                 </div>
             </td>
 
-            <td class="center">
-                <div class="placeholder" v-if="elements.length === 0">
+            <td class="center" @mousemove="handleFormMouseMove($event)">
+                <div class="placeholder" v-if="data.swimlanes[0].elements.length === 0">
                     从左侧拖拽或点击来添加字段
                 </div>
-                <div class="swimlane" @mousemove="handleFormMouseMove($event)"
-                     @mouseup="handleMouseUp(elements)">
-                    <template v-for="(element, index) in elements">
-                        <div v-if="element.type === 'grid'" :key="'element-' + index"
-                             :class="{instance: true}" @mousedown="handleElementMouseDown($event)">
-                            <i class="dragger el-icon-rank"
-                               @mousedown="handleMouseDown($event, element)"></i>
-                            <span class="id">{{element.id}}</span>
-                            <grid :data="element"
-                                  @mouseup.stop="handleMouseUp($event.element.elements)"
-                                  @mousedown.stop="handleInstanceMouseDown"></grid>
-                        </div>
-                    </template>
-                </div>
+                <grid @mouseup.stop="handleInstanceMouseUp($event.element.elements)" class="form"
+                      @mousedown.stop="handleInstanceMouseDown" :data="data"></grid>
             </td>
 
             <td class="right">Right</td>
@@ -82,6 +70,11 @@
           {type: 'tab', icon: 'icontab', name: '标签页', enable: false},
           {type: 'separator', icon: 'iconsplit', name: '分割线', enable: false},
         ],
+        data: {
+          type: 'grid',
+          id: new Date().getTime(),
+          swimlanes: [{span: 100, elements: []}],
+        },
         elements: [],
         currentInstance: {
           target: null,
@@ -151,7 +144,7 @@
         document.getElementsByClassName('swimlane')[0].appendChild(indicator);
         return indicator;
       },
-      handleMouseUp(elements) {
+      handleInstanceMouseUp(elements) {
         if (this.draggingInfo.target) {
           let instance = this.draggingInfo.mode === 'move'
               ? this.draggingInfo.target
@@ -162,11 +155,6 @@
             this.removeIndicator();
           });
         }
-      },
-      handleMouseDown(event, element) {
-        event.element = element;
-        event.swimlane = this;
-        this.handleInstanceMouseDown(event);
       },
       handleInstanceMouseDown(event) {
         this.currentInstance.target = event.element;
@@ -202,13 +190,6 @@
           element.swimlanes = [{span: 50, elements: []}, {span: 50, elements: []}];
         }
         return element;
-      },
-      handleElementMouseDown(event) {
-        let actives = document.getElementsByClassName('active');
-        for (let element of actives) {
-          element.classList.remove('active');
-        }
-        event.target.closest('.instance').classList.add('active');
       },
     },
     components: {Grid},
