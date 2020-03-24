@@ -4,7 +4,8 @@
             <td class="left">
                 <div>基础字段</div>
                 <ul class="panel">
-                    <li class="widget" @mousedown="handleWidgetMouseDown(item, $event)"
+                    <li :class="['widget', (!item.enable ? 'disable': '')]"
+                        @mousedown="handleWidgetMouseDown(item, $event)"
                         v-for="item in basicWidgets" :key="'widget' + item.type">
                         <span :class="['iconfont', item.icon]"></span>
                         {{item.name}}
@@ -12,7 +13,8 @@
                 </ul>
                 <div>高级字段</div>
                 <ul class="panel">
-                    <li class="widget" @mousedown="handleWidgetMouseDown(item, $event)"
+                    <li :class="['widget', (!item.enable ? 'disable': '')]"
+                        @mousedown="handleWidgetMouseDown(item, $event)"
                         v-for="item in advancedWidgets" :key="'widget' + item.type">
                         <span :class="['iconfont', item.icon]"></span>
                         {{item.name}}
@@ -31,6 +33,7 @@
                      @mouseup="handleMouseUp(elements)">
                     <template v-for="(element, index) in elements">
                         <div v-if="element.type === 'grid'" :key="'element-' + index"
+                             @mousedown="currentInstance.target = element"
                              :class="{active: element === currentInstance.target, instance: true}">
                             <i class="dragger el-icon-rank"
                                @mousedown="handleMouseDown($event, element)"></i>
@@ -50,7 +53,8 @@
 <script>
   import Grid from './Grid';
   import {clone, getIndex, removeAllChildNodes} from '../../utils/dom';
-  import '../../assets/dynamicform.css';
+  import '../../assets/dynamic-form.css';
+  import '../../assets/dynamic-form-designer.css';
 
   export default {
     name: 'DynamicFormDesigner',
@@ -65,18 +69,18 @@
           html: null,
         },
         basicWidgets: [
-          {type: 'input', icon: 'iconinput', name: '输入框'},
-          {type: 'dropdown', icon: 'icondropdown', name: '下拉选择'},
-          {type: 'datetime', icon: 'icondatetime', name: '日期时间'},
-          {type: 'tree', icon: 'icontree', name: '级联选择'},
-          {type: 'checkbox', icon: 'iconcheckbox', name: '多选'},
-          {type: 'radio', icon: 'iconradio', name: '单选'},
+          {type: 'input', icon: 'iconinput', name: '输入框', enable: false},
+          {type: 'dropdown', icon: 'icondropdown', name: '下拉选择', enable: false},
+          {type: 'datetime', icon: 'icondatetime', name: '日期时间', enable: false},
+          {type: 'tree', icon: 'icontree', name: '级联选择', enable: false},
+          {type: 'checkbox', icon: 'iconcheckbox', name: '多选', enable: false},
+          {type: 'radio', icon: 'iconradio', name: '单选', enable: false},
         ],
         advancedWidgets: [
-          {type: 'grid', icon: 'iconinput', name: '布局'},
-          {type: 'list', icon: 'iconinput', name: '列表'},
-          {type: 'tab', icon: 'iconinput', name: '标签页'},
-          {type: 'separator', icon: 'iconinput', name: '分割线'},
+          {type: 'grid', icon: 'icongrid', name: '布局', enable: true},
+          {type: 'list', icon: 'iconlist', name: '列表', enable: false},
+          {type: 'tab', icon: 'icontab', name: '标签页', enable: false},
+          {type: 'separator', icon: 'iconsplit', name: '分割线', enable: false},
         ],
         elements: [],
         currentInstance: {
@@ -87,6 +91,8 @@
     },
     methods: {
       handleWidgetMouseDown(widget, event) {
+        if (!widget.enable) { return; }
+
         this.draggingInfo.mode = 'copy';
         this.draggingInfo.target = widget;
         this.draggingInfo.offsetX = event.offsetX;
@@ -227,67 +233,3 @@
     },
   };
 </script>
-<style>
-    .indicator {
-        height: 5px;
-        background-color: lightpink;
-    }
-</style>
-<style scoped>
-    .layout {
-        width: 100%;
-        height: 100%;
-    }
-
-    .layout td {
-        border: 1px solid #dadce0;
-        padding: 10px;
-    }
-
-    .left {
-        width: 280px;
-        vertical-align: top;
-    }
-
-    .right {
-        width: 280px;
-    }
-
-    .panel {
-        width: 100%;
-        list-style: none;
-        padding: 0;
-    }
-
-    .widget {
-        width: 125px;
-        display: inline-block;
-        cursor: move;
-        border: 1px solid #dadce0;
-        padding: 5px 10px;
-        margin: 2px;
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-
-    .swimlane {
-        border: 1px dashed #dadce0;
-        height: 100%;
-        position: relative;
-        padding: 6px;
-    }
-
-    .placeholder {
-        position: absolute;
-        z-index: -1;
-        font-size: 20px;
-        top: calc(50% - 15px);
-        left: calc(50% - 130px);
-    }
-
-    #draggable {
-        position: fixed;
-    }
-</style>

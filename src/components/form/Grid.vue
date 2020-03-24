@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import '../../assets/dynamicform.css';
+  import '../../assets/dynamic-form.css';
 
   export default {
     name: 'Grid',
@@ -56,12 +56,12 @@
 
 <style scoped>
     .row {
-        border: 1px dashed #dadce0;
+        border: 1px dashed #a3a3a3;
         width: 100%;
     }
 
     .col {
-        border: 1px dashed #dadce0;
+        border: 1px dashed #a3a3a3;
         height: 50px;
         padding: 6px;
     }

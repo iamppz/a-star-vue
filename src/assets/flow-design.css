@@ -18558,7 +18558,7 @@ span.ant-radio+* {
 
 .ant-radio-button-wrapper-disabled.ant-radio-button-wrapper-checked {
     color: #fff;
-    background-color: #e6e6e6;
+    background-color: #a3a3a3;
     border-color: #d9d9d9;
     box-shadow: none
 }

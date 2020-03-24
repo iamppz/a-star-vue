@@ -4,12 +4,12 @@
 
 .instance.active > .dragger {
     background-color: #1890ff;
+    display: block;
     color: white;
 }
 
 .instance .dragger {
-    background-color: #dadce0;
-    color: white;
+    display: none;
 }
 
 .dragger {
@@ -20,7 +20,7 @@
 }
 
 .instance {
-    border: 1px solid #dadce0;
+    border: 1px solid #a3a3a3;
     position: relative;
     padding: 6px;
 }
