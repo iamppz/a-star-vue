@@ -6,9 +6,10 @@
                 @mouseup="handleSwimlaneMouseUp($event, swimlane)">
                 <template v-if="swimlane.elements">
                     <div v-for="(element, j) in swimlane.elements" :key="i + '-' + j"
-                         :class="{active: element === active, instance: true}">
+                         :class="{instance: true}" @mousedown="handleElementMouseDown($event)">
                         <i class="dragger el-icon-rank"
-                           @mousedown.stop="handleElementMouseDown($event, element, swimlane)"></i>
+                           @mousedown.stop="handleDraggerMouseDown($event, element, swimlane)"></i>
+                        <span class="id">{{element.id}}</span>
                         <grid :data="element" @mousedown.stop="handleChildElementMouseDown"
                               @mouseup="handleChildSwimlaneMouseUp"></grid>
                     </div>
@@ -28,14 +29,10 @@
         type: Object,
         default: null,
       },
-      active: {
-        type: Object,
-        default: null,
-      },
     },
     computed: {},
     methods: {
-      handleElementMouseDown(event, element, parent) {
+      handleDraggerMouseDown(event, element, parent) {
         event.element = element;
         event.swimlane = parent;
         this.$emit('mousedown', event);
@@ -49,6 +46,13 @@
       },
       handleChildSwimlaneMouseUp(event) {
         this.$emit('mouseup', event);
+      },
+      handleElementMouseDown(event) {
+        let actives = document.getElementsByClassName('active');
+        for (let element of actives) {
+          element.classList.remove('active');
+        }
+        event.target.closest('.instance').classList.add('active');
       },
     },
   };

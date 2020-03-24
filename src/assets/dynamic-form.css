@@ -24,3 +24,10 @@
     position: relative;
     padding: 6px;
 }
+
+.id {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    color: #a3a3a3;
+}

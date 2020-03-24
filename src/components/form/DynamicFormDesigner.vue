@@ -33,11 +33,11 @@
                      @mouseup="handleMouseUp(elements)">
                     <template v-for="(element, index) in elements">
                         <div v-if="element.type === 'grid'" :key="'element-' + index"
-                             @mousedown="currentInstance.target = element"
-                             :class="{active: element === currentInstance.target, instance: true}">
+                             :class="{instance: true}" @mousedown="handleElementMouseDown($event)">
                             <i class="dragger el-icon-rank"
                                @mousedown="handleMouseDown($event, element)"></i>
-                            <grid :data="element" :active="currentInstance.target"
+                            <span class="id">{{element.id}}</span>
+                            <grid :data="element"
                                   @mouseup.stop="handleMouseUp($event.element.elements)"
                                   @mousedown.stop="handleInstanceMouseDown"></grid>
                         </div>
@@ -165,15 +165,12 @@
       },
       handleMouseDown(event, element) {
         event.element = element;
+        event.swimlane = this;
         this.handleInstanceMouseDown(event);
       },
       handleInstanceMouseDown(event) {
         this.currentInstance.target = event.element;
-        if (event.swimlane) {
-          this.currentInstance.parent = event.swimlane;
-        } else {
-          this.currentInstance.parent = null;
-        }
+        this.currentInstance.parent = event.swimlane;
 
         this.draggingInfo.target = event.element;
         this.draggingInfo.offsetX = event.offsetX;
@@ -185,7 +182,7 @@
           let draggable = document.getElementById('draggable');
           removeAllChildNodes(draggable);
           draggable.appendChild(clone(event.target.closest('div')));
-          let elements = event.swimlane ? event.swimlane.elements : this.elements;
+          let elements = event.swimlane.elements;
           elements.splice(elements.indexOf(event.element), 1);
         });
         this.initIndicator();
@@ -200,11 +197,18 @@
         }
       },
       createWidgetInstance(widgetType) {
-        let element = {type: widgetType};
+        let element = {type: widgetType, id: new Date().getTime()};
         if (element.type === 'grid') {
           element.swimlanes = [{span: 50, elements: []}, {span: 50, elements: []}];
         }
         return element;
+      },
+      handleElementMouseDown(event) {
+        let actives = document.getElementsByClassName('active');
+        for (let element of actives) {
+          element.classList.remove('active');
+        }
+        event.target.closest('.instance').classList.add('active');
       },
     },
     components: {Grid},
