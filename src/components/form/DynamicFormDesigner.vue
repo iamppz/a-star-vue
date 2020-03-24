@@ -2,7 +2,6 @@
     <table class="layout" @mousemove="handleMouseMove($event)">
         <tr>
             <td class="left">
-                {{draggingInfo}}
                 <div>基础字段</div>
                 <ul class="panel">
                     <li class="widget" @mousedown="handleWidgetMouseDown(item, $event)"
