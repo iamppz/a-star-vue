@@ -2,6 +2,7 @@
     <table class="layout" @mousemove="handleMouseMove($event)">
         <tr>
             <td class="left">
+                {{draggingInfo}}
                 <div>基础字段</div>
                 <ul class="panel">
                     <li class="widget" @mousedown="handleWidgetMouseDown(item, $event)"
@@ -18,6 +19,7 @@
                         {{item.name}}
                     </li>
                 </ul>
+                {{draggingInfo.target}}
                 <div v-if="draggingInfo.target !== null" id="draggable"
                      :style="{top: draggingInfo.y + 'px', left: draggingInfo.x + 'px'}">
                 </div>
@@ -28,12 +30,14 @@
                     从左侧拖拽或点击来添加字段
                 </div>
                 <div class="form" @mousemove="handleFormMouseMove($event)"
-                     @mouseleave="handleFormMouseUp" @mouseup="handleFormMouseUp">
+                     @mouseup="handleMouseUp(elements)">
                     <template v-for="(element, index) in elements">
                         <div v-if="element.type === 'grid'" :key="'element-' + index"
                              :class="{active: element === currentInstance.target, instance: true}">
-                            <grid :data="element" @mouseup.stop="handleGridMouseUp"
-                                  :active="currentInstance.target"
+                            <i class="dragger el-icon-rank"
+                               @mousedown="handleMouseDown($event, element)"></i>
+                            <grid :data="element" :active="currentInstance.target"
+                                  @mouseup.stop="handleMouseUp($event.element.elements)"
                                   @mousedown.stop="handleInstanceMouseDown"></grid>
                         </div>
                     </template>
@@ -48,6 +52,7 @@
 <script>
   import Grid from './Grid';
   import {getIndex, removeAllChildNodes} from '../../utils/dom';
+  import '../../assets/dynamicform.css';
 
   export default {
     name: 'DynamicFormDesigner',
@@ -94,7 +99,7 @@
           let draggable = document.getElementById('draggable');
           draggable.appendChild(event.target.cloneNode(true));
         });
-        this.handleFormMouseMove(event);
+        this.initIndicator();
       },
       handleMouseMove(event) {
         if (this.draggingInfo.target) {
@@ -114,14 +119,7 @@
           if (container === null) {
             container = document.getElementsByClassName('form')[0];
           }
-          let indicators = document.getElementsByClassName('indicator');
-          let indicator;
-          if (indicators.length > 0) {
-            indicator = indicators[0];
-          } else {
-            indicator = document.createElement('div');
-            indicator.classList.add('indicator');
-          }
+          let indicator = this.initIndicator();
           let refNode = null;
           for (let childNode of container.childNodes) {
             let top = childNode.getBoundingClientRect().top;
@@ -137,11 +135,17 @@
           }
         }
       },
-      handleFormMouseUp() {
-        this.handleMouseUp(this.elements);
-      },
-      handleGridMouseUp(event) {
-        this.handleMouseUp(event.element.elements);
+      initIndicator() {
+        let indicators = document.getElementsByClassName('indicator');
+        let indicator;
+        if (indicators.length > 0) {
+          indicator = indicators[0];
+        } else {
+          indicator = document.createElement('div');
+          indicator.classList.add('indicator');
+        }
+        document.getElementsByClassName('form')[0].appendChild(indicator);
+        return indicator;
       },
       handleMouseUp(elements) {
         if (this.draggingInfo.target) {
@@ -155,10 +159,16 @@
           });
         }
       },
+      handleMouseDown(event, element) {
+        event.element = element;
+        this.handleInstanceMouseDown(event);
+      },
       handleInstanceMouseDown(event) {
         this.currentInstance.target = event.element;
         if (event.parentElement) {
           this.currentInstance.parent = event.parentElement;
+        } else {
+          this.currentInstance.parent = null;
         }
 
         this.draggingInfo.target = event.element;
@@ -168,16 +178,18 @@
         this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
         this.draggingInfo.mode = 'move';
         this.$nextTick(() => {
-          let grid = event.target.closest('table');
+          let grid = event.target.closest('div');
           let clonedGrid = grid.cloneNode(true);
           clonedGrid.style.width = grid.clientWidth + 'px';
+          clonedGrid.classList.add('instance');
+          clonedGrid.classList.add('active');
           let draggable = document.getElementById('draggable');
           removeAllChildNodes(draggable);
           draggable.appendChild(clonedGrid);
           let elements = event.parentElement ? event.parentElement.elements : this.elements;
           elements.splice(elements.indexOf(event.element), 1);
         });
-        this.handleFormMouseMove(event);
+        this.initIndicator();
       },
       getIndicatorIndex() {
         return getIndex(document.getElementsByClassName('indicator')[0]);
@@ -272,10 +284,6 @@
         height: 100%;
         position: relative;
         padding: 6px;
-    }
-
-    .instance.active {
-        border: 1px solid #1890ff;
     }
 
     .placeholder {

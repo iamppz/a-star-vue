@@ -1,14 +1,15 @@
 <template>
-    <table class="row" @mousedown="handleMouseDown(data, $event)">
+    <table class="row">
         <tr>
-            <td v-for="(col, i) in data.children" :key="i"
-                class="col" :style="{width: col.span + '%'}"
-                @mouseup="handleMouseUp(col, $event)">
-                <template v-if="col.elements">
-                    <div v-for="(element, j) in col.elements" :key="i + '-' + j"
+            <td v-for="(form, i) in data.children" :key="i"
+                class="col" :style="{width: form.span + '%'}"
+                @mouseup="handleMouseUp($event, form)">
+                <template v-if="form.elements">
+                    <div v-for="(element, j) in form.elements" :key="i + '-' + j"
                          :class="{active: element === active, instance: true}">
-                        <grid :data="element" @mouseup.stop="handleChildMouseUp"
-                              @mousedown.stop="handleChildMouseDown(...arguments, col)"></grid>
+                        <i class="dragger el-icon-rank"
+                           @mousedown.stop="handleChildMouseDown($event, element, form)"></i>
+                        <grid :data="element"></grid>
                     </div>
                 </template>
             </td>
@@ -17,6 +18,8 @@
 </template>
 
 <script>
+  import '../../assets/dynamicform.css';
+
   export default {
     name: 'Grid',
     props: {
@@ -31,22 +34,14 @@
     },
     computed: {},
     methods: {
-      handleMouseUp(element, event) {
+      handleChildMouseDown(event, element, parent) {
         event.element = element;
-        this.$emit('mouseup', event);
-      },
-      handleChildMouseUp(event) {
-        this.$emit('mouseup', event);
-      },
-      handleMouseDown(element, event) {
-        event.element = element;
+        event.parentElement = parent;
         this.$emit('mousedown', event);
       },
-      handleChildMouseDown(event, parent) {
-        if (!event.parentElement) {
-          event.parentElement = parent;
-        }
-        this.$emit('mousedown', event);
+      handleMouseUp(event, element) {
+        event.element = element;
+        this.$emit('mouseup', event);
       },
     },
   };
@@ -58,17 +53,9 @@
         width: 100%;
     }
 
-    .row:not(:first-child) {
-        margin-top: 6px;
-    }
-
     .col {
         border: 1px dashed #dadce0;
         height: 50px;
         padding: 6px;
-    }
-
-    .instance.active {
-        border: 1px solid #1890ff;
     }
 </style>
