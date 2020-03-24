@@ -1,5 +1,5 @@
 <template>
-    <table class="layout" @mousemove="handleMouseMove($event)">
+    <table class="layout" @mousemove="handleMouseMove($event)" @mouseup="handleMouseUp">
         <tr>
             <td class="left">
                 <div>基础字段</div>
@@ -102,6 +102,14 @@
         if (this.draggingInfo.target) {
           this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
           this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
+        }
+      },
+      handleMouseUp() {
+        if (this.draggingInfo.target) {
+          this.draggingInfo.target = null;
+          this.$nextTick(() => {
+            this.removeIndicator();
+          });
         }
       },
       handleFormMouseMove(event) {
