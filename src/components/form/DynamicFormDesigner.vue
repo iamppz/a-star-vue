@@ -116,14 +116,7 @@
         if (this.draggingInfo.target) {
           let container;
           let target = event.target;
-          if (target.classList.contains('col') || target.classList.contains('swimlane')) {
-            container = target;
-          } else {
-            container = target.closest('.col') || target.closest('.swimlane');
-          }
-          if (container === null) {
-            container = document.getElementsByClassName('swimlane')[0];
-          }
+          container = target.classList.contains('swimlane') ? target : target.closest('.swimlane');
           let indicator = this.initIndicator();
           let refNode = null;
           for (let childNode of container.childNodes) {

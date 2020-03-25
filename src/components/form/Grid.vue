@@ -5,14 +5,14 @@
                 class="swimlane" :style="{width: swimlane.span + '%'}"
                 @mouseup="handleSwimlaneMouseUp($event, swimlane)">
                 <template v-if="swimlane.elements">
-                    <template v-for="(element, j) in swimlane.elements">
-                        <div :key="i + '-' + j"
-                             :class="{instance: true}" @mousedown="handleElementMouseDown($event)">
+                    <template v-for="element in swimlane.elements">
+                        <div :key="element.id" class="instance"
+                             @mousedown.stop="handleElementMouseDown($event)">
                             <i class="dragger el-icon-rank"
                                @mousedown.stop="handleDraggerMouseDown($event, element, swimlane)"></i>
                             <span class="id">{{element.id}}</span>
                             <grid :data="element" @mousedown.stop="handleChildDraggerMouseDown"
-                                  @mouseup="handleChildSwimlaneMouseUp"></grid>
+                                  @mouseup.stop="handleChildSwimlaneMouseUp"></grid>
                         </div>
                     </template>
                 </template>
@@ -64,6 +64,10 @@
     .swimlanes {
         border: 1px dashed #a3a3a3;
         width: 100%;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 
     .swimlane {

@@ -13,6 +13,7 @@
 }
 
 .dragger {
+    padding: 4px;
     cursor: move;
     position: absolute;
     top: 0;
