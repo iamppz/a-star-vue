@@ -3,7 +3,7 @@
     height: 100%;
 }
 
-.layout td {
+.layout > tr > td {
     border: 1px solid #e6e6e6;
     padding: 10px;
 }
@@ -41,13 +41,6 @@
     cursor: not-allowed;
 }
 
-.swimlane {
-    border: 1px dashed #dadce0;
-    height: 100%;
-    position: relative;
-    padding: 6px;
-}
-
 .placeholder {
     position: absolute;
     z-index: -1;
@@ -63,8 +56,4 @@
 .indicator {
     height: 5px;
     background-color: lightpink;
-}
-
-.form {
-    height: 100%;
 }

@@ -22,8 +22,6 @@
 </template>
 
 <script>
-  import '../../assets/dynamic-form.css';
-
   export default {
     name: 'Grid',
     props: {
@@ -61,19 +59,5 @@
 </script>
 
 <style scoped>
-    .swimlanes {
-        border: 1px dashed #a3a3a3;
-        width: 100%;
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-
-    .swimlane {
-        border: 1px dashed #a3a3a3;
-        height: 50px;
-        padding: 6px;
-        vertical-align: top;
-    }
+    @import "../../assets/grid.css";
 </style>

@@ -32,3 +32,20 @@
     right: 10px;
     color: #a3a3a3;
 }
+
+.swimlanes {
+    border: 1px dashed #a3a3a3;
+    width: 100%;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.swimlane {
+    border: 1px dashed #a3a3a3;
+    height: 50px;
+    padding: 6px;
+    vertical-align: top;
+    position: relative;
+}

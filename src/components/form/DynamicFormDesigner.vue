@@ -1,5 +1,6 @@
 <template>
-    <table class="layout" @mousemove="handleMouseMove($event)" @mouseup="handleMouseUp">
+    <table class="layout" @mousemove="handleMouseMove($event)"
+           @mouseup="handleInstanceMouseUp(data.swimlanes[0].elements)">
         <tr>
             <td class="left">
                 <div>基础字段</div>
@@ -30,6 +31,7 @@
                     从左侧拖拽或点击来添加字段
                 </div>
                 <grid @mouseup.stop="handleInstanceMouseUp($event.element.elements)" class="form"
+                      style="height: 100%;"
                       @mousedown.stop="handleInstanceMouseDown" :data="data"></grid>
             </td>
 
@@ -41,8 +43,6 @@
 <script>
   import Grid from './Grid';
   import {clone, getIndex, removeAllChildNodes} from '../../utils/dom';
-  import '../../assets/dynamic-form.css';
-  import '../../assets/dynamic-form-designer.css';
 
   export default {
     name: 'DynamicFormDesigner',
@@ -75,7 +75,6 @@
           id: new Date().getTime(),
           swimlanes: [{span: 100, elements: []}],
         },
-        elements: [],
         currentInstance: {
           target: null,
           parent: null,
@@ -102,14 +101,6 @@
         if (this.draggingInfo.target) {
           this.draggingInfo.x = event.clientX - this.draggingInfo.offsetX;
           this.draggingInfo.y = event.clientY - this.draggingInfo.offsetY;
-        }
-      },
-      handleMouseUp() {
-        if (this.draggingInfo.target) {
-          this.draggingInfo.target = null;
-          this.$nextTick(() => {
-            this.removeIndicator();
-          });
         }
       },
       handleFormMouseMove(event) {
@@ -150,7 +141,13 @@
           let instance = this.draggingInfo.mode === 'move'
               ? this.draggingInfo.target
               : this.createWidgetInstance(this.draggingInfo.target.type);
-          elements.splice(this.getIndicatorIndex(), 0, instance);
+          let indicatorIndex = this.getIndicatorIndex();
+          if (indicatorIndex === 0) {
+            elements.unshift(instance);
+          } else {
+            elements.splice(indicatorIndex, 0, instance);
+          }
+          this.$forceUpdate();
           this.draggingInfo.target = null;
           this.$nextTick(() => {
             this.removeIndicator();
@@ -219,3 +216,6 @@
     },
   };
 </script>
+<style scoped>
+    @import "../../assets/dynamic-form-designer.css";
+</style>
