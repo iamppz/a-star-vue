@@ -5,6 +5,10 @@
 
 .layout > tr > td {
     border: 1px solid #e6e6e6;
+    position: relative;
+}
+
+.left, .right, .form {
     padding: 10px;
 }
 
@@ -46,7 +50,14 @@
     z-index: -1;
     font-size: 20px;
     top: calc(50% - 15px);
+}
+
+.form > .placeholder {
     left: calc(50% - 130px);
+}
+
+.right > .placeholder {
+    left: calc(50% - 50px);
 }
 
 #draggable {
@@ -56,4 +67,10 @@
 .indicator {
     height: 5px;
     background-color: lightpink;
+}
+
+.toolbar {
+    height: 50px;
+    text-align: right;
+    padding: 10px 20px;
 }

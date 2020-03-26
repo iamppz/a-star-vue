@@ -2,7 +2,7 @@
     <table class="layout" @mousemove="handleMouseMove($event)"
            @mouseup="handleInstanceMouseUp(data.swimlanes[0].elements)">
         <tr>
-            <td class="left">
+            <td class="left" rowspan="2">
                 <div>基础字段</div>
                 <ul class="panel">
                     <li :class="['widget', (!item.enable ? 'disable': '')]"
@@ -26,16 +26,31 @@
                 </div>
             </td>
 
-            <td class="center" @mousemove="handleFormMouseMove($event)">
+            <td class="toolbar">
+                <el-button type="text" icon="el-icon-delete">清空</el-button>
+                <el-button type="text" icon="el-icon-view">预览</el-button>
+            </td>
+
+            <td class="right" rowspan="2">
+                <div class="placeholder" v-if="currentInstance.target === null">
+                    请选择字段
+                </div>
+                <div v-if="currentInstance.target !== null">
+                    {{currentInstance}}
+
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="form" @mousemove="handleFormMouseMove($event)">
                 <div class="placeholder" v-if="data.swimlanes[0].elements.length === 0">
                     从左侧拖拽或点击来添加字段
                 </div>
-                <grid @mouseup.stop="handleInstanceMouseUp($event.element.elements)" class="form"
-                      style="height: 100%;"
-                      @mousedown.stop="handleInstanceMouseDown" :data="data"></grid>
+                <grid @mouseup.stop="handleInstanceMouseUp($event.swimlane.elements)" class="form"
+                      style="height: 100%;" :active="currentInstance.target"
+                      @dragstart.stop="handleInstanceDragStart" :data="data"
+                      @mousedown="handleInstanceMouseDown"></grid>
             </td>
-
-            <td class="right">Right</td>
         </tr>
     </table>
 </template>
@@ -105,9 +120,7 @@
       },
       handleFormMouseMove(event) {
         if (this.draggingInfo.target) {
-          let container;
-          let target = event.target;
-          container = target.classList.contains('swimlane') ? target : target.closest('.swimlane');
+          let container = this.findContainer(event);
           let indicator = this.initIndicator();
           let refNode = null;
           for (let childNode of container.childNodes) {
@@ -123,6 +136,17 @@
             container.insertBefore(indicator, refNode);
           }
         }
+      },
+      findContainer(event) {
+        let target = event.target;
+        let container;
+        if (target.classList.contains('swimlane')) {
+          container = target;
+        } else {
+          container = target.closest('.swimlane');
+        }
+        container = container || document.getElementsByClassName('swimlane')[0];
+        return container;
       },
       initIndicator() {
         let indicators = document.getElementsByClassName('indicator');
@@ -147,7 +171,6 @@
           } else {
             elements.splice(indicatorIndex, 0, instance);
           }
-          this.$forceUpdate();
           this.draggingInfo.target = null;
           this.$nextTick(() => {
             this.removeIndicator();
@@ -155,6 +178,9 @@
         }
       },
       handleInstanceMouseDown(event) {
+        this.currentInstance.target = event.element;
+      },
+      handleInstanceDragStart(event) {
         this.currentInstance.target = event.element;
         this.currentInstance.parent = event.swimlane;
 
