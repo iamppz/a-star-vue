@@ -7,6 +7,13 @@ yarn install
 yarn run serve
 ```
 
+or
+
+``` shell
+npm install
+npm run serve
+```
+
 ### Playground
 
 - [**Workflow Designer:**](http://122.51.84.51/#/app/component/flowchart) /#/app/component/flowchart
