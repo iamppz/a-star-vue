@@ -43,13 +43,15 @@
         </tr>
         <tr>
             <td class="form" @mousemove="handleFormMouseMove($event)">
-                <div class="placeholder" v-if="data.swimlanes[0].elements.length === 0">
-                    从左侧拖拽或点击来添加字段
+                <div style="height: 100%; overflow-y: auto;">
+                    <div class="placeholder" v-if="data.swimlanes[0].elements.length === 0">
+                        从左侧拖拽或点击来添加字段
+                    </div>
+                    <grid @mouseup.stop="handleInstanceMouseUp($event.swimlane.elements)"
+                          style="height: 100%;" :active="currentInstance.target"
+                          @dragstart.stop="handleInstanceDragStart" :data="data"
+                          @mousedown="handleInstanceMouseDown"></grid>
                 </div>
-                <grid @mouseup.stop="handleInstanceMouseUp($event.swimlane.elements)" class="form"
-                      style="height: 100%;" :active="currentInstance.target"
-                      @dragstart.stop="handleInstanceDragStart" :data="data"
-                      @mousedown="handleInstanceMouseDown"></grid>
             </td>
         </tr>
     </table>
@@ -162,15 +164,16 @@
       },
       handleInstanceMouseUp(elements) {
         if (this.draggingInfo.target) {
-          let instance = this.draggingInfo.mode === 'move'
+          let element = this.draggingInfo.mode === 'move'
               ? this.draggingInfo.target
               : this.createWidgetInstance(this.draggingInfo.target.type);
           let indicatorIndex = this.getIndicatorIndex();
           if (indicatorIndex === 0) {
-            elements.unshift(instance);
+            elements.unshift(element);
           } else {
-            elements.splice(indicatorIndex, 0, instance);
+            elements.splice(indicatorIndex, 0, element);
           }
+          this.currentInstance.target = element;
           this.draggingInfo.target = null;
           this.$nextTick(() => {
             this.removeIndicator();
