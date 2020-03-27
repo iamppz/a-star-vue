@@ -36,8 +36,7 @@
                     请选择字段
                 </div>
                 <div v-if="currentInstance.target !== null">
-                    {{currentInstance}}
-
+                    {{currentInstance.target}}
                 </div>
             </td>
         </tr>
@@ -50,7 +49,7 @@
                     <grid @mouseup.stop="handleInstanceMouseUp($event.swimlane.elements)"
                           style="height: 100%;" :active="currentInstance.target"
                           @dragstart.stop="handleInstanceDragStart" :data="data"
-                          @mousedown="handleInstanceMouseDown"></grid>
+                          @active="handleInstanceMouseDown"></grid>
                 </div>
             </td>
         </tr>

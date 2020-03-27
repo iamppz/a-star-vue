@@ -12,7 +12,7 @@
                                @mousedown.stop="handleDraggerMouseDown($event, element, swimlane)"></i>
                             <span class="id">{{element.id}}</span>
                             <grid :data="element" @dragstart.stop="handleChildDraggerMouseDown"
-                                  :active="active" @mousedown.stop="handleChildElementMouseDown"
+                                  :active="active" @active.stop="handleChildElementMouseDown"
                                   @mouseup.stop="handleChildSwimlaneMouseUp"></grid>
                         </div>
                     </template>
@@ -54,10 +54,10 @@
       },
       handleElementMouseDown(event, element) {
         event.element = element;
-        this.$emit('mousedown', event);
+        this.$emit('active', event);
       },
       handleChildElementMouseDown(event) {
-        this.$emit('mousedown', event);
+        this.$emit('active', event);
       }
     },
   };
