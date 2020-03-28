@@ -37,17 +37,19 @@
                 </div>
                 <div v-if="currentInstance.target !== null">
                     <div v-if="currentInstance.target.type === 'grid'">
-                        <div v-for="(swimlane, i) in currentInstance.target.swimlanes"
-                             style="margin-bottom: 10px;">
-                            <i class="iconfont iconsort" style="cursor: move"></i>
-                            &nbsp;
-                            <el-input v-model="swimlane.span" style="width: 200px;"
-                                      size="small"></el-input>
-                            &nbsp;
-                            <el-button type="text" icon="el-icon-delete" style="cursor: pointer"
-                                       @click="currentInstance.target.swimlanes.splice(i, 1)">
-                            </el-button>
-                        </div>
+                        <draggable v-model="currentInstance.target.swimlanes" handle=".iconsort">
+                            <div v-for="(swimlane, i) in currentInstance.target.swimlanes"
+                                 style="margin-bottom: 10px;" :key="'span-' + i">
+                                <i class="iconfont iconsort" style="cursor: move"></i>
+                                &nbsp;
+                                <el-input v-model="swimlane.span" style="width: 200px;"
+                                          size="small"></el-input>
+                                &nbsp;
+                                <el-button type="text" icon="el-icon-delete" style="cursor: pointer"
+                                           @click="currentInstance.target.swimlanes.splice(i, 1)">
+                                </el-button>
+                            </div>
+                        </draggable>
                         <el-button type="text" icon="el-icon-plus"
                                    @click="currentInstance.target.swimlanes.push({span: 50, elements: []})">
                             添加列
@@ -76,6 +78,7 @@
 <script>
   import Grid from './Grid';
   import {clone, getIndex, removeAllChildNodes} from '../../utils/dom';
+  import draggable from 'vuedraggable';
 
   export default {
     name: 'DynamicFormDesigner',
@@ -235,7 +238,7 @@
         return element;
       },
     },
-    components: {Grid},
+    components: {Grid, draggable},
     mounted() {
       let that = this;
       document.onkeydown = function(event) {
