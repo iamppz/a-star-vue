@@ -36,7 +36,23 @@
                     请选择字段
                 </div>
                 <div v-if="currentInstance.target !== null">
-                    {{currentInstance.target}}
+                    <div v-if="currentInstance.target.type === 'grid'">
+                        <div v-for="swimlane in currentInstance.target.swimlanes"
+                             style="margin-bottom: 10px;">
+                            <i class="iconfont iconsort" style="cursor: move"></i>
+                            &nbsp;
+                            <el-input v-model="swimlane.span" style="width: 200px;"
+                                      size="small"></el-input>
+                            &nbsp;
+                            <el-button type="text" icon="el-icon-delete"
+                                       style="cursor: pointer"></el-button>
+                        </div>
+                        <el-button type="text" icon="el-icon-plus"
+                                   @click="currentInstance.target.swimlanes.push({span: 50, elements: []})">
+                            添加列
+                        </el-button>
+                    </div>
+                    <!--                    {{currentInstance.target}}-->
                 </div>
             </td>
         </tr>

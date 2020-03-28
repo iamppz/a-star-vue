@@ -2,7 +2,7 @@
     <table class="swimlanes">
         <tr>
             <td v-for="(swimlane, i) in data.swimlanes" :key="i"
-                class="swimlane" :style="{width: swimlane.span + '%'}"
+                class="swimlane" :style="{width: width(swimlane.span) + '%'}"
                 @mouseup="handleSwimlaneMouseUp($event, swimlane)">
                 <template v-if="swimlane.elements">
                     <template v-for="element in swimlane.elements">
@@ -58,7 +58,10 @@
       },
       handleChildElementMouseDown(event) {
         this.$emit('active', event);
-      }
+      },
+      width(span) {
+        this.data.swimlanes.reduce((sum, current) => sum += current.span, 0);
+      },
     },
   };
 </script>
