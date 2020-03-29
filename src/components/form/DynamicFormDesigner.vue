@@ -37,6 +37,7 @@
                 </div>
                 <div v-if="active.target !== null">
                     <div v-if="active.target.type === 'grid'">
+                        <h4>列设置</h4>
                         <draggable v-model="active.target.swimlanes" handle=".iconsort">
                             <div v-for="(swimlane, i) in active.target.swimlanes"
                                  style="margin-bottom: 10px;" :key="'span-' + i">
@@ -54,6 +55,16 @@
                                    @click="active.target.swimlanes.push({span: 50, elements: []})">
                             添加列
                         </el-button>
+                    </div>
+                    <div v-else-if="active.target.type === 'input'">
+                        <el-form label-width="60px">
+                            <el-form-item label="标题">
+                                <el-input v-model="active.target.label" size="small"></el-input>
+                            </el-form-item>
+                            <el-form-item label="水印">
+                                <el-input v-model="active.target.placeholder" size="small"></el-input>
+                            </el-form-item>
+                        </el-form>
                     </div>
                     <!--                    {{active.target}}-->
                 </div>
@@ -234,6 +245,9 @@
         let element = {type: widgetType, id: new Date().getTime()};
         if (element.type === 'grid') {
           element.swimlanes = [{span: 50, elements: []}, {span: 50, elements: []}];
+        } else if (element.type === 'input') {
+          element.label = '单行文本';
+          element.placeholder = '请填写';
         }
         return element;
       },

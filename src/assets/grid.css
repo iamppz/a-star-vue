@@ -54,5 +54,13 @@
 }
 
 .input {
-    table-layout: fixed; width: 100%;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.input > tr > td.label {
+    padding: 0 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

@@ -17,11 +17,11 @@
                         <div v-if="element.type === 'input'">
                             <table class="input">
                                 <tr>
-                                    <td style="width: 80px; text-align: right;">
-                                        <span>字段：</span>
+                                    <td class="label" style="width: 80px; text-align: right;">
+                                        <span :title="element.label">{{element.label}}</span>
                                     </td>
                                     <td>
-                                        <el-input></el-input>
+                                        <el-input :placeholder="element.placeholder"></el-input>
                                     </td>
                                 </tr>
                             </table>
