@@ -32,13 +32,13 @@
             </td>
 
             <td class="right" rowspan="2">
-                <div class="placeholder" v-if="currentInstance.target === null">
+                <div class="placeholder" v-if="active.target === null">
                     请选择字段
                 </div>
-                <div v-if="currentInstance.target !== null">
-                    <div v-if="currentInstance.target.type === 'grid'">
-                        <draggable v-model="currentInstance.target.swimlanes" handle=".iconsort">
-                            <div v-for="(swimlane, i) in currentInstance.target.swimlanes"
+                <div v-if="active.target !== null">
+                    <div v-if="active.target.type === 'grid'">
+                        <draggable v-model="active.target.swimlanes" handle=".iconsort">
+                            <div v-for="(swimlane, i) in active.target.swimlanes"
                                  style="margin-bottom: 10px;" :key="'span-' + i">
                                 <i class="iconfont iconsort" style="cursor: move"></i>
                                 &nbsp;
@@ -46,16 +46,16 @@
                                           size="small"></el-input>
                                 &nbsp;
                                 <el-button type="text" icon="el-icon-delete" style="cursor: pointer"
-                                           @click="currentInstance.target.swimlanes.splice(i, 1)">
+                                           @click="active.target.swimlanes.splice(i, 1)">
                                 </el-button>
                             </div>
                         </draggable>
                         <el-button type="text" icon="el-icon-plus"
-                                   @click="currentInstance.target.swimlanes.push({span: 50, elements: []})">
+                                   @click="active.target.swimlanes.push({span: 50, elements: []})">
                             添加列
                         </el-button>
                     </div>
-                    <!--                    {{currentInstance.target}}-->
+                    <!--                    {{active.target}}-->
                 </div>
             </td>
         </tr>
@@ -66,7 +66,7 @@
                         从左侧拖拽或点击来添加字段
                     </div>
                     <grid @mouseup.stop="handleInstanceMouseUp($event.swimlane.elements)"
-                          style="height: 100%;" :active="currentInstance.target"
+                          style="height: 100%;" :active="active.target"
                           @dragstart.stop="handleInstanceDragStart" :data="data"
                           @active="handleInstanceMouseDown"></grid>
                 </div>
@@ -111,7 +111,7 @@
           id: new Date().getTime(),
           swimlanes: [{span: 100, elements: []}],
         },
-        currentInstance: {
+        active: {
           target: null,
           parent: null,
         },
@@ -192,7 +192,7 @@
           } else {
             elements.splice(indicatorIndex, 0, element);
           }
-          this.currentInstance.target = element;
+          this.active.target = element;
           this.draggingInfo.target = null;
           this.$nextTick(() => {
             this.removeIndicator();
@@ -200,11 +200,11 @@
         }
       },
       handleInstanceMouseDown(event) {
-        this.currentInstance.target = event.element;
+        this.active.target = event.element;
       },
       handleInstanceDragStart(event) {
-        this.currentInstance.target = event.element;
-        this.currentInstance.parent = event.swimlane;
+        this.active.target = event.element;
+        this.active.parent = event.swimlane;
 
         this.draggingInfo.target = event.element;
         this.draggingInfo.offsetX = event.offsetX;
@@ -244,16 +244,14 @@
       document.onkeydown = function(event) {
         switch (event.keyCode) {
           case 27:
-            if (that.currentInstance.target) {
-              that.currentInstance.target = null;
-              that.currentInstance.parent = null;
+            if (that.active.target) {
+              that.active.target = null;
+              that.active.parent = null;
             }
             break;
           case 46:
-            if (that.currentInstance.target) {
-              let elements = that.currentInstance.parent
-                  ? that.currentInstance.parent.elements
-                  : that.elements;
+            if (that.active.target) {
+              let elements = that.active.parent ? that.active.parent.elements : that.elements;
               elements.splice(elements.indexOf(event.element), 1);
             }
             break;
