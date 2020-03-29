@@ -93,7 +93,7 @@
           html: null,
         },
         basicWidgets: [
-          {type: 'input', icon: 'iconinput', name: '输入框', enable: false},
+          {type: 'input', icon: 'iconinput', name: '输入框', enable: true},
           {type: 'dropdown', icon: 'icondropdown', name: '下拉选择', enable: false},
           {type: 'datetime', icon: 'icondatetime', name: '日期时间', enable: false},
           {type: 'tree', icon: 'icontree', name: '级联选择', enable: false},

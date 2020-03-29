@@ -6,6 +6,7 @@
     background-color: #1890ff;
     display: block;
     color: white;
+    z-index: 1;
 }
 
 .instance .dragger {
@@ -31,6 +32,7 @@
     top: 6px;
     right: 10px;
     color: #a3a3a3;
+    z-index: 1;
 }
 
 .swimlanes {
@@ -49,4 +51,8 @@
     padding: 6px;
     vertical-align: top;
     position: relative;
+}
+
+.input {
+    table-layout: fixed; width: 100%;
 }
