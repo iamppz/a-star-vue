@@ -1,5 +1,5 @@
 <template>
-    <table class="swimlanes">
+    <table :class="['swimlanes', mode]">
         <tr>
             <td v-for="(swimlane, i) in data.swimlanes" :key="i"
                 class="swimlane" :style="{width: swimlane.span + 'px'}"
@@ -7,7 +7,7 @@
                 <template v-for="element in swimlane.elements">
                     <div :key="element.id" :class="{instance: true, active: active === element}"
                          @mousedown.stop="handleActive($event, element)">
-                        <i class="dragger el-icon-rank"
+                        <i :class="['dragger', 'el-icon-rank']"
                            @mousedown.stop="handleDragStart($event, element, swimlane)"></i>
                         <span class="id">{{element.id}}</span>
                         <grid v-if="element.type === 'grid'"
@@ -63,6 +63,13 @@
         type: Object,
         default: null,
       },
+      mode: {
+        type: String,
+        default: 'design',
+      },
+    },
+    data: function() {
+      return {};
     },
     computed: {},
     methods: {

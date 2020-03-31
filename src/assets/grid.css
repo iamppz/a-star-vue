@@ -53,6 +53,14 @@
     position: relative;
 }
 
+.edit .swimlane, .edit.swimlanes, .edit .instance {
+    border-style: none;
+}
+
+.edit .id {
+    display: none;
+}
+
 .input {
     table-layout: fixed;
     width: 100%;

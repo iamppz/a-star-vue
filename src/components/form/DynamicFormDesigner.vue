@@ -28,7 +28,9 @@
 
             <td class="toolbar">
                 <el-button type="text" icon="el-icon-delete">清空</el-button>
-                <el-button type="text" icon="el-icon-view">预览</el-button>
+                <el-button type="text" icon="el-icon-view" @click="previewDialogVisible = true">
+                    预览
+                </el-button>
             </td>
 
             <td class="right" rowspan="2">
@@ -112,6 +114,9 @@
                           style="height: 100%;" :active="active.target"
                           @dragstart.stop="handleInstanceDragStart" :data="data"
                           @active="handleInstanceMouseDown"></grid>
+                    <el-dialog title="预览" :visible.sync="previewDialogVisible" width="50%">
+                        <grid :data="data" mode="edit"></grid>
+                    </el-dialog>
                 </div>
             </td>
         </tr>
@@ -158,6 +163,7 @@
           target: null,
           parent: null,
         },
+        previewDialogVisible: false,
       };
     },
     methods: {
