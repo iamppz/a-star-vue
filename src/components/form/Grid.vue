@@ -26,6 +26,24 @@
                                 </tr>
                             </table>
                         </div>
+                        <div v-if="element.type === 'dropdown'">
+                            <table class="dropdown">
+                                <tr>
+                                    <td class="label" style="width: 80px; text-align: right;">
+                                        <span :title="element.label">{{element.label}}</span>
+                                    </td>
+                                    <td>
+                                        <el-select :placeholder="element.placeholder"
+                                                   style="width: 100%;">
+                                            <el-option v-for="item in element.options"
+                                                       :key="item.value" :label="item.label"
+                                                       :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </template>
             </td>

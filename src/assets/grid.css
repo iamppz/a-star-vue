@@ -64,3 +64,15 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.dropdown {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.dropdown > tr > td.label {
+    padding: 0 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

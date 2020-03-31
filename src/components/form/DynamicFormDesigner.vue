@@ -62,8 +62,40 @@
                                 <el-input v-model="active.target.label" size="small"></el-input>
                             </el-form-item>
                             <el-form-item label="水印">
-                                <el-input v-model="active.target.placeholder" size="small"></el-input>
+                                <el-input v-model="active.target.placeholder"
+                                          size="small"></el-input>
                             </el-form-item>
+                        </el-form>
+                    </div>
+                    <div v-else-if="active.target.type === 'dropdown'">
+                        <el-form label-width="60px">
+                            <h4>显示设置</h4>
+                            <el-form-item label="标题">
+                                <el-input v-model="active.target.label" size="small"></el-input>
+                            </el-form-item>
+                            <el-form-item label="水印">
+                                <el-input v-model="active.target.placeholder"
+                                          size="small"></el-input>
+                            </el-form-item>
+                            <h4>选项设置</h4>
+                            <draggable v-model="active.target.options" handle=".iconsort">
+                                <div v-for="(option, i) in active.target.options"
+                                     style="margin-bottom: 10px;" :key="'span-' + i">
+                                    <i class="iconfont iconsort" style="cursor: move"></i>
+                                    &nbsp;
+                                    <el-input v-model="option.label" style="width: 200px;"
+                                              size="small"></el-input>
+                                    &nbsp;
+                                    <el-button type="text" icon="el-icon-delete"
+                                               style="cursor: pointer"
+                                               @click="active.target.options.splice(i, 1)">
+                                    </el-button>
+                                </div>
+                            </draggable>
+                            <el-button type="text" icon="el-icon-plus"
+                                       @click="active.target.options.push({label: '新选项', value: new Date().getTime()})">
+                                添加选项
+                            </el-button>
                         </el-form>
                     </div>
                     <!--                    {{active.target}}-->
@@ -104,8 +136,8 @@
           html: null,
         },
         basicWidgets: [
-          {type: 'input', icon: 'iconinput', name: '输入框', enable: true},
-          {type: 'dropdown', icon: 'icondropdown', name: '下拉选择', enable: false},
+          {type: 'input', icon: 'iconinput', name: '单行文本', enable: true},
+          {type: 'dropdown', icon: 'icondropdown', name: '下拉选择', enable: true},
           {type: 'datetime', icon: 'icondatetime', name: '日期时间', enable: false},
           {type: 'tree', icon: 'icontree', name: '级联选择', enable: false},
           {type: 'checkbox', icon: 'iconcheckbox', name: '多选', enable: false},
@@ -248,6 +280,10 @@
         } else if (element.type === 'input') {
           element.label = '单行文本';
           element.placeholder = '请填写';
+        } else if (element.type === 'dropdown') {
+          element.label = '下拉选择';
+          element.placeholder = '请选择';
+          element.options = [];
         }
         return element;
       },
@@ -265,7 +301,9 @@
             break;
           case 46:
             if (that.active.target) {
-              let elements = that.active.parent ? that.active.parent.elements : that.elements;
+              let elements = that.active.parent
+                  ? that.active.parent.elements
+                  : that.data.swimlanes[0].elements;
               elements.splice(elements.indexOf(event.element), 1);
             }
             break;
