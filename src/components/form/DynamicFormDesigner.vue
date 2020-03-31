@@ -150,7 +150,7 @@
         ],
         advancedWidgets: [
           {type: 'grid', icon: 'icongrid', name: '布局', enable: true},
-          {type: 'list', icon: 'iconlist', name: '列表', enable: false},
+          {type: 'list', icon: 'iconlist', name: '列表', enable: true},
           {type: 'tab', icon: 'icontab', name: '标签页', enable: false},
           {type: 'separator', icon: 'iconsplit', name: '分割线', enable: false},
         ],
@@ -290,6 +290,9 @@
           element.label = '下拉选择';
           element.placeholder = '请选择';
           element.options = [];
+        } else if (element.type === 'list') {
+          element.label = '列表';
+          element.elements = [];
         }
         return element;
       },

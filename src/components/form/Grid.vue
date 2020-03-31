@@ -15,9 +15,9 @@
                               :active="active" @active.stop="handleChildActive"
                               @mouseup.stop="handleChildSwimlaneMouseUp"></grid>
                         <div v-if="element.type === 'input'">
-                            <table class="input">
+                            <table class="form-group">
                                 <tr>
-                                    <td class="label" style="width: 80px; text-align: right;">
+                                    <td class="label">
                                         <span :title="element.label">{{element.label}}</span>
                                     </td>
                                     <td>
@@ -27,9 +27,9 @@
                             </table>
                         </div>
                         <div v-if="element.type === 'dropdown'">
-                            <table class="dropdown">
+                            <table class="form-group">
                                 <tr>
-                                    <td class="label" style="width: 80px; text-align: right;">
+                                    <td class="label">
                                         <span :title="element.label">{{element.label}}</span>
                                     </td>
                                     <td>
@@ -40,6 +40,68 @@
                                                        :value="item.value">
                                             </el-option>
                                         </el-select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div v-if="element.type === 'list'">
+                            <table class="form-group list">
+                                <tr>
+                                    <td class="label">
+                                        <span :title="element.label">{{element.label}}</span>
+                                    </td>
+                                    <td class="swimlane"
+                                        @mouseup="handleSwimlaneMouseUp($event, element)">
+                                        <template v-for="item in element.elements">
+                                            <div :key="item.id"
+                                                 :class="{instance: true, active: active === item}"
+                                                 @mousedown.stop="handleActive($event, item)">
+                                                <i :class="['dragger', 'el-icon-rank']"
+                                                   @mousedown.stop="handleDragStart($event, item, element)"></i>
+                                                <span class="id">{{item.id}}</span>
+                                                <div v-if="item.type === 'input'">
+                                                    <table class="form-group">
+                                                        <tr>
+                                                            <td class="label">
+                                                                <span :title="item.label">
+                                                                    {{item.label}}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <el-input
+                                                                        :placeholder="item.placeholder"></el-input>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                <div v-if="item.type === 'dropdown'">
+                                                    <table class="form-group">
+                                                        <tr>
+                                                            <td class="label">
+                                                                <span :title="item.label">
+                                                                    {{item.label}}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <el-select style="width: 100%;"
+                                                                           :placeholder="item.placeholder">
+                                                                    <el-option
+                                                                            v-for="item in item.options"
+                                                                            :key="item.value"
+                                                                            :label="item.label"
+                                                                            :value="item.value">
+                                                                    </el-option>
+                                                                </el-select>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </template>
                                     </td>
                                 </tr>
                             </table>

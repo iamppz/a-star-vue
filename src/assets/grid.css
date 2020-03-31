@@ -61,26 +61,40 @@
     display: none;
 }
 
-.input {
+.form-group {
     table-layout: fixed;
     width: 100%;
 }
 
-.input > tr > td.label {
+.form-group > tr > td.label {
     padding: 0 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align: right;
+    width: 80px;
 }
 
-.dropdown {
-    table-layout: fixed;
+.list {
     width: 100%;
 }
 
-.dropdown > tr > td.label {
-    padding: 0 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.list .swimlane {
+    overflow-x: auto;
     white-space: nowrap;
+}
+
+.list .instance {
+    width: 200px;
+    display: inline-block;
+}
+
+.list .form-group > tr > td.label {
+    text-align: left;
+}
+
+.list .indicator {
+    display: inline-block;
+    width: 5px;
+    height: 100%;
 }
