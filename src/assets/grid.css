@@ -61,40 +61,27 @@
     display: none;
 }
 
-.form-group {
-    table-layout: fixed;
-    width: 100%;
-}
-
-.form-group > tr > td.label {
-    padding: 0 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: right;
-    width: 80px;
-}
-
 .list {
     width: 100%;
 }
 
-.list .swimlane {
+.swimlane.row {
     overflow-x: auto;
     white-space: nowrap;
 }
 
-.list .instance {
+.swimlane.row .instance {
     width: 200px;
     display: inline-block;
+    vertical-align: top;
 }
 
-.list .form-group > tr > td.label {
+.swimlane.row .form-group > tr > td.label {
     text-align: left;
 }
 
-.list .indicator {
+.swimlane.row .indicator {
     display: inline-block;
-    width: 5px;
     height: 100%;
+    width: 5px;
 }

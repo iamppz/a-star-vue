@@ -2,7 +2,7 @@
     <table :class="['swimlanes', mode]">
         <tr>
             <td v-for="(swimlane, i) in data.swimlanes" :key="i"
-                class="swimlane" :style="{width: swimlane.span + 'px'}"
+                :class="['swimlane', direction]" :style="{width: swimlane.span + 'px'}"
                 @mouseup="handleSwimlaneMouseUp($event, swimlane)">
                 <template v-for="element in swimlane.elements">
                     <div :key="element.id" :class="{instance: true, active: active === element}"
@@ -15,96 +15,26 @@
                               :active="active" @active.stop="handleChildActive"
                               @mouseup.stop="handleChildSwimlaneMouseUp"></grid>
                         <div v-if="element.type === 'input'">
-                            <table class="form-group">
-                                <tr>
-                                    <td class="label">
-                                        <span :title="element.label">{{element.label}}</span>
-                                    </td>
-                                    <td>
-                                        <el-input :placeholder="element.placeholder"></el-input>
-                                    </td>
-                                </tr>
-                            </table>
+                            <form-group :layout="direction === 'row' ? 'inline' : 'default'">
+                                <span slot="label" :title="element.label">{{element.label}}</span>
+                                <el-input slot="element"
+                                          :placeholder="element.placeholder"></el-input>
+                            </form-group>
                         </div>
                         <div v-if="element.type === 'dropdown'">
-                            <table class="form-group">
-                                <tr>
-                                    <td class="label">
-                                        <span :title="element.label">{{element.label}}</span>
-                                    </td>
-                                    <td>
-                                        <el-select :placeholder="element.placeholder"
-                                                   style="width: 100%;">
-                                            <el-option v-for="item in element.options"
-                                                       :key="item.value" :label="item.label"
-                                                       :value="item.value">
-                                            </el-option>
-                                        </el-select>
-                                    </td>
-                                </tr>
-                            </table>
+                            <form-group :layout="direction === 'row' ? 'inline' : 'default'">
+                                <span slot="label" :title="element.label">{{element.label}}</span>
+                                <select-wrapper slot="element" :options="element.options"
+                                                :placeholder="element.placeholder"></select-wrapper>
+                            </form-group>
                         </div>
                         <div v-if="element.type === 'list'">
-                            <table class="form-group list">
-                                <tr>
-                                    <td class="label">
-                                        <span :title="element.label">{{element.label}}</span>
-                                    </td>
-                                    <td class="swimlane"
-                                        @mouseup="handleSwimlaneMouseUp($event, element)">
-                                        <template v-for="item in element.elements">
-                                            <div :key="item.id"
-                                                 :class="{instance: true, active: active === item}"
-                                                 @mousedown.stop="handleActive($event, item)">
-                                                <i :class="['dragger', 'el-icon-rank']"
-                                                   @mousedown.stop="handleDragStart($event, item, element)"></i>
-                                                <span class="id">{{item.id}}</span>
-                                                <div v-if="item.type === 'input'">
-                                                    <table class="form-group">
-                                                        <tr>
-                                                            <td class="label">
-                                                                <span :title="item.label">
-                                                                    {{item.label}}
-                                                                </span>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <el-input
-                                                                        :placeholder="item.placeholder"></el-input>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                                <div v-if="item.type === 'dropdown'">
-                                                    <table class="form-group">
-                                                        <tr>
-                                                            <td class="label">
-                                                                <span :title="item.label">
-                                                                    {{item.label}}
-                                                                </span>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <el-select style="width: 100%;"
-                                                                           :placeholder="item.placeholder">
-                                                                    <el-option
-                                                                            v-for="item in item.options"
-                                                                            :key="item.value"
-                                                                            :label="item.label"
-                                                                            :value="item.value">
-                                                                    </el-option>
-                                                                </el-select>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </td>
-                                </tr>
-                            </table>
+                            <form-group class="list">
+                                    <span slot="label"
+                                          :title="element.label">{{element.label}}</span>
+                                <grid slot="element" :mode="mode" direction="row" :data="element"
+                                      @mouseup="handleSwimlaneMouseUp($event, element.swimlanes[0])"></grid>
+                            </form-group>
                         </div>
                     </div>
                 </template>
@@ -114,8 +44,12 @@
 </template>
 
 <script>
+  import SelectWrapper from '../SelectWrapper';
+  import FormGroup from './FormGroup';
+
   export default {
     name: 'Grid',
+    components: {FormGroup, SelectWrapper},
     props: {
       data: {
         type: Object,
@@ -128,6 +62,10 @@
       mode: {
         type: String,
         default: 'design',
+      },
+      direction: {
+        type: String,
+        default: 'column',
       },
     },
     data: function() {

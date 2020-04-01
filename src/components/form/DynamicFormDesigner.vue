@@ -292,7 +292,7 @@
           element.options = [];
         } else if (element.type === 'list') {
           element.label = '列表';
-          element.elements = [];
+          element.swimlanes = [{elements: []}];
         }
         return element;
       },
