@@ -1,6 +1,6 @@
 <template>
     <table class="layout" @mousemove="handleMouseMove($event)"
-           @mouseup="handleInstanceMouseUp(data.swimlanes[0].elements)">
+           @mouseup="handleInstanceMouseUp(data.swimlanes[0].elements, data)">
         <tr>
             <td class="left" rowspan="2">
                 <div>基础字段</div>
@@ -110,7 +110,7 @@
                     <div class="placeholder" v-if="data.swimlanes[0].elements.length === 0">
                         从左侧拖拽或点击来添加字段
                     </div>
-                    <grid @mouseup.stop="handleInstanceMouseUp($event.swimlane.elements)"
+                    <grid @mouseup.stop="handleInstanceMouseUp($event.swimlane.elements, $event.parent)"
                           style="height: 100%;" :active="active.target"
                           @dragstart.stop="handleInstanceDragStart" :data="data"
                           @active="handleInstanceMouseDown"></grid>
@@ -209,13 +209,22 @@
       },
       findContainer(event) {
         let target = event.target;
+        let type = this.draggingInfo.target.type;
+        let root = document.getElementsByClassName('swimlane')[0];
+        if (type === 'list') {
+          return root;
+        }
+
         let container;
         if (target.classList.contains('swimlane')) {
           container = target;
         } else {
           container = target.closest('.swimlane');
         }
-        container = container || document.getElementsByClassName('swimlane')[0];
+        if (container && container.classList.contains('row') && type === 'grid') {
+          container = null;
+        }
+        container = container || root;
         return container;
       },
       initIndicator() {
@@ -230,8 +239,16 @@
         document.getElementsByClassName('swimlane')[0].appendChild(indicator);
         return indicator;
       },
-      handleInstanceMouseUp(elements) {
+      handleInstanceMouseUp(elements, parent) {
         if (this.draggingInfo.target) {
+          if (this.draggingInfo.target.type === 'list') {
+            elements = this.data.swimlanes[0].elements;
+          }
+
+          if (parent.type === 'list' && this.draggingInfo.target.type === 'grid') {
+            elements = this.data.swimlanes[0].elements;
+          }
+
           let element = this.draggingInfo.mode === 'move'
               ? this.draggingInfo.target
               : this.createWidgetInstance(this.draggingInfo.target.type);

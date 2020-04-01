@@ -3,7 +3,7 @@
         <tr>
             <td v-for="(swimlane, i) in data.swimlanes" :key="i"
                 :class="['swimlane', direction]" :style="{width: swimlane.span + 'px'}"
-                @mouseup="handleSwimlaneMouseUp($event, swimlane)">
+                @mouseup="handleSwimlaneMouseUp($event, swimlane, data)">
                 <template v-for="element in swimlane.elements">
                     <div :key="element.id" :class="{instance: true, active: active === element}"
                          @mousedown.stop="handleActive($event, element)">
@@ -33,7 +33,7 @@
                                     <span slot="label"
                                           :title="element.label">{{element.label}}</span>
                                 <grid slot="element" :mode="mode" direction="row" :data="element"
-                                      @mouseup="handleSwimlaneMouseUp($event, element.swimlanes[0])"></grid>
+                                      @mouseup="handleSwimlaneMouseUp($event, element.swimlanes[0], element)"></grid>
                             </form-group>
                         </div>
                     </div>
@@ -78,8 +78,9 @@
         event.swimlane = parent;
         this.$emit('dragstart', event);
       },
-      handleSwimlaneMouseUp(event, swimlane) {
+      handleSwimlaneMouseUp(event, swimlane, parent) {
         event.swimlane = swimlane;
+        event.parent = parent;
         this.$emit('mouseup', event);
       },
       handleChildDragStart(event) {
