@@ -69,6 +69,24 @@
                             </el-form-item>
                         </el-form>
                     </div>
+                    <div v-else-if="active.target.type === 'datetime'">
+                        <el-form label-width="60px">
+                            <el-form-item label="标题">
+                                <el-input v-model="active.target.label" size="small"></el-input>
+                            </el-form-item>
+                            <el-form-item label="水印">
+                                <el-input v-model="active.target.placeholder"
+                                          size="small"></el-input>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                    <div v-else-if="active.target.type === 'list'">
+                        <el-form label-width="60px">
+                            <el-form-item label="标题">
+                                <el-input v-model="active.target.label" size="small"></el-input>
+                            </el-form-item>
+                        </el-form>
+                    </div>
                     <div v-else-if="active.target.type === 'dropdown'">
                         <el-form label-width="60px">
                             <h4>显示设置</h4>
@@ -143,7 +161,7 @@
         basicWidgets: [
           {type: 'input', icon: 'iconinput', name: '单行文本', enable: true},
           {type: 'dropdown', icon: 'icondropdown', name: '下拉选择', enable: true},
-          {type: 'datetime', icon: 'icondatetime', name: '日期时间', enable: false},
+          {type: 'datetime', icon: 'icondatetime', name: '日期时间', enable: true},
           {type: 'tree', icon: 'icontree', name: '级联选择', enable: false},
           {type: 'checkbox', icon: 'iconcheckbox', name: '多选', enable: false},
           {type: 'radio', icon: 'iconradio', name: '单选', enable: false},
@@ -315,6 +333,9 @@
         } else if (element.type === 'list') {
           element.label = '列表';
           element.swimlanes = [{elements: []}];
+        } else if (element.type === 'datetime') {
+          element.label = '日期时间';
+          element.placeholder = '请选择';
         }
         return element;
       },

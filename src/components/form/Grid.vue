@@ -9,8 +9,8 @@
                         <!--suppress HtmlUnknownTag -->
                         <cell :element="element" :key="element.id" :direction="direction"
                               @dragstart="handleDragStart" @mouseup="handleSwimlaneMouseUp"
-                              :mode="mode"
-                              @active="handleActive" :swimlane="swimlane" :active="active"></cell>
+                              :mode="mode" @active="handleActive" :swimlane="swimlane"
+                              :active="active"></cell>
                     </template>
                 </td>
             </tr>

@@ -8,11 +8,19 @@
               :data="element" @dragstart.stop="handleChildDragStart"
               :active="active" @active.stop="handleChildActive"
               @mouseup.stop="handleChildSwimlaneMouseUp"></grid>
-        <form-group v-if="element.type === 'input'" :layout="direction === 'row' ? 'inline' : 'default'">
+        <form-group v-if="element.type === 'input'"
+                    :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <el-input slot="element" :placeholder="element.placeholder"></el-input>
         </form-group>
-        <form-group v-if="element.type === 'dropdown'" :layout="direction === 'row' ? 'inline' : 'default'">
+        <form-group v-if="element.type === 'datetime'"
+                    :layout="direction === 'row' ? 'inline' : 'default'">
+            <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
+            <el-date-picker slot="element" :placeholder="element.placeholder"
+                            style="width: 100%;"></el-date-picker>
+        </form-group>
+        <form-group v-if="element.type === 'dropdown'"
+                    :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <select-wrapper slot="element" :options="element.options"
                             :placeholder="element.placeholder"></select-wrapper>
