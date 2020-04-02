@@ -4,7 +4,7 @@
         <i :class="['dragger', 'el-icon-rank']"
            @mousedown.stop="handleDragStart($event, element, swimlane)"></i>
         <span class="id">{{element.id}}</span>
-        <grid v-if="element.type === 'grid'"
+        <grid v-if="element.type === 'grid'" :mode="mode"
               :data="element" @dragstart.stop="handleChildDragStart"
               :active="active" @active.stop="handleChildActive"
               @mouseup.stop="handleChildSwimlaneMouseUp"></grid>

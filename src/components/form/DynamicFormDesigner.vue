@@ -115,7 +115,7 @@
                           @dragstart.stop="handleInstanceDragStart" :data="data"
                           @active="handleInstanceMouseDown"></grid>
                     <el-dialog title="预览" :visible.sync="previewDialogVisible" width="50%">
-                        <grid :data="data" mode="edit"></grid>
+                        <grid :data="previewData" mode="edit"></grid>
                     </el-dialog>
                 </div>
             </td>
