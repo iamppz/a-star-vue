@@ -25,6 +25,26 @@
             <select-wrapper slot="element" :options="element.options"
                             :placeholder="element.placeholder"></select-wrapper>
         </form-group>
+        <form-group v-if="element.type === 'checkbox'"
+                    :layout="direction === 'row' ? 'inline' : 'default'">
+            <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
+            <div slot="element">
+                <el-checkbox v-for="option in element.options" :label="option.label"
+                             :key="option.value">
+                    {{option.label}}
+                </el-checkbox>
+            </div>
+        </form-group>
+        <form-group v-if="element.type === 'radio'"
+                    :layout="direction === 'row' ? 'inline' : 'default'">
+            <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
+            <div slot="element">
+                <el-radio v-for="option in element.options" :label="option.label"
+                             :key="option.value">
+                    {{option.label}}
+                </el-radio>
+            </div>
+        </form-group>
         <form-group v-if="element.type === 'list'" class="list">
             <span slot="label" :title="element.label">{{element.label}}</span>
             <div slot="element">

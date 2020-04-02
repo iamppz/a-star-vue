@@ -39,6 +39,7 @@
     .form-group {
         table-layout: fixed;
         width: 100%;
+        min-height: 42px;
     }
 
     .form-group.inline {

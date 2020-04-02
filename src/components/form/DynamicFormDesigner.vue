@@ -118,6 +118,33 @@
                             </el-button>
                         </el-form>
                     </div>
+                    <div v-else-if="active.target.type === 'checkbox' || active.target.type === 'radio'">
+                        <el-form label-width="60px">
+                            <h4>显示设置</h4>
+                            <el-form-item label="标题">
+                                <el-input v-model="active.target.label" size="small"></el-input>
+                            </el-form-item>
+                            <h4>选项设置</h4>
+                            <draggable v-model="active.target.options" handle=".iconsort">
+                                <div v-for="(option, i) in active.target.options"
+                                     style="margin-bottom: 10px;" :key="'span-' + i">
+                                    <i class="iconfont iconsort" style="cursor: move"></i>
+                                    &nbsp;
+                                    <el-input v-model="option.label" style="width: 200px;"
+                                              size="small"></el-input>
+                                    &nbsp;
+                                    <el-button type="text" icon="el-icon-delete"
+                                               style="cursor: pointer"
+                                               @click="active.target.options.splice(i, 1)">
+                                    </el-button>
+                                </div>
+                            </draggable>
+                            <el-button type="text" icon="el-icon-plus"
+                                       @click="active.target.options.push({label: '新选项', value: new Date().getTime()})">
+                                添加选项
+                            </el-button>
+                        </el-form>
+                    </div>
                     <!--                    {{active.target}}-->
                 </div>
             </td>
@@ -163,8 +190,8 @@
           {type: 'dropdown', icon: 'icondropdown', name: '下拉选择', enable: true},
           {type: 'datetime', icon: 'icondatetime', name: '日期时间', enable: true},
           {type: 'tree', icon: 'icontree', name: '级联选择', enable: false},
-          {type: 'checkbox', icon: 'iconcheckbox', name: '多选', enable: false},
-          {type: 'radio', icon: 'iconradio', name: '单选', enable: false},
+          {type: 'checkbox', icon: 'iconcheckbox', name: '多选', enable: true},
+          {type: 'radio', icon: 'iconradio', name: '单选', enable: true},
         ],
         advancedWidgets: [
           {type: 'grid', icon: 'icongrid', name: '布局', enable: true},
@@ -271,12 +298,7 @@
           let element = this.draggingInfo.mode === 'move'
               ? this.draggingInfo.target
               : this.createWidgetInstance(this.draggingInfo.target.type);
-          let indicatorIndex = this.getIndicatorIndex();
-          if (indicatorIndex === 0) {
-            elements.unshift(element);
-          } else {
-            elements.splice(indicatorIndex, 0, element);
-          }
+          elements.splice(this.getIndicatorIndex(), 0, element);
           this.active.target = element;
           this.draggingInfo.target = null;
           this.$nextTick(() => {
@@ -336,6 +358,12 @@
         } else if (element.type === 'datetime') {
           element.label = '日期时间';
           element.placeholder = '请选择';
+        } else if (element.type === 'checkbox') {
+          element.label = '多选';
+          element.options = [];
+        } else if (element.type === 'radio') {
+          element.label = '单选';
+          element.options = [];
         }
         return element;
       },
