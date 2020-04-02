@@ -1,3 +1,7 @@
+.column > .instance {
+    padding: 6px 0;
+}
+
 .instance.active {
     border: 1px solid #1890ff;
 }
@@ -24,7 +28,6 @@
 .instance {
     border: 1px solid #a3a3a3;
     position: relative;
-    padding: 6px;
 }
 
 .id {
@@ -45,10 +48,13 @@
     user-select: none;
 }
 
+.swimlanes:not(:first-of-type):not(:last-of-type) {
+    margin: 10px 0;
+}
+
 .swimlane {
     border: 1px dashed #a3a3a3;
-    height: 50px;
-    padding: 6px;
+    height: 42px;
     vertical-align: top;
     position: relative;
 }
@@ -73,8 +79,8 @@
 
 .swimlane.row .instance {
     width: 200px;
-    display: inline-block;
     vertical-align: top;
+    display: inline-flex;
 }
 
 .swimlane.row .form-group > tr > td.label {

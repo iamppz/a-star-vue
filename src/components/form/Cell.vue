@@ -8,34 +8,27 @@
               :data="element" @dragstart.stop="handleChildDragStart"
               :active="active" @active.stop="handleChildActive"
               @mouseup.stop="handleChildSwimlaneMouseUp"></grid>
-        <div v-if="element.type === 'input'">
-            <form-group :layout="direction === 'row' ? 'inline' : 'default'">
-                <span slot="label" :title="element.label">{{element.label}}</span>
-                <el-input slot="element"
-                          :placeholder="element.placeholder"></el-input>
-            </form-group>
-        </div>
-        <div v-if="element.type === 'dropdown'">
-            <form-group :layout="direction === 'row' ? 'inline' : 'default'">
-                <span slot="label" :title="element.label">{{element.label}}</span>
-                <select-wrapper slot="element" :options="element.options"
-                                :placeholder="element.placeholder"></select-wrapper>
-            </form-group>
-        </div>
-        <div v-if="element.type === 'list'">
-            <form-group class="list">
-                <span slot="label" :title="element.label">{{element.label}}</span>
-                <div slot="element">
-                    <grid :mode="mode" direction="row"
-                          :data="element"
-                          @mouseup="handleSwimlaneMouseUp($event, element.swimlanes[0], element)"></grid>
-                    <el-button type="text"
-                               @click="element.swimlanes.push({elements: []})">
-                        添加行
-                    </el-button>
-                </div>
-            </form-group>
-        </div>
+        <form-group v-if="element.type === 'input'" :layout="direction === 'row' ? 'inline' : 'default'">
+            <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
+            <el-input slot="element" :placeholder="element.placeholder"></el-input>
+        </form-group>
+        <form-group v-if="element.type === 'dropdown'" :layout="direction === 'row' ? 'inline' : 'default'">
+            <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
+            <select-wrapper slot="element" :options="element.options"
+                            :placeholder="element.placeholder"></select-wrapper>
+        </form-group>
+        <form-group v-if="element.type === 'list'" class="list">
+            <span slot="label" :title="element.label">{{element.label}}</span>
+            <div slot="element">
+                <grid :mode="mode" direction="row" :data="element" :active="active"
+                      @active.stop="handleChildActive" @dragstart.stop="handleChildDragStart"
+                      @mouseup="handleSwimlaneMouseUp($event, element.swimlanes[0], element)"></grid>
+                <el-button type="text" v-if="mode === 'edit'"
+                           @click="element.swimlanes.push({elements: JSON.parse(JSON.stringify(element.swimlanes[0].elements))})">
+                    添加行
+                </el-button>
+            </div>
+        </form-group>
     </div>
 </template>
 
@@ -67,6 +60,10 @@
       mode: {
         type: String,
         default: 'design',
+      },
+      labeled: {
+        type: Boolean,
+        default: true,
       },
     },
     methods: {

@@ -1,28 +1,26 @@
 <template>
-    <div :class="['form-group', layout]">
-        <table v-if="layout === 'default'">
-            <tr>
-                <td class="label">
-                    <slot name="label"></slot>
-                </td>
-                <td>
-                    <slot name="element"></slot>
-                </td>
-            </tr>
-        </table>
-        <table v-else>
-            <tr>
-                <td class="label">
-                    <slot name="label"></slot>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <slot name="element"></slot>
-                </td>
-            </tr>
-        </table>
-    </div>
+    <table v-if="layout === 'default'" :class="['form-group', layout]">
+        <tr>
+            <td class="label">
+                <slot name="label"></slot>
+            </td>
+            <td>
+                <slot name="element"></slot>
+            </td>
+        </tr>
+    </table>
+    <table v-else :class="['form-group', layout]">
+        <tr>
+            <td class="label">
+                <slot name="label"></slot>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <slot name="element"></slot>
+            </td>
+        </tr>
+    </table>
 </template>
 
 <script>
@@ -38,16 +36,16 @@
 </script>
 
 <style scoped>
-    .form-group > table {
+    .form-group {
         table-layout: fixed;
         width: 100%;
     }
 
-    .form-group.inline > table {
+    .form-group.inline {
         display: inline-block;
     }
 
-    .form-group > table > tr > td.label {
+    .form-group > tr > td.label {
         padding: 0 10px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -56,7 +54,7 @@
         width: 80px;
     }
 
-    .form-group.inline > table > tr > td.label {
+    .form-group.inline > tr > td.label {
         text-align: left;
     }
 </style>

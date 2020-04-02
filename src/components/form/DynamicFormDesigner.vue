@@ -28,7 +28,7 @@
 
             <td class="toolbar">
                 <el-button type="text" icon="el-icon-delete">清空</el-button>
-                <el-button type="text" icon="el-icon-view" @click="previewDialogVisible = true">
+                <el-button type="text" icon="el-icon-view" @click="handleClickPreview">
                     预览
                 </el-button>
             </td>
@@ -111,7 +111,7 @@
                         从左侧拖拽或点击来添加字段
                     </div>
                     <grid @mouseup.stop="handleInstanceMouseUp($event.swimlane.elements, $event.parent)"
-                          style="height: 100%;" :active="active.target"
+                          style="height: 100%;" :active="active.target" id="content"
                           @dragstart.stop="handleInstanceDragStart" :data="data"
                           @active="handleInstanceMouseDown"></grid>
                     <el-dialog title="预览" :visible.sync="previewDialogVisible" width="50%">
@@ -159,6 +159,7 @@
           id: new Date().getTime(),
           swimlanes: [{span: 100, elements: []}],
         },
+        previewData: null,
         active: {
           target: null,
           parent: null,
@@ -210,7 +211,7 @@
       findContainer(event) {
         let target = event.target;
         let type = this.draggingInfo.target.type;
-        let root = document.getElementsByClassName('swimlane')[0];
+        let root = document.querySelector('#content > tr > td.swimlane');
         if (type === 'list') {
           return root;
         }
@@ -267,6 +268,10 @@
       },
       handleInstanceMouseDown(event) {
         this.active.target = event.element;
+      },
+      handleClickPreview() {
+        this.previewDialogVisible = true;
+        this.previewData = JSON.parse(JSON.stringify(this.data));
       },
       handleInstanceDragStart(event) {
         this.active.target = event.element;

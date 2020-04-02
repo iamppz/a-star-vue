@@ -8,20 +8,22 @@
                     <template v-for="element in swimlane.elements">
                         <!--suppress HtmlUnknownTag -->
                         <cell :element="element" :key="element.id" :direction="direction"
-                              @dragstart="handleDragStart" @mouseup="handleSwimlaneMouseUp" :mode="mode"
+                              @dragstart="handleDragStart" @mouseup="handleSwimlaneMouseUp"
+                              :mode="mode"
                               @active="handleActive" :swimlane="swimlane" :active="active"></cell>
                     </template>
                 </td>
             </tr>
         </template>
         <template v-else>
-            <tr v-for="(swimlane, i) in data.swimlanes" :key="i"
-                @mouseup="handleSwimlaneMouseUp($event, swimlane, data)">
-                <td :class="['swimlane', direction]">
+            <tr v-for="(swimlane, i) in data.swimlanes" :key="i">
+                <td :class="['swimlane', direction]"
+                    @mouseup="handleSwimlaneMouseUp($event, swimlane, data)">
                     <template v-for="element in swimlane.elements">
                         <!--suppress HtmlUnknownTag -->
                         <cell :element="element" :key="element.id" :direction="direction"
-                              @dragstart="handleDragStart" @mouseup="handleSwimlaneMouseUp" :mode="mode"
+                              :labeled="i === 0" :mode="mode"
+                              @dragstart="handleDragStart" @mouseup="handleSwimlaneMouseUp"
                               @active="handleActive" :swimlane="swimlane" :active="active"></cell>
                     </template>
                 </td>
@@ -72,8 +74,8 @@
       },
     },
     beforeCreate() {
-      this.$options.components.Cell = () => import('./Cell.vue')
-    }
+      this.$options.components.Cell = () => import('./Cell.vue');
+    },
   };
 </script>
 
