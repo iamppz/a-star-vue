@@ -60,17 +60,23 @@
                     </div>
                     <div v-else-if="active.target.type === 'input'">
                         <el-form label-width="60px">
+                            <h4>显示设置</h4>
                             <el-form-item label="标题">
                                 <el-input v-model="active.target.label" size="small"></el-input>
                             </el-form-item>
                             <el-form-item label="水印">
                                 <el-input v-model="active.target.placeholder"
                                           size="small"></el-input>
+                            </el-form-item>
+                            <h4>校验设置</h4>
+                            <el-form-item label="必填">
+                                <el-checkbox v-model="active.target.required"></el-checkbox>
                             </el-form-item>
                         </el-form>
                     </div>
                     <div v-else-if="active.target.type === 'datetime'">
                         <el-form label-width="60px">
+                            <h4>显示设置</h4>
                             <el-form-item label="标题">
                                 <el-input v-model="active.target.label" size="small"></el-input>
                             </el-form-item>
@@ -78,10 +84,15 @@
                                 <el-input v-model="active.target.placeholder"
                                           size="small"></el-input>
                             </el-form-item>
+                            <h4>校验设置</h4>
+                            <el-form-item label="必填">
+                                <el-checkbox v-model="active.target.required"></el-checkbox>
+                            </el-form-item>
                         </el-form>
                     </div>
                     <div v-else-if="active.target.type === 'list'">
                         <el-form label-width="60px">
+                            <h4>显示设置</h4>
                             <el-form-item label="标题">
                                 <el-input v-model="active.target.label" size="small"></el-input>
                             </el-form-item>
@@ -116,6 +127,10 @@
                                        @click="active.target.options.push({label: '新选项', value: new Date().getTime()})">
                                 添加选项
                             </el-button>
+                            <h4>校验设置</h4>
+                            <el-form-item label="必填">
+                                <el-checkbox v-model="active.target.required"></el-checkbox>
+                            </el-form-item>
                         </el-form>
                     </div>
                     <div v-else-if="active.target.type === 'checkbox' || active.target.type === 'radio'">
@@ -143,6 +158,10 @@
                                        @click="active.target.options.push({label: '新选项', value: new Date().getTime()})">
                                 添加选项
                             </el-button>
+                            <h4>校验设置</h4>
+                            <el-form-item label="必填">
+                                <el-checkbox v-model="active.target.required"></el-checkbox>
+                            </el-form-item>
                         </el-form>
                     </div>
                     <!--                    {{active.target}}-->
@@ -187,6 +206,7 @@
         },
         basicWidgets: [
           {type: 'input', icon: 'iconinput', name: '单行文本', enable: true},
+          {type: 'textarea', icon: 'iconinput', name: '多行文本', enable: false},
           {type: 'dropdown', icon: 'icondropdown', name: '下拉选择', enable: true},
           {type: 'datetime', icon: 'icondatetime', name: '日期时间', enable: true},
           {type: 'tree', icon: 'icontree', name: '级联选择', enable: false},
@@ -348,22 +368,27 @@
         } else if (element.type === 'input') {
           element.label = '单行文本';
           element.placeholder = '请填写';
+          element.required = false;
         } else if (element.type === 'dropdown') {
           element.label = '下拉选择';
           element.placeholder = '请选择';
           element.options = [];
+          element.required = false;
         } else if (element.type === 'list') {
           element.label = '列表';
           element.swimlanes = [{elements: []}];
         } else if (element.type === 'datetime') {
           element.label = '日期时间';
           element.placeholder = '请选择';
+          element.required = false;
         } else if (element.type === 'checkbox') {
           element.label = '多选';
           element.options = [];
+          element.required = false;
         } else if (element.type === 'radio') {
           element.label = '单选';
           element.options = [];
+          element.required = false;
         }
         return element;
       },
