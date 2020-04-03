@@ -74,6 +74,22 @@
                             </el-form-item>
                         </el-form>
                     </div>
+                    <div v-else-if="active.target.type === 'textarea'">
+                        <el-form label-width="60px">
+                            <h4>显示设置</h4>
+                            <el-form-item label="标题">
+                                <el-input v-model="active.target.label" size="small"></el-input>
+                            </el-form-item>
+                            <el-form-item label="水印">
+                                <el-input v-model="active.target.placeholder"
+                                          size="small"></el-input>
+                            </el-form-item>
+                            <h4>校验设置</h4>
+                            <el-form-item label="必填">
+                                <el-checkbox v-model="active.target.required"></el-checkbox>
+                            </el-form-item>
+                        </el-form>
+                    </div>
                     <div v-else-if="active.target.type === 'datetime'">
                         <el-form label-width="60px">
                             <h4>显示设置</h4>
@@ -206,7 +222,7 @@
         },
         basicWidgets: [
           {type: 'input', icon: 'iconinput', name: '单行文本', enable: true},
-          {type: 'textarea', icon: 'iconinput', name: '多行文本', enable: false},
+          {type: 'textarea', icon: 'iconinput', name: '多行文本', enable: true},
           {type: 'dropdown', icon: 'icondropdown', name: '下拉选择', enable: true},
           {type: 'datetime', icon: 'icondatetime', name: '日期时间', enable: true},
           {type: 'tree', icon: 'icontree', name: '级联选择', enable: false},
@@ -367,6 +383,10 @@
           element.swimlanes = [{span: 50, elements: []}, {span: 50, elements: []}];
         } else if (element.type === 'input') {
           element.label = '单行文本';
+          element.placeholder = '请填写';
+          element.required = false;
+        } else if (element.type === 'textarea') {
+          element.label = '多行文本';
           element.placeholder = '请填写';
           element.required = false;
         } else if (element.type === 'dropdown') {

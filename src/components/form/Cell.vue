@@ -13,6 +13,11 @@
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <el-input slot="element" :placeholder="element.placeholder"></el-input>
         </form-group>
+        <form-group v-if="element.type === 'textarea'"
+                    :layout="direction === 'row' ? 'inline' : 'default'">
+            <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
+            <el-input type="textarea" slot="element" :placeholder="element.placeholder"></el-input>
+        </form-group>
         <form-group v-if="element.type === 'datetime'"
                     :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
