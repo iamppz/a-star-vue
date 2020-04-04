@@ -2,6 +2,7 @@
     <table v-if="layout === 'default'" :class="['form-group', layout]">
         <tr>
             <td class="label">
+                <span v-if="required" class="required">*</span>
                 <slot name="label"></slot>
             </td>
             <td>
@@ -12,6 +13,7 @@
     <table v-else :class="['form-group', layout]">
         <tr>
             <td class="label">
+                <span v-if="required" class="required">*</span>
                 <slot name="label"></slot>
             </td>
         </tr>
@@ -31,6 +33,10 @@
         type: String,
         default: 'default',
       },
+      required: {
+        type: Boolean,
+        default: false
+      }
     },
   };
 </script>
@@ -52,10 +58,14 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         text-align: right;
-        width: 80px;
+        width: 100px;
     }
 
     .form-group.inline > tr > td.label {
         text-align: left;
+    }
+
+    .form-group > tr > td.label > .required {
+        color: red;
     }
 </style>
