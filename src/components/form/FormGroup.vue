@@ -9,6 +9,12 @@
                 <slot name="element"></slot>
             </td>
         </tr>
+        <tr>
+            <td></td>
+            <td class="warning">
+                &nbsp;
+            </td>
+        </tr>
     </table>
     <table v-else :class="['form-group', layout]">
         <tr>
@@ -20,6 +26,11 @@
         <tr>
             <td>
                 <slot name="element"></slot>
+            </td>
+        </tr>
+        <tr>
+            <td class="warning">
+                &nbsp;
             </td>
         </tr>
     </table>
@@ -35,8 +46,8 @@
       },
       required: {
         type: Boolean,
-        default: false
-      }
+        default: false,
+      },
     },
   };
 </script>
@@ -67,5 +78,10 @@
 
     .form-group > tr > td.label > .required {
         color: red;
+    }
+
+    .form-group > tr > td.warning {
+        color: red;
+        margin: 0;
     }
 </style>

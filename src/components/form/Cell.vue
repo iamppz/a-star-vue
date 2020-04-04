@@ -50,7 +50,7 @@
                 </el-radio>
             </div>
         </form-group>
-        <form-group v-if="element.type === 'list'" class="list">
+        <form-group v-if="element.type === 'list'" class="list" :required="element.required">
             <span slot="label" :title="element.label">{{element.label}}</span>
             <div slot="element">
                 <grid :mode="mode" direction="row" :data="element" :active="active"
