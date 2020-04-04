@@ -12,7 +12,7 @@
         <tr>
             <td></td>
             <td class="warning">
-                <span v-if="warning !== null">{{warning}}</span>
+                <span v-if="warning">{{warning}}</span>
                 <span v-else>&nbsp;</span>
             </td>
         </tr>
@@ -31,7 +31,7 @@
         </tr>
         <tr>
             <td class="warning">
-                <span v-if="warning !== null">{{warning}}</span>
+                <span v-if="warning">{{warning}}</span>
                 <span v-else>&nbsp;</span>
             </td>
         </tr>
