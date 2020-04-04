@@ -12,7 +12,8 @@
         <tr>
             <td></td>
             <td class="warning">
-                &nbsp;
+                <span v-if="warning !== null">{{warning}}</span>
+                <span v-else>&nbsp;</span>
             </td>
         </tr>
     </table>
@@ -30,7 +31,8 @@
         </tr>
         <tr>
             <td class="warning">
-                &nbsp;
+                <span v-if="warning !== null">{{warning}}</span>
+                <span v-else>&nbsp;</span>
             </td>
         </tr>
     </table>
@@ -47,6 +49,10 @@
       required: {
         type: Boolean,
         default: false,
+      },
+      warning: {
+        type: String,
+        default: null,
       },
     },
   };
