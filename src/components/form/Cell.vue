@@ -11,31 +11,39 @@
         <form-group v-if="element.type === 'input'" :required="element.required"
                     :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
-            <el-input slot="element" :placeholder="element.placeholder"></el-input>
+            <el-input slot="element" v-model="element.value" :readonly="mode !== 'edit'"
+                      :placeholder="element.placeholder"></el-input>
         </form-group>
         <form-group v-if="element.type === 'textarea'" :required="element.required"
                     :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
-            <el-input type="textarea" slot="element" :placeholder="element.placeholder"></el-input>
+            <el-input type="textarea" v-model="element.value" slot="element"
+                      :placeholder="element.placeholder" :readonly="mode !== 'edit'"></el-input>
         </form-group>
         <form-group v-if="element.type === 'datetime'" :required="element.required"
                     :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <el-date-picker slot="element" :placeholder="element.placeholder"
-                            style="width: 100%;"></el-date-picker>
+                            style="width: 100%;" v-model="element.value"
+                            :readonly="mode !== 'edit'"></el-date-picker>
         </form-group>
         <form-group v-if="element.type === 'dropdown'" :required="element.required"
                     :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
-            <select-wrapper slot="element" :options="element.options"
-                            :placeholder="element.placeholder"></select-wrapper>
+            <el-select style="width: 100%;" :placeholder="element.placeholder"
+                       v-model="element.value" :readonly="mode !== 'edit'">
+                <el-option v-for="item in element.options" :key="item.value" :label="item.label"
+                           :value="item.value">
+                </el-option>
+            </el-select>
         </form-group>
         <form-group v-if="element.type === 'checkbox'" :required="element.required"
                     :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <div slot="element">
                 <el-checkbox v-for="option in element.options" :label="option.label"
-                             :key="option.value">
+                             :key="option.value" v-model="element.value"
+                             :readonly="mode !== 'edit'">
                     {{option.label}}
                 </el-checkbox>
             </div>
@@ -45,7 +53,7 @@
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <div slot="element">
                 <el-radio v-for="option in element.options" :label="option.label"
-                             :key="option.value">
+                          :key="option.value" v-model="element.value" :readonly="mode !== 'edit'">
                     {{option.label}}
                 </el-radio>
             </div>
@@ -68,11 +76,10 @@
 <script>
   import FormGroup from './FormGroup';
   import Grid from './Grid';
-  import SelectWrapper from '../SelectWrapper';
 
   export default {
     name: 'Cell',
-    components: {SelectWrapper, Grid, FormGroup},
+    components: {Grid, FormGroup},
     props: {
       element: {
         type: Object,

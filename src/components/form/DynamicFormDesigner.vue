@@ -196,6 +196,9 @@
                           @active="handleInstanceMouseDown"></grid>
                     <el-dialog title="预览" :visible.sync="previewDialogVisible" width="50%">
                         <grid :data="previewData" mode="edit"></grid>
+                        <span slot="footer">
+                            <el-button type="primary" @click="handleSaveClick">保存</el-button>
+                        </span>
                     </el-dialog>
                 </div>
             </td>
@@ -367,6 +370,39 @@
           elements.splice(elements.indexOf(event.element), 1);
         });
         this.initIndicator();
+      },
+      handleSaveClick() {
+        this.previewDialogVisible = false;
+        let result = {};
+        let func = function(data, result) {
+          data.swimlanes.forEach(swimlane => {
+            swimlane.elements.forEach(element => {
+              switch (element.type) {
+                case 'grid':
+                  func(element, result);
+                  break;
+                case 'list':
+                  result[element.id] = [];
+                  element.swimlanes.forEach(row => {
+                    let rowResult = {};
+                    row.elements.forEach(listElement => {
+                      rowResult[listElement.id] = listElement.value;
+                    });
+                    result[element.id].push(rowResult);
+                  });
+                  break;
+                default:
+                  result[element.id] = element.value;
+                  break;
+              }
+            });
+          });
+        };
+        func(this.previewData, result);
+        this.$message({
+          type: 'info',
+          message: JSON.stringify(result),
+        });
       },
       getIndicatorIndex() {
         return getIndex(document.getElementsByClassName('indicator')[0]);
