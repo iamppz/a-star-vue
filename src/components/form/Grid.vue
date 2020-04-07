@@ -72,6 +72,38 @@
       handleActive(event) {
         this.$emit('active', event);
       },
+      validate() {
+        let result = {};
+        let func = function(data, result) {
+          data.swimlanes.forEach(swimlane => {
+            swimlane.elements.forEach(element => {
+              switch (element.type) {
+                case 'grid':
+                  func(element, result);
+                  break;
+                case 'list':
+                  element.swimlanes.forEach(row => {
+                    row.elements.forEach(listElement => {
+                      if (listElement.required && !listElement.value) {
+                        listElement.warning = '不能为空';
+                        result[element.id + ':' + listElement.id] = '不能为空';
+                      }
+                    });
+                  });
+                  break;
+                default:
+                  if (element.required && !element.value) {
+                    element.warning = '不能为空';
+                    result[element.id] = '不能为空';
+                  }
+                  break;
+              }
+            });
+          });
+        };
+        func(this.data, result);
+        return result;
+      },
       getData() {
         let result = {};
         let func = function(data, result) {

@@ -372,12 +372,21 @@
         this.initIndicator();
       },
       handleSaveClick() {
-        this.previewDialogVisible = false;
+        let validateResult = this.$refs.previewGrid.validate();
+        if (Object.keys(validateResult).length > 0) {
+          this.$message({
+            type: 'info',
+            message: JSON.stringify(validateResult),
+          });
+          return;
+        }
+
         let result = this.$refs.previewGrid.getData();
         this.$message({
           type: 'info',
           message: JSON.stringify(result),
         });
+        this.previewDialogVisible = false;
       },
       getIndicatorIndex() {
         return getIndex(document.getElementsByClassName('indicator')[0]);
