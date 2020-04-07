@@ -72,6 +72,35 @@
       handleActive(event) {
         this.$emit('active', event);
       },
+      getData() {
+        let result = {};
+        let func = function(data, result) {
+          data.swimlanes.forEach(swimlane => {
+            swimlane.elements.forEach(element => {
+              switch (element.type) {
+                case 'grid':
+                  func(element, result);
+                  break;
+                case 'list':
+                  result[element.id] = [];
+                  element.swimlanes.forEach(row => {
+                    let rowResult = {};
+                    row.elements.forEach(listElement => {
+                      rowResult[listElement.id] = listElement.value;
+                    });
+                    result[element.id].push(rowResult);
+                  });
+                  break;
+                default:
+                  result[element.id] = element.value;
+                  break;
+              }
+            });
+          });
+        };
+        func(this.data, result);
+        return result;
+      },
     },
     beforeCreate() {
       this.$options.components.Cell = () => import('./Cell.vue');
