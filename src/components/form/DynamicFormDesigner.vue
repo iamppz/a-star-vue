@@ -398,7 +398,7 @@
         }
       },
       createWidgetInstance(widgetType) {
-        let element = {type: widgetType, id: new Date().getTime()};
+        let element = {type: widgetType, id: new Date().getTime(), warning: null};
         if (element.type === 'grid') {
           element.swimlanes = [{span: 50, elements: []}, {span: 50, elements: []}];
         } else if (element.type === 'input') {

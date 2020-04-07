@@ -4,31 +4,29 @@
         <i :class="['dragger', 'el-icon-rank']"
            @mousedown.stop="handleDragStart($event, element, swimlane)"></i>
         <span class="id">{{element.id}}</span>
-        <grid v-if="element.type === 'grid'" :mode="mode"
-              :data="element" @dragstart.stop="handleChildDragStart"
-              :active="active" @active.stop="handleChildActive"
-              @mouseup.stop="handleChildSwimlaneMouseUp"></grid>
+        <grid v-if="element.type === 'grid'" :mode="mode" :data="element"
+              @dragstart.stop="handleChildDragStart" :active="active"
+              @active.stop="handleChildActive" @mouseup.stop="handleChildSwimlaneMouseUp"></grid>
         <form-group v-if="element.type === 'input'" :required="element.required"
-                    :layout="direction === 'row' ? 'inline' : 'default'">
+                    :warning="element.warning" :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <el-input slot="element" v-model="element.value" :readonly="mode !== 'edit'"
                       :placeholder="element.placeholder"></el-input>
         </form-group>
         <form-group v-if="element.type === 'textarea'" :required="element.required"
-                    :layout="direction === 'row' ? 'inline' : 'default'">
+                    :layout="direction === 'row' ? 'inline' : 'default'" :warning="element.warning">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <el-input type="textarea" v-model="element.value" slot="element"
                       :placeholder="element.placeholder" :readonly="mode !== 'edit'"></el-input>
         </form-group>
         <form-group v-if="element.type === 'datetime'" :required="element.required"
-                    :layout="direction === 'row' ? 'inline' : 'default'">
+                    :layout="direction === 'row' ? 'inline' : 'default'" :warning="element.warning">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
-            <el-date-picker slot="element" :placeholder="element.placeholder"
-                            style="width: 100%;" v-model="element.value"
-                            :readonly="mode !== 'edit'"></el-date-picker>
+            <el-date-picker slot="element" :placeholder="element.placeholder" style="width: 100%;"
+                            v-model="element.value" :readonly="mode !== 'edit'"></el-date-picker>
         </form-group>
         <form-group v-if="element.type === 'dropdown'" :required="element.required"
-                    :layout="direction === 'row' ? 'inline' : 'default'">
+                    :layout="direction === 'row' ? 'inline' : 'default'" :warning="element.warning">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <el-select style="width: 100%;" :placeholder="element.placeholder"
                        v-model="element.value" :readonly="mode !== 'edit'">
@@ -38,7 +36,7 @@
             </el-select>
         </form-group>
         <form-group v-if="element.type === 'checkbox'" :required="element.required"
-                    :layout="direction === 'row' ? 'inline' : 'default'">
+                    :layout="direction === 'row' ? 'inline' : 'default'" :warning="element.warning">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <div slot="element">
                 <el-checkbox v-for="option in element.options" :label="option.label"
@@ -49,7 +47,7 @@
             </div>
         </form-group>
         <form-group v-if="element.type === 'radio'" :required="element.required"
-                    :layout="direction === 'row' ? 'inline' : 'default'">
+                    :layout="direction === 'row' ? 'inline' : 'default'" :warning="element.warning">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
             <div slot="element">
                 <el-radio v-for="option in element.options" :label="option.label"
@@ -58,7 +56,8 @@
                 </el-radio>
             </div>
         </form-group>
-        <form-group v-if="element.type === 'list'" class="list" :required="element.required">
+        <form-group v-if="element.type === 'list'" class="list" :required="element.required"
+                    :warning="element.warning">
             <span slot="label" :title="element.label">{{element.label}}</span>
             <div slot="element">
                 <grid :mode="mode" direction="row" :data="element" :active="active"
