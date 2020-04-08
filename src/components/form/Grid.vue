@@ -90,6 +90,10 @@
                       }
                     });
                   });
+                  if (element.swimlanes.length === 1) {
+                    element.warning = '不能为空';
+                    result[element.id] = '不能为空';
+                  }
                   break;
                 default:
                   if (element.required && !element.value) {
@@ -115,12 +119,14 @@
                   break;
                 case 'list':
                   result[element.id] = [];
-                  element.swimlanes.forEach(row => {
-                    let rowResult = {};
-                    row.elements.forEach(listElement => {
-                      rowResult[listElement.id] = listElement.value;
-                    });
-                    result[element.id].push(rowResult);
+                  element.swimlanes.forEach((row, index) => {
+                    if (index > 0) {
+                      let rowResult = {};
+                      row.elements.forEach(listElement => {
+                        rowResult[listElement.id] = listElement.value;
+                      });
+                      result[element.id].push(rowResult);
+                    }
                   });
                   break;
                 default:

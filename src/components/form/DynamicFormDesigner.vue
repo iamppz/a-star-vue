@@ -112,6 +112,10 @@
                             <el-form-item label="标题">
                                 <el-input v-model="active.target.label" size="small"></el-input>
                             </el-form-item>
+                            <h4>校验设置</h4>
+                            <el-form-item label="必填">
+                                <el-checkbox v-model="active.target.required"></el-checkbox>
+                            </el-form-item>
                         </el-form>
                     </div>
                     <div v-else-if="active.target.type === 'dropdown'">
@@ -398,7 +402,7 @@
         }
       },
       createWidgetInstance(widgetType) {
-        let element = {type: widgetType, id: new Date().getTime(), warning: null};
+        let element = {type: widgetType, id: widgetType + new Date().getTime(), warning: null};
         if (element.type === 'grid') {
           element.swimlanes = [{span: 50, elements: []}, {span: 50, elements: []}];
         } else if (element.type === 'input') {

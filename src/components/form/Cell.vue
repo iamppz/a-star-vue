@@ -15,7 +15,7 @@
                       @active.stop="handleChildActive" @dragstart.stop="handleChildDragStart"
                       @mouseup="handleSwimlaneMouseUp($event, element.swimlanes[0], element)"></grid>
                 <el-button type="text" v-if="mode === 'edit'"
-                           @click="element.swimlanes.push({elements: JSON.parse(JSON.stringify(element.swimlanes[0].elements))})">
+                           @click="addRow(element)">
                     添加行
                 </el-button>
             </div>
@@ -131,10 +131,11 @@
       handleChildActive(event) {
         this.$emit('active', event);
       },
+      addRow(listElement) {
+        let json = JSON.stringify(listElement.swimlanes[0].elements);
+        let swimlane = {elements: JSON.parse(json)};
+        listElement.swimlanes.push(swimlane);
+      }
     },
   };
 </script>
-
-<style scoped>
-
-</style>
