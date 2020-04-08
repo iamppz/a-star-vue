@@ -19,6 +19,9 @@
             <tr v-for="(swimlane, i) in data.swimlanes" :key="i">
                 <td :class="['swimlane', direction]"
                     @mouseup="handleSwimlaneMouseUp($event, swimlane, data)">
+                    <el-button type="text" @click="data.swimlanes.splice(i, 1)">
+                        <icon type="delete" class="delete" v-if="mode === 'edit' && i > 0"/>
+                    </el-button>
                     <template v-for="element in swimlane.elements">
                         <!--suppress HtmlUnknownTag -->
                         <cell :element="element" :key="element.id" :direction="direction"
@@ -33,6 +36,7 @@
 </template>
 
 <script>
+  import {Icon} from 'ant-design-vue';
 
   export default {
     name: 'Grid',
@@ -142,6 +146,9 @@
     },
     beforeCreate() {
       this.$options.components.Cell = () => import('./Cell.vue');
+    },
+    components: {
+      Icon,
     },
   };
 </script>

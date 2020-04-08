@@ -84,6 +84,7 @@
 
     .form-group.inline > tr > td.label {
         text-align: left;
+        padding: 0;
     }
 
     .form-group > tr > td.label > .required {
