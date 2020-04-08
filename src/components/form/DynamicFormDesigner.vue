@@ -27,9 +27,15 @@
             </td>
 
             <td class="toolbar">
-                <el-button type="text" icon="el-icon-delete">清空</el-button>
+                <el-button type="text" icon="el-icon-delete" @click="handleClickClear">
+                    清空
+                </el-button>
                 <el-button type="text" icon="el-icon-view" @click="handleClickPreview">
                     预览
+                </el-button>
+                <el-button type="text">
+                    <icon type="save"/>
+                    保存
                 </el-button>
             </td>
 
@@ -213,6 +219,8 @@
 <script>
   import Grid from './Grid';
   import {clone, getIndex, removeAllChildNodes} from '../../utils/dom';
+  import {Icon} from 'ant-design-vue';
+
   import draggable from 'vuedraggable';
 
   export default {
@@ -295,6 +303,9 @@
             container.insertBefore(indicator, refNode);
           }
         }
+      },
+      handleClickClear() {
+        this.data.swimlanes[0].elements.splice(0, this.data.swimlanes[0].elements.length);
       },
       findContainer(event) {
         let target = event.target;
@@ -437,7 +448,7 @@
         return element;
       },
     },
-    components: {Grid, draggable},
+    components: {Grid, draggable, Icon},
     mounted() {
       let that = this;
       document.onkeydown = function(event) {
