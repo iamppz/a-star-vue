@@ -23,47 +23,50 @@
         <form-group :required="element.required" v-else :warningable="inputed"
                     :warning="element.warning" :layout="direction === 'row' ? 'inline' : 'default'">
             <span slot="label" v-if="labeled" :title="element.label">{{element.label}}</span>
-            <template v-if="element.type === 'input'">
-                <el-input slot="element" v-model="element.value" :readonly="mode !== 'edit'"
-                          :placeholder="element.placeholder" v-if="inputed"></el-input>
-            </template>
-            <template v-if="element.type === 'textarea'">
-                <el-input type="textarea" v-model="element.value" slot="element" v-if="inputed"
-                          :placeholder="element.placeholder" :readonly="mode !== 'edit'"></el-input>
-            </template>
-            <template v-if="element.type === 'datetime'">
-                <el-date-picker slot="element" :placeholder="element.placeholder"
-                                style="width: 100%;" v-model="element.value"
-                                :readonly="mode !== 'edit'" v-if="inputed"></el-date-picker>
-            </template>
-            <template v-if="element.type === 'dropdown'">
-                <el-select style="width: 100%;" :placeholder="element.placeholder" v-if="inputed"
-                           v-model="element.value" :readonly="mode !== 'edit'" slot="element">
-                    <el-option v-for="item in element.options" :key="item.value" :label="item.label"
-                               :value="item.value">
-                    </el-option>
-                </el-select>
-            </template>
-            <template v-if="element.type === 'checkbox'">
-                <div slot="element" v-if="inputed">
-                    <el-checkbox v-for="option in element.options" :label="option.label"
-                                 :key="option.value" v-model="element.value"
-                                 :readonly="mode !== 'edit'">
-                        {{option.label}}
-                    </el-checkbox>
-                </div>
-            </template>
-            <template v-if="element.type === 'radio'">
-                <div slot="element" v-if="inputed">
-                    <el-radio v-for="option in element.options" :label="option.label"
-                              :key="option.value" v-model="element.value"
-                              :readonly="mode !== 'edit'">
-                        {{option.label}}
-                    </el-radio>
-                </div>
+            <template v-if="inputed">
+                <template v-if="element.type === 'input'">
+                    <el-input slot="element" v-model="element.value" :readonly="mode !== 'edit'"
+                              :placeholder="element.placeholder"></el-input>
+                </template>
+                <template v-if="element.type === 'textarea'">
+                    <el-input type="textarea" v-model="element.value" slot="element"
+                              :placeholder="element.placeholder"
+                              :readonly="mode !== 'edit'"></el-input>
+                </template>
+                <template v-if="element.type === 'datetime'">
+                    <el-date-picker slot="element" :placeholder="element.placeholder"
+                                    style="width: 100%;" v-model="element.value"
+                                    :readonly="mode !== 'edit'"></el-date-picker>
+                </template>
+                <template v-if="element.type === 'dropdown'">
+                    <el-select style="width: 100%;" :placeholder="element.placeholder"
+                               v-model="element.value" :readonly="mode !== 'edit'" slot="element">
+                        <el-option v-for="item in element.options" :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
+                </template>
+                <template v-if="element.type === 'checkbox'">
+                    <div slot="element">
+                        <el-checkbox v-for="option in element.options" :label="option.label"
+                                     :key="option.value" v-model="element.value"
+                                     :readonly="mode !== 'edit'">
+                            {{option.label}}
+                        </el-checkbox>
+                    </div>
+                </template>
+                <template v-if="element.type === 'radio'">
+                    <div slot="element">
+                        <el-radio v-for="option in element.options" :label="option.label"
+                                  :key="option.value" v-model="element.value"
+                                  :readonly="mode !== 'edit'">
+                            {{option.label}}
+                        </el-radio>
+                    </div>
+                </template>
             </template>
         </form-group>
-
     </div>
 </template>
 
