@@ -9,7 +9,7 @@
                 <slot name="element"></slot>
             </td>
         </tr>
-        <tr>
+        <tr v-if="warningable">
             <td></td>
             <td class="warning">
                 <span v-if="warning">{{warning}}</span>
@@ -29,7 +29,7 @@
                 <slot name="element"></slot>
             </td>
         </tr>
-        <tr>
+        <tr v-if="warningable">
             <td class="warning">
                 <span v-if="warning">{{warning}}</span>
                 <span v-else>&nbsp;</span>
@@ -54,6 +54,10 @@
         type: String,
         default: null,
       },
+      warningable: {
+        type: Boolean,
+        default: true
+      }
     },
   };
 </script>

@@ -22,7 +22,7 @@
                     <template v-for="element in swimlane.elements">
                         <!--suppress HtmlUnknownTag -->
                         <cell :element="element" :key="element.id" :direction="direction"
-                              :labeled="i === 0" :mode="mode"
+                              :labeled="i === 0" :inputed="i !== 0 || mode !== 'edit'" :mode="mode"
                               @dragstart="handleDragStart" @mouseup="handleSwimlaneMouseUp"
                               @active="handleActive" :swimlane="swimlane" :active="active"></cell>
                     </template>

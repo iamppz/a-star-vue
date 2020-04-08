@@ -63,6 +63,14 @@
     border-style: none;
 }
 
+.swimlanes.edit > tr:first-of-type > .swimlane.row {
+    height: inherit;
+}
+
+.swimlanes.edit > tr:first-of-type > .swimlane.row > .instance > .form-group {
+    min-height: inherit;
+}
+
 .edit .id {
     display: none;
 }
