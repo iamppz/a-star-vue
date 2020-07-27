@@ -1,66 +1,68 @@
 body {
-    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
 }
 
 .icon {
-    margin-right: 0.5rem;
-    color: #00C1C9;
+  margin-right: 0.5rem;
+  color: #00c1c9;
 }
 
 .content {
-    color: #969799;
+  color: #969799;
 }
 
 .content .iconfont {
-    font-size: 0.8rem;
-    margin-right: 0.3rem;
+  font-size: 0.8rem;
+  margin-right: 0.3rem;
 }
 
 .content p {
-    margin: 0.5rem 0;
+  margin: 0.5rem 0;
 }
 
 .card {
-    background-color: white;
-    border-radius: 0.15rem;
-    margin-left: 0.6rem;
-    margin-right: 0.6rem;
-    padding: 0.6rem;
-    margin-top: 0.6rem;
-    box-shadow: 0 0.1rem 0.03rem -0.06rem #dfdfdf, 0 0.06rem 0.06rem 0 #dfdfdf, 0 0.03rem 0.16rem 0 #dfdfdf;
-    font-size: 0.8rem;
+  background-color: white;
+  border-radius: 0.15rem;
+  margin-left: 0.6rem;
+  margin-right: 0.6rem;
+  padding: 0.6rem;
+  margin-top: 0.6rem;
+  box-shadow: 0 0.1rem 0.03rem -0.06rem #dfdfdf, 0 0.06rem 0.06rem 0 #dfdfdf,
+    0 0.03rem 0.16rem 0 #dfdfdf;
+  font-size: 0.8rem;
 }
 
 .header {
-    width: 100%;
-    display: inline-flex;
-    justify-content: space-between;
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
 }
 
 .title {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
 .status {
-    color: #00C1C9;
+  color: #00c1c9;
 }
 
 .avatar {
-    border-radius: 50%;
-    width: 3rem;
-    height: 3rem;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
 }
 
 .avatar-box {
-    text-align: center;
-    width: 4rem;
+  text-align: center;
+  width: 4rem;
 }
 
 .advisor {
-    margin: 0;
-    color: #969799;
+  margin: 0;
+  color: #969799;
 }
 
 .layout {
-    width: 100%;
+  width: 100%;
 }
