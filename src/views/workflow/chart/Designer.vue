@@ -9,44 +9,40 @@
       @save="handleChartSave"
     >
     </flowchart>
-    <flow-chart-node-dialog
-      :visible.sync="nodeDialogVisible"
-      :node.sync="editingInfo.target"
-    >
-    </flow-chart-node-dialog>
-    <flow-chart-connection-dialog
+    <node-dialog :visible.sync="nodeDialogVisible" :node.sync="nodeForm.target">
+    </node-dialog>
+    <connection-dialog
       :visible.sync="connectionDialogVisible"
-      :connection.sync="connectionEditingInfo.target"
-      :operation="connectionEditingInfo.operations"
+      :connection.sync="connectionForm.target"
+      :operation="connectionForm.operation"
     >
-    </flow-chart-connection-dialog>
+    </connection-dialog>
   </div>
 </template>
 <script>
 import Vue from "vue";
 import processService from "../../../service/processService";
 import { Message } from "element-ui";
-import FlowChartNodeDialog from "../../../components/flowchart/joyce/FlowChartNodeDialog";
-import FlowChartConnectionDialog from "../../../components/flowchart/joyce/FlowChartConnectionDialog";
+import NodeDialog from "../../../components/NodeDialog";
+import ConnectionDialog from "../../../components/ConnectionDialog";
 import Flowchart from "flowchart-vue";
 
 Vue.use(Flowchart);
 
 export default {
   components: {
-    FlowChartConnectionDialog,
-    FlowChartNodeDialog
+    NodeDialog,
+    ConnectionDialog
   },
   data: function() {
     return {
       nodes: [],
       connections: [],
       loaded: false,
-      editingInfo: { target: null },
-      connectionEditingInfo: { target: null },
+      nodeForm: { target: null },
+      connectionForm: { target: null, operation: null },
       nodeDialogVisible: false,
-      connectionDialogVisible: false,
-      tab: "form"
+      connectionDialogVisible: false
     };
   },
   async mounted() {
@@ -119,23 +115,13 @@ export default {
       }
     },
     handleEditNode(node) {
-      this.editingInfo.target = node;
+      this.nodeForm.target = node;
       this.nodeDialogVisible = true;
     },
     handleEditConnection(connection) {
-      this.connectionEditingInfo.target = connection;
+      this.connectionForm.target = connection;
       this.connectionDialogVisible = true;
-    }
-  },
-  computed: {
-    formDesignerHeight() {
-      return window.innerHeight - 190 + "px";
     }
   }
 };
 </script>
-<style>
-#tab {
-  margin-top: 20px;
-}
-</style>
