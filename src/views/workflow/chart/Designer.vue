@@ -1,6 +1,28 @@
 <template>
   <div>
+    <div id="toolbar">
+      <button
+        @click="
+          $refs.chart.add({
+            id: +new Date(),
+            x: 10,
+            y: 10,
+            name: 'New',
+            type: 'operation',
+            approvers: []
+          })
+        "
+      >
+        Add(Double-click canvas)
+      </button>
+      <button @click="$refs.chart.remove()">Delete(Del)</button>
+      <button @click="$refs.chart.editCurrent()">
+        Edit(Double-click node)
+      </button>
+      <button @click="$refs.chart.save()">Save</button>
+    </div>
     <flowchart
+      ref="chart"
       v-if="loaded"
       :nodes="nodes"
       :connections="connections"
