@@ -1,31 +1,26 @@
 <template>
   <div>
-    <div class="modal" v-if="visible" style="width: 320px">
-      <div class="header">
-        <span>Edit</span>
-      </div>
-      <div class="body">
-        <label for="name">Name</label>
-        <input id="name" class="form-control" v-model="connectionForm.name" />
-        <label for="type">Type</label>
-        <select id="type" class="form-control" v-model="connectionForm.type">
-          <option
-            :key="'connection-type-' + item.id"
-            v-for="item in [
-              { name: 'Pass', id: 'pass' },
-              { name: 'Reject', id: 'reject' }
-            ]"
-            :value="item.id"
-          >
-            {{ item.name }}
-          </option>
-        </select>
-      </div>
-      <div class="footer">
+    <a-modal title="edit" v-model="visible">
+      <label for="name">Name</label>
+      <input id="name" class="form-control" v-model="connectionForm.name" />
+      <label for="type">Type</label>
+      <select id="type" class="form-control" v-model="connectionForm.type">
+        <option
+          :key="'connection-type-' + item.id"
+          v-for="item in [
+            { name: 'Pass', id: 'pass' },
+            { name: 'Reject', id: 'reject' }
+          ]"
+          :value="item.id"
+        >
+          {{ item.name }}
+        </option>
+      </select>
+      <template slot="footer">
         <button @click="handleClickCancelSaveConnection">Cancel</button>
         <button @click="handleClickSaveConnection">Ok</button>
-      </div>
-    </div>
+      </template>
+    </a-modal>
   </div>
 </template>
 <script>

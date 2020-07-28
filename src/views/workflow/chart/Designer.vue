@@ -44,7 +44,6 @@
 <script>
 import Vue from "vue";
 import processService from "../../../service/processService";
-import { Message } from "element-ui";
 import NodeDialog from "../../../components/NodeDialog";
 import ConnectionDialog from "../../../components/ConnectionDialog";
 import Flowchart from "flowchart-vue";

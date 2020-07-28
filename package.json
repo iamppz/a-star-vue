@@ -8,10 +8,10 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "ant-design-vue": "^1.6.4",
     "axios": "^0.18.1",
     "babel-plugin-import": "^1.11.0",
     "css-loader": "^2.1.0",
-    "element-ui": "2.13.0",
     "flowchart-vue": "^0.15.2",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
