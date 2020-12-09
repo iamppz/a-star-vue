@@ -13,7 +13,8 @@
             open: openList.findIndex(item => item.x === i && item.y === j) >= 0,
             close:
               closedList.findIndex(item => item.x === i && item.y === j) >= 0,
-            path: path.findIndex(item => item.x === i && item.y === j) >= 0
+            path: path.findIndex(item => item.x === i && item.y === j) >= 0,
+            current: current.x === i && current.y === j
           }"
         >
           {{ i + "," + j }}
@@ -35,6 +36,8 @@ export default {
       col: 30,
       from: { x: 15, y: 8 },
       to: { x: 14, y: 30 },
+      current: { x: 0, y: 0 },
+      arrive: false,
       closedList: [],
       openList: [],
       hvCost: 10,
@@ -174,25 +177,29 @@ export default {
       setInterval(this.forward, 10);
     },
     forward() {
-      if (this.path.length > 0) {
+      if (this.arrive) {
         return;
       }
-
       if (this.openList.length > 0) {
         this.openList = _.sortBy(this.openList, item => -item.f);
         let current = this.openList.pop();
 
+        this.current.x = current.x;
+        this.current.y = current.y;
+
+        let ref = current;
+        this.path.splice(0, this.path.length);
+        this.path.push(ref);
+        while (
+          ref.previous &&
+          (ref.previous.x !== this.from.x || ref.previous.y !== this.from.y)
+        ) {
+          this.path.push(ref.previous);
+          ref = ref.previous;
+        }
+
         if (current.x === this.to.x && current.y === this.to.y) {
-          this.path.push(current);
-          while (
-            current.previous &&
-            (current.previous.x !== this.from.x ||
-              current.previous.y !== this.from.y)
-          ) {
-            this.path.push(current.previous);
-            current = current.previous;
-          }
-          return;
+          this.arrive = true;
         }
 
         for (const offset of [
@@ -295,13 +302,13 @@ export default {
 }
 
 .open {
-  background: gray;
-  color: white;
+  background: lightskyblue;
+  color: black;
 }
 
 .close {
-  background: red;
-  color: white;
+  background: gray;
+  color: black;
 }
 
 .path {
