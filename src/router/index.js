@@ -1,17 +1,10 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Login from "../views/Login";
-import AStar from "../views/process/AStar";
-import Detail from "../views/workflow/chart/Designer";
+import AStar from "../views/AStar";
 
 Vue.use(VueRouter);
 
-const routes = [
-  { path: "/", component: Login },
-  { path: "/login", component: Login },
-  { path: "/aStar", component: AStar },
-  { path: "/flowchart/designer", component: Detail }
-];
+const routes = [{ path: "/", component: AStar }];
 
 let router = new VueRouter({
   routes
