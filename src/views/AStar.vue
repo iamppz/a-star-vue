@@ -31,7 +31,7 @@ import _ from "lodash";
 export default {
   data() {
     return {
-      row: 30,
+      row: 25,
       col: 30,
       from: { x: 15, y: 8 },
       to: { x: 14, y: 30 },
@@ -42,7 +42,19 @@ export default {
       terrainCost: 1,
       path: [],
       blocks: [
-        { x: 1, y: 1 },
+        { x: 1, y: 10 },
+        { x: 2, y: 10 },
+        { x: 3, y: 10 },
+        { x: 4, y: 10 },
+        { x: 4, y: 11 },
+        { x: 4, y: 12 },
+        { x: 4, y: 13 },
+        { x: 2, y: 13 },
+        { x: 2, y: 14 },
+        { x: 2, y: 15 },
+        { x: 3, y: 15 },
+        { x: 4, y: 15 },
+        { x: 5, y: 15 },
         { x: 12, y: 22 },
         { x: 12, y: 11 },
         { x: 12, y: 12 },
@@ -76,6 +88,37 @@ export default {
         { x: 7, y: 25 },
         { x: 8, y: 25 },
         { x: 9, y: 25 },
+        { x: 6, y: 24 },
+        { x: 6, y: 23 },
+        { x: 6, y: 22 },
+        { x: 6, y: 21 },
+        { x: 6, y: 20 },
+        { x: 6, y: 19 },
+        { x: 6, y: 18 },
+        { x: 6, y: 17 },
+        { x: 6, y: 16 },
+        { x: 6, y: 16 },
+        { x: 6, y: 14 },
+        { x: 6, y: 13 },
+        { x: 6, y: 12 },
+        { x: 6, y: 11 },
+        { x: 6, y: 10 },
+        { x: 6, y: 9 },
+        { x: 6, y: 8 },
+        { x: 6, y: 7 },
+        { x: 6, y: 6 },
+        { x: 6, y: 5 },
+        { x: 6, y: 15 },
+        { x: 7, y: 5 },
+        { x: 8, y: 5 },
+        { x: 9, y: 5 },
+        { x: 10, y: 5 },
+        { x: 11, y: 5 },
+        { x: 12, y: 5 },
+        { x: 13, y: 5 },
+        { x: 14, y: 5 },
+        { x: 15, y: 5 },
+        { x: 16, y: 5 },
         { x: 10, y: 25 },
         { x: 11, y: 25 },
         { x: 12, y: 25 },
@@ -85,7 +128,36 @@ export default {
         { x: 16, y: 25 },
         { x: 17, y: 25 },
         { x: 18, y: 25 },
-        { x: 19, y: 25 }
+        { x: 19, y: 25 },
+        { x: 19, y: 24 },
+        { x: 19, y: 23 },
+        { x: 19, y: 22 },
+        { x: 19, y: 21 },
+        { x: 19, y: 20 },
+        { x: 20, y: 20 },
+        { x: 21, y: 20 },
+        { x: 22, y: 20 },
+        { x: 23, y: 20 },
+        { x: 24, y: 20 },
+        { x: 24, y: 21 },
+        { x: 24, y: 22 },
+        { x: 24, y: 23 },
+        { x: 24, y: 24 },
+        { x: 24, y: 25 },
+        { x: 24, y: 26 },
+        { x: 24, y: 27 },
+        { x: 24, y: 28 },
+        { x: 25, y: 29 },
+        { x: 12, y: 30 },
+        { x: 12, y: 30 },
+        { x: 12, y: 29 },
+        { x: 12, y: 28 },
+        { x: 13, y: 28 },
+        { x: 14, y: 28 },
+        { x: 15, y: 28 },
+        { x: 16, y: 28 },
+        { x: 16, y: 29 },
+        { x: 24, y: 29 }
       ]
     };
   },
@@ -99,7 +171,7 @@ export default {
   },
   methods: {
     forwardAutomatically() {
-      setInterval(this.forward, 100);
+      setInterval(this.forward, 10);
     },
     forward() {
       if (this.path.length > 0) {
@@ -133,7 +205,13 @@ export default {
 
           if (
             this.blocks.find(b => b.x === position.x && b.y === position.y) ||
-            this.closedList.find(b => b.x === position.x && b.y === position.y)
+            this.closedList.find(
+              b => b.x === position.x && b.y === position.y
+            ) ||
+            position.y > 30 ||
+            position.x > 25 ||
+            position.x < 1 ||
+            position.y < 1
           ) {
             continue;
           }
@@ -233,5 +311,6 @@ export default {
 
 #table {
   border-collapse: collapse;
+  zoom: 0.5;
 }
 </style>
