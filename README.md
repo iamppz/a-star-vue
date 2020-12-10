@@ -16,5 +16,4 @@ npm run serve
 
 ### Playground
 
-- [**Dingtalk-like Workflow Designer**](http://122.51.84.51/#/app/process/flowDesign) /#/app/process/flowDesign
-- [**AStar:**](http://122.51.84.51/#/aStar) /#/aStar
+- [**AStar:**](https://iamppz.github.io/a-star-vue/#/) /#/aStar
